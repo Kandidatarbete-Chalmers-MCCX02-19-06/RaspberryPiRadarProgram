@@ -26,7 +26,7 @@ Git fungerar på många sätt väldigt bra som versionshanteringsprogam, det end
 
 **`Local branch`** = lokal gren, den gren som sparas lokalt på datorn.
 
-**`Remote branch`** eller **`origin`** = gren som sparas online på GitHub. Lokala grenar kan sammanfogas med Remote/origin-grenen utan att påverka orginalgrenen (master).
+**`Remote branch`** eller **`origin`** = gren som sparas online på GitHub. Lokala grenar kan sammanfogas med Remote/origin-grenen utan att påverka orginalgrenen (*master*).
 
 **`master`** = orginalgrenen, den gren som alla andra grenar så småningom kommer sammanfogas med.
 
@@ -36,9 +36,9 @@ Git fungerar på många sätt väldigt bra som versionshanteringsprogam, det end
 
 **`Checkout`** = byta gren.
 
-**`Commit`** = skicka den färdiga versionen till Git som sammanställer alla ändringar som gjorts. För att committa måsten en lämplig kommentar skrivas för att kort beskriva vad som ändrats. Notera att Commit *inte* skickar versionen till onlineversionen (Remote/origin) på GitHub. För att skicka ändringarna till GitHub måste versionen *pushas*. 
+**`Commit`** = skicka den färdiga versionen av en lokal gren till Git som sammanställer alla ändringar som gjorts på grenen. För att committa måsten en lämplig kommentar skrivas för att kort beskriva vad som ändrats. Notera att Commit *inte* sammanfogar grenen med onlineversionen (Remote/origin) på GitHub. För att göra detta måste grenen *pushas*. 
 
-**`Push`** = skicka alla commits av en gren till onlineversionen (Remote/origin) på GitHub där de sammanfogas. Om det finns ändringar i koden på precis samma ställe som olika personer utfört uppstår en så kallas *merge conflict*.
+**`Push`** = sammanfogar alla commits av en gren med onlineversionen (Remote/origin) på GitHub. Om det finns ändringar i koden på precis samma ställe som olika personer utfört uppstår en så kallas *merge conflict*.
 
 **`Merge conflict`** = konflikt vid sammanfogning av två grenar. Då måste man välja vilken kod som ska användas i den del av koden som konflikten uppstår. Det går även att blanda koden eller skriva ny kod i de konfliktdrabbade delarna. 
 
