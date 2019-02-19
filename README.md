@@ -43,3 +43,7 @@ Git fungerar på många sätt väldigt bra som versionshanteringsprogam, det end
 **`Merge conflict`** = konflikt vid sammanfogning av två grenar. Då måste man välja vilken kod som ska användas i den del av koden som konflikten uppstår. Det går även att blanda koden eller skriva ny kod i de konfliktdrabbade delarna. 
 
 **`Pull`** = hämta Remote/origin grenen från GitHub och sammanfoga den med den lokala grenen. 
+
+**`Pull requests`** = 
+
+**`Revert`** = 
