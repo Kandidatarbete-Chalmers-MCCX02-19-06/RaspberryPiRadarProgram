@@ -28,7 +28,7 @@ Git fungerar på många sätt väldigt bra som versionshanteringsprogam, det end
 
 **`Remote branch`** eller **`origin`** = gren som sparas online på GitHub. Lokala grenar kan sammanfogas med Remote/origin-grenen utan att påverka orginalgrenen (master).
 
-**`master`** = orginalgrenen, den gen som alla andra grenar så småning om kommer sammanfogas med.
+**`master`** = orginalgrenen, den gren som alla andra grenar så småning om kommer sammanfogas med.
 
 **`Merge`** = sammanfoga innehållet i en gren till en annan.
 
