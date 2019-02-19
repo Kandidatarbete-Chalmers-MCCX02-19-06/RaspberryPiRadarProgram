@@ -19,4 +19,5 @@ Git fungerar på många sätt väldigt bra som versionshanteringsprogam, det end
 
 #### Ordlista
 > Repository = datakatalog (alt. versionsarkiv, projektförråd, eller repositorium) är det som normalt ses som själva projektet, alltså alla filer som är kopplade till projektet
+
 > Gren (Brach på engelska) är en version av
