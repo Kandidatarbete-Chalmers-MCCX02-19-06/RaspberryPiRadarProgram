@@ -18,6 +18,10 @@ Versionshantering ett system för att bokföra olika verisoner av en fil. Det in
 Git fungerar på många sätt väldigt bra som versionshanteringsprogam, det enda problemet är att Git är kommandoradsbaserat vilket innebär att all hantering av verisoner sker med kommandotolken/terminalen genom kommandon. GitHub är ett grafiskt system för verisonhantering som bygger på Git. GitHub lagrar en orginalversion av projektet online med öppen källkod som är tillgänglig för alla att ladda ner till en likal version. Det är orginalversionen som alla lokala versioner sammanfogas med. 
 
 #### Ordlista
-`Repository = datakatalog (alt. versionsarkiv, projektförråd, eller repositorium) är det som normalt ses som själva projektet, alltså alla filer som är kopplade till projektet`
+```
+Repository = datakatalog (alt. versionsarkiv, projektförråd, eller repositorium) är det som normalt ses som själva projektet, alltså alla filer som är kopplade till projektet
+```
 
-`Gren (Brach på engelska) är en version av`
+```
+Gren (Brach på engelska) är en version av
+```
