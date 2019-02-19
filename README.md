@@ -19,7 +19,8 @@ Git fungerar på många sätt väldigt bra som versionshanteringsprogam, det end
 
 #### Ordlista
 ```
-Repository = datakatalog (alt. versionsarkiv, projektförråd, eller repositorium) är det som normalt ses som själva projektet, alltså alla filer som är kopplade till projektet
+Repository = datakatalog (alt. versionsarkiv, projektförråd, eller repositorium) 
+är det som normalt ses som själva projektet och alla filer som är kopplade till projektet
 ```
 
 ```
