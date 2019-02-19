@@ -22,11 +22,11 @@ Git fungerar på många sätt väldigt bra som versionshanteringsprogam, det end
 **`Repository`** = datakatalog (alt. versionsarkiv, projektförråd, eller repositorium) 
 är det som normalt ses som själva projektet och alla filer som är kopplade till projektet. Förväxla inte med det som GitHub kallar för Projects.
 
-**`Branch`** = gren är en version av projektet.
+**`Branch`** = gren är en version av projektet. Två grenar kan utvecklas åt olika ritkningar var för sig för att sedan sammanfogas. En gren kan både finnas lokalt och online på GitHub. 
 
 **`Local branch`** = lokal gren, den gren som sparas lokalt på datorn.
 
-**`Remote branch`** eller **`origin`** = gren som sparas online på GitHub. Notera att även lokalt skapade grenar kan laddas upp till GitHub utan att sammanfogas med orginalgrenen. 
+**`Remote branch`** eller **`origin`** = gren som sparas online på GitHub. Lokala grenar kan sammanfogas med Remote/origin-grenen utan att påverka orginalgrenen (master).
 
 **`master`** = orginalgrenen, den gen som alla andra grenar så småning om kommer sammanfogas med.
 
