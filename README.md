@@ -19,8 +19,8 @@ Git fungerar på många sätt väldigt bra som versionshanteringsprogam, det end
 
 #### Ordlista
 
-**_Repository_** = datakatalog (alt. versionsarkiv, projektförråd, eller repositorium) 
+**_`Repository`_** = datakatalog (alt. versionsarkiv, projektförråd, eller repositorium) 
 är det som normalt ses som själva projektet och alla filer som är kopplade till projektet. Förväxla inte med det som GitHub kallar för Projects.
 
-**_`Gren`_** (Brach på engelska) är en version av
+**_Gren_** = (Brach på engelska) är en version av
 
