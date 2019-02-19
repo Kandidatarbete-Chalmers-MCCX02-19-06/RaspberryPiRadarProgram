@@ -1,3 +1,6 @@
 Testar med Visual Studio Code: OK!
 Testar med GitHub Desktop: OK!
-Testar med PyCharm
+Testar med PyCharm: OK!
+
+Kommentarer: När man commitar med GitHub Desktop kan man både skriva en summary och en mer detaljerad beskrivning. 
+Detta kan man inte göra i de andra programmen. GitHub Desktop kan även skriva en summary automatiskt.
