@@ -47,3 +47,6 @@ Git fungerar på många sätt väldigt bra som versionshanteringsprogam, det end
 **`Pull requests`** = om det uppstår en *merge conflict* och man själv inte vet vilken ändring som är bäst kan man välja att göra en pull request från Remote/origin. Det innebär att en annan person får avgöra hur sammanfogningen ska gå till. Detta görs i GitHub under fliken *Pull requests* (tredje fliken till vänster).
 
 **`Revert`** = återkalla en ändring. Om en ändring inte var bra kan den helt enkelt återkallas och så blir allt som förut. 
+
+
+Mer information finns på https://guides.github.com/activities/hello-world/
