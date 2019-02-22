@@ -1,0 +1,11 @@
+GitHub inehåller följande mappar
+
+# BT-anslutning RBPI: pythonprogram för Raspberry-Pi för anslutning med Bluetooth
+
+# MATLAB: MATLAB-program för signalbehandling
+
+# Mät-C: C-program för mätningar
+
+# Mät-python: python-program för mätningar
+
+# Slasktratt alt. bös: här kan onödiga filer läggas om de inte kan slängas
