@@ -1,4 +1,5 @@
 # BtEchoClient.py
+# Fungerar ej, ger en massa error, kräver import från saker
 
 from btcom import *  # TigerJython
 from btpycom import *  # Standard-Python (PC, Raspi, ...)
