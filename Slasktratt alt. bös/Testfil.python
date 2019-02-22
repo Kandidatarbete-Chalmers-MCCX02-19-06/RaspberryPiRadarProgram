@@ -21,3 +21,4 @@ List all the branches in your repo, and also tell you what branch you're current
 Fetch and merge changes on the remote server to your working directory: git pull
 
 För att göra ändrignar måste man vara inloggad och ha access. Om man inte har acess kan man ändå förelså änringar genom pull-requests.
+Nu gör jag en ändring.
