@@ -33,3 +33,6 @@ För att göra ändrignar måste man vara inloggad och ha access. Om man inte ha
 Anslut till eduroam:
 sudo nano /etc/wpa_supplicant.conf
 sudo wpa_supplicant -i wlan0 -c /etc/wpa_supplicant.conf från https://normally.online/2017/07/11/how-to-connect-your-raspberry-pi-to-eduroam/
+
+Autostart: sudo crontab -e
+https://smallbusiness.chron.com/run-command-startup-linux-27796.html
