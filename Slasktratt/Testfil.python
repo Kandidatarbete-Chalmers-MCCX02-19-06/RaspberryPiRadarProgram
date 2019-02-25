@@ -29,3 +29,7 @@ och sedan: git add *
 # Fetch and merge changes on the remote server to your working directory: git pull
 
 För att göra ändrignar måste man vara inloggad och ha access. Om man inte har acess kan man ändå förelså änringar genom pull-requests.
+
+Anslut till eduroam:
+sudo nano /etc/wpa_supplicant.conf
+sudo wpa_supplicant -i wlan0 -c /etc/wpa_supplicant.conf från https://normally.online/2017/07/11/how-to-connect-your-raspberry-pi-to-eduroam/
