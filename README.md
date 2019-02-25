@@ -50,3 +50,50 @@ Git fungerar på många sätt väldigt bra som versionshanteringsprogam, det end
 
 
 Mer information finns på https://guides.github.com/activities/hello-world/
+
+#### Kommandon för att styra Git:
+
+Create a working copy of a repository: 
+```
+git clone /path/to/repository
+```
+Add one or more files to staging (index): 
+```
+git add <filename> 
+```
+och sedan: 
+```
+git add *
+```
+Commit changes to head : 
+```
+git commit -m "Commit message"
+```
+Send changes to the master branch of your remote repository: 
+```
+git push origin master 
+```
+
+List the files you've changed and those you still need to add or commit: 
+```
+git status
+```
+Switch from one branch to another: 
+```
+git checkout <branchname>
+```
+List all the branches in your repo, and also tell you what branch you're currently in: 
+```
+git branch
+```
+Fetch and merge changes on the remote server to your working directory: 
+```
+git pull
+```
+
+#### Ändra README
+Man kan ändra README och andra .md filer med en syntax som är beskriven här: https://help.github.com/articles/basic-writing-and-formatting-syntax/
+
+#### Ändra avatar
+Man kan ändra sin avatar om man är missnöjd med hjälp av någon av de här sidorna som genererar avatarer: http://identicon.net/
+alternativt: http://www.tinygraphs.com/
