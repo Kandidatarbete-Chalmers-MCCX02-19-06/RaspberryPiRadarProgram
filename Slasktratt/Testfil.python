@@ -36,3 +36,6 @@ sudo wpa_supplicant -i wlan0 -c /etc/wpa_supplicant.conf från https://normally.
 
 Autostart: sudo crontab -e
 https://smallbusiness.chron.com/run-command-startup-linux-27796.html
+
+Vi har en gemensam GitHub-profil för Raspberry Pi:
+RaspberryPi-MCCX02-19-06
