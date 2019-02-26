@@ -106,3 +106,10 @@ Man kan ändra README och andra .md filer med en syntax som är beskriven här: 
 #### Ändra avatar
 Man kan ändra sin avatar om man är missnöjd med hjälp av någon av de här sidorna som genererar avatarer: http://identicon.net/
 alternativt: http://www.tinygraphs.com/
+
+#### Internet
+För att få internet: skapa en ny terminal och klistra in följande kommando:
+```
+sudo wpa_supplicant -i wlan0 -c /etc/wpa_supplicant.conf
+```
+Låt sedan terminalen vara. Så fort man trycker `ctrl+C` avslutas programmet och man förlorar nätet. Ibland krånglar programmet lite. Då kan man behöva starta om det.
