@@ -69,11 +69,14 @@ Commit changes to head :
 ```
 git commit -m "Commit message"
 ```
+Commit any files you've added with git add, and also commit any files you've changed since then:
+```
+git commit -a
+```
 Send changes to the master branch of your remote repository: 
 ```
 git push origin master 
 ```
-
 List the files you've changed and those you still need to add or commit: 
 ```
 git status
@@ -90,6 +93,12 @@ Fetch and merge changes on the remote server to your working directory:
 ```
 git pull
 ```
+View all the merge conflicts:
+```
+git diff
+```
+
+För att commita till GitHub från Raspberryn måste man första lägga till filerna med `add`, sedan `commit` och tillsist `push`. När man pushar behöver man logga in till GitHub. Användarnamn finns i ett kodument på Desktop på Raspberryn. Om det finns en *merge conflict* kan man se konflikterna med `diff`.
 
 #### Ändra README
 Man kan ändra README och andra .md filer med en syntax som är beskriven här: https://help.github.com/articles/basic-writing-and-formatting-syntax/
