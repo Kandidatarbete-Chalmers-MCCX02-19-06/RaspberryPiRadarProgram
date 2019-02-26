@@ -7,6 +7,7 @@ function [dist,amp_out, phase_out,t,T,D,A,P, gain, L_start, L_end, L_data, L_seq
 %
     
     infofilename = strcat('Info_',filename)
+    disp('test')
 
     %delimiter used in document
     delim = ';'
