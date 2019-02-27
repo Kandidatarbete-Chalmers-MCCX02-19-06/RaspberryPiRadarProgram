@@ -8,4 +8,4 @@ GitHub inehåller följande mappar
 
 # Mät-python: python-program för mätningar
 
-# Slasktratt alt. bös: här kan onödiga filer läggas om de inte kan slängas
+# Övrigt: här kan onödiga filer läggas om de inte kan slängas
