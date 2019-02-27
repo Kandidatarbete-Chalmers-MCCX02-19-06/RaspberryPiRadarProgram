@@ -28,13 +28,15 @@ def main():
     config.gain = 1
     tid = 10
     sekvenser = config.sweep_rate * tid
-    config.running_average_factor = 0.5
+    #config.running_average_factor = 0.5
 
     info = client.setup_session(config)
     num_points = info["data_length"]
     print(num_points)
 
-    with open("Info_Ton20_Sweep100_Test6.csv", "w", newline='\n') as result:
+    filnamn="Testfil_Sweep100_0227_Test1.csv"
+
+    with open("Info_"+filnamn, "w", newline='\n') as result:
         writer = csv.writer(result, delimiter=';')
         writer.writerow(["Gain: ", str(config.gain)])
         writer.writerow(["Min range:", str(config.range_interval[0])])
@@ -57,7 +59,7 @@ def main():
     print(i+1)
     print((end - start), "s")
     # print("Disconnecting...")
-    np.savetxt("Ton20_Sweep100_Test6.csv", matris, delimiter=";")
+    np.savetxt(filnamn, matris, delimiter=";")
     # with open("IQ2_Test.csv", "w", newline='') as f:
     #    writer = csv.writer(f)
     #    writer.writerows(matris)
