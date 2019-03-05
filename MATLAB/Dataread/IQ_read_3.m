@@ -1,4 +1,4 @@
-function [dist,amp_out, phase_out,t,T,D,A,P, gain, L_start, L_end, L_data, L_seq, Fs] = IQ_read_3(filename)
+function [dist,amp_out, phase_out,t,gain, L_start, L_end, L_data, L_seq, Fs] = IQ_read_3(filename)
 %IQ_read_3 Is the third iteration of a program to read radar IQ data
 %   Reads IQ data from Acconneer radar setup, using the IQ service. The
 %   data is first stored in a .csv file using another program, using the
