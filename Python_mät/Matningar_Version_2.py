@@ -34,9 +34,9 @@ def main():
     num_points = info["data_length"]
     print(num_points)
 
-    filnamn="Testfil_Sweep100_0227_Test1.csv"
+    filename = "Ton20_Sweep100_Test6.csv"
 
-    with open("Info_"+filnamn, "w", newline='\n') as result:
+    with open("Info_"+filename, "w", newline='\n') as result:
         writer = csv.writer(result, delimiter=';')
         writer.writerow(["Gain: ", str(config.gain)])
         writer.writerow(["Min range:", str(config.range_interval[0])])
@@ -59,7 +59,7 @@ def main():
     print(i+1)
     print((end - start), "s")
     # print("Disconnecting...")
-    np.savetxt(filnamn, matris, delimiter=";")
+    np.savetxt(filename, matris, delimiter=";")
     # with open("IQ2_Test.csv", "w", newline='') as f:
     #    writer = csv.writer(f)
     #    writer.writerows(matris)

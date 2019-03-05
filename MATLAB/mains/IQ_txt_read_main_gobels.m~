@@ -21,6 +21,7 @@ c = 3e8;%[m/s]
 fc = 60.5e9;% [Hz]
 wavelength = c/fc
 
+S_amp = size(amp)
 %test of matched filter
 MF = amp(1,:).*(cos(phase(1,:)) + 1i*sin(phase(1,:)) );%get the first vector for matched filter
 MF = flip(MF);
@@ -88,49 +89,67 @@ Fs = Fs/r%New sample rate in time domain
 %Delta distance of tracked target
 target_delta_distance = wavelength/2/pi/2*target_phase;
 
-%filer data into two bandwidths
-F_low_BR = 0.15
-F_high_BR = 0.8
+F_low = 0.85
+F_high = 6
+BWrel_transband = 0.2
+Atten_stopband = 60
+[target_delta_distance] = bandpassfilter(target_delta_distance,Fs,F_low,F_high,BWrel_transband,Atten_stopband);
 
-F_low_HR = 0.85
-F_high_HR = 6
-BWrel_transband_BR = 0.5
-BWrel_transband_HR = 0.2
-Atten_stopband = 40
-[delta_distance_BR] = bandpassfilter(target_delta_distance,Fs,F_low_BR,F_high_BR,BWrel_transband_BR,Atten_stopband);
-[delta_distance_HR] = bandpassfilter(target_delta_distance,Fs,F_low_HR,F_high_HR,BWrel_transband_HR,Atten_stopband);
+% %test of filter on delta distance
+% F_low_1 = 0.7
+% F_low_2 = 0.85
+% 
+% F_high_1 = 6
+% F_high_2 = 7
+% Atten_stopband = 60
+% %target_delta_distance = highpass(target_delta_distance,F_low,Fs);
+% %target_delta_distance = lowpass(target_delta_distance,F_high,Fs);
+% 
+% %Kaiser filter test start
+% LpFilt = designfilt('lowpassfir', ...
+%                     'PassbandFrequency',F_high_1, ...
+%                     'StopbandFrequency',F_high_2, ...
+%                     'PassbandRipple',0.1, ...
+%                     'StopbandAttenuation',Atten_stopband, ...
+%                     'SampleRate',Fs, ...
+%                     'DesignMethod','kaiserwin');
+%                 
+% HpFilt = designfilt('highpassfir', ...
+%                     'PassbandFrequency',F_low_2, ...
+%                     'StopbandFrequency',F_low_1, ...
+%                     'PassbandRipple',0.1, ...
+%                     'StopbandAttenuation',Atten_stopband, ...
+%                     'SampleRate',Fs, ...
+%                     'DesignMethod','kaiserwin');
+%                 %fvtool(HpFilt)
+% target_delta_distance = filter(LpFilt,target_delta_distance);
+% target_delta_distance = filter(HpFilt,target_delta_distance);
 
-%FFTs
+%Windowing
+%W = window(@flattopwin,1,L_seq)';
+W = rectwin(L_seq)';
+target_amplitude = target_amplitude .* W;
+target_phase = target_phase .* W;
+target_delta_distance = target_delta_distance .* W;
+
+
+% %Padded FFT
+% FFT_resolution = 0.01%[Hz resolution]
+% L_fft = 2 * round (max(Fs/FFT_resolution,L_seq)/2 )%needed length of FFT, or orignial.
+% f = Fs*(0:(L_fft/2))/L_fft;
+% 
+% Y = fft(target_delta_distance,L_fft);
+% P2 = abs(Y/L_fft);
+% P1 = P2(1:L_fft/2+1);
+% P1(2:end-1) = 2*P1(2:end-1);
+% target_delta_distance_fft = P1;%FFT for delta distance from phase of target
 F_resolution = 0.01 %[Hz]
-[f_BR,delta_distance_BR] = smartFFT_abs(delta_distance_BR,Fs,F_resolution);
-[f_HR,delta_distance_HR] = smartFFT_abs(delta_distance_HR,Fs,F_resolution);
+[f,target_delta_distance_fft] = smartFFT_abs(target_delta_distance,Fs,F_resolution);
 
-%Frequency finding
-BW_comb = 0.05 %[Hz] Tightness of tone scanning
-%Scan span for breating rate
-%Fscan_lower_BR = F_low_BR
-%Fscan_upper_BR = F_low_BR/3
-
-%Scan span for heartrate
-Fscan_lower_HR = F_low_HR
-Fscan_upper_HR = F_high_HR/4
-%f_detected_BR = basetone_finder(f_BR,delta_distance_BR,Fs,F_low_BR,F_high_BR,BW_comb)
-f_detected_HR = basetone_finder(f_HR,delta_distance_HR,Fs,F_low_HR,F_high_HR,BW_comb)
-BPM_HR = 60*f_detected_HR
-
-%Plots
 figure(5)
-subplot(1,2,1)
-plot(f_BR,delta_distance_BR)
-ylabel('FFT of BR spectrum')
+plot(f,target_delta_distance_fft)
+ylabel('Amplitudes of tones in reflection phase [m]')
 xlabel('f [Hz]')
-xlim([F_low_BR F_high_BR])
-
-subplot(1,2,2)
-plot(f_HR,delta_distance_HR)
-ylabel('FFT of HR spectrum')
-xlabel('f [Hz]')
-xlim([F_low_HR F_high_HR])
 
 
 figure(6)
@@ -153,6 +172,9 @@ subplot(2,2,4)
 plot(t,5e-3/2/pi/2*(target_phase - mean(target_phase)))
 xlabel('t [s]')
 ylabel('Delta distance of tracked target [m]')
+
+
+
 
 
 
