@@ -20,8 +20,11 @@ def main():
     config = configs.EnvelopeServiceConfig()
     config.sensor = args.sensors
     config.range_interval = [0.2, 0.6]
-    config.sweep_rate = 1
+    config.sweep_rate = 10
     config.gain = 0.6
+    tid = 10
+    sekvenser = tid * config.sweep_rate
+    filename = "Lutande_Reflektor_jacka.csv"
 
     info = client.setup_session(config)
     num_points = info["data_length"]
@@ -31,12 +34,16 @@ def main():
 
     fig, (amplitude_ax) = plt.subplots(1)
     fig.set_size_inches(12, 6)
-    fig.canvas.set_window_title("Annotate test")
+    fig.canvas.set_window_title(filename)
 
     for ax in [amplitude_ax]:
         ax.set_xlabel("Depth (m)")
         ax.set_xlim(config.range_interval)
-        ax.grid(True)
+        ax.set_xticks(np.linspace(0.2, 0.6, num=5))
+        ax.set_xticks(np.concatenate([np.linspace(0.21, 0.29, num=9), np.linspace(
+            0.31, 0.39, num=9), np.linspace(0.41, 0.49, num=9), np.linspace(0.51, 0.59, num=9)]), minor=True)
+        ax.grid(True, which='major')
+        ax.grid(True, which='minor')
 
     amplitude_ax.set_ylabel("Amplitude")
     amplitude_ax.set_ylim(0, 1.1 * amplitude_y_max)
@@ -54,12 +61,16 @@ def main():
     print("Press Ctrl-C to end session")
 
     client.start_streaming()
+    matris = np.zeros((sekvenser, 2))
 
-    while not interrupt_handler.got_signal:
-        # for i in range(0, 1):
+    # while not interrupt_handler.got_signal:
+    for i in range(0, sekvenser):
         info, sweep = client.get_next()
         amplitude = np.abs(sweep)
         ymax = amplitude.max()
+        matris = np.roll(matris, 1, axis=0)
+        matris[0][:] = [xmax, ymax]
+
         #xmax = num_points[np.argmax(amplitude)]
         xmax = config.range_interval[0] + (config.range_interval[1] - config.range_interval[0]) * \
             (np.argmax(amplitude)/num_points)
@@ -78,6 +89,8 @@ def main():
         # print(xmax)
         fig.canvas.flush_events()
         annotate.remove()
+    matris = np.mean(matris, axis=0)
+    np.savetxt(filename, matris, delimiter=",")
 
     print("Disconnecting...")
     plt.close()
