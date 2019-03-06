@@ -1,0 +1,8 @@
+setuptools
+numpy
+scipy
+pyserial
+matplotlib
+pyqtgraph
+PyQt5
+Flask
