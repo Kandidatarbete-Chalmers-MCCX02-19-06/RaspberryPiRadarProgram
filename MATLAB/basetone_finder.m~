@@ -1,4 +1,4 @@
-function [f_search,P_sum_N,f_fine] = basetone_finder(f,FFT_SS,Fs,Fscan_min,Fscan_max,BW_comb,N_harmonics,plot_selection)
+function [f_fine] = basetone_finder(f,FFT_SS,Fs,Fscan_min,Fscan_max,Q,N_harmonics,plot_selection)
 %Finds fundamental tone in noisy data by looking at harmonics
 %   Looks for fundamental tone with the most energy in it and it's
 %   harmoincs.
@@ -12,6 +12,7 @@ function [f_search,P_sum_N,f_fine] = basetone_finder(f,FFT_SS,Fs,Fscan_min,Fscan
 %F resolution
 L_fft = length(FFT_SS)*2;
 %Comb bandwidth in samples
+BW_comb = 
 i_BW_ss = round(L_fft/Fs*BW_comb/4);%bandwidth in number of frequency samples.
 %Limits Fmin/max to protect against index out of bounds from harmonics
 Fscan_min = min(Fs/2/N_harmonics,Fscan_min);
@@ -36,7 +37,7 @@ for i = 1:length(i_f_search)
         %Snittar värde
         %P_sum_N(i) = P_sum_N(i) + mean( i_harm*FFT_SS(i_f_search(i)-i_BW_ss: i_harm*i_f_search(i)+i_BW_ss ) );
         
-        S_square = FFT_SS(i_harm*(i_f_search(i)-i_BW_ss): i_harm*(i_f_search(i)+i_BW_ss) );
+        S_square = FFT_SS(i_harm*i_f_search(i)-i_BW_ss: i_harm*i_f_search(i)+i_BW_ss );
         
         %P_sum_N(i) = P_sum_N(i) +  sqrt( mean( S_square ) );
         P_sum_N(i) = P_sum_N(i) *  sqrt( mean( S_square ) );
@@ -47,15 +48,7 @@ end
 
 
 [maxval,i_crude] = max(P_sum_N);%Finds index of crude measurement of frequency.
-f_crude = f_search(i_crude);%Crude frequency measurement
-%Change to peak finding.... (test)
-height = 0.1*(max(P_sum_N)-min(P_sum_N));
-
-%Find peak instead of max val..
-[PKS,LOCS]= findpeaks(P_sum_N,'MinPeakProminence',height);
-[maxval,i_crude] = max(PKS);
-f_crude = f_search(LOCS(i_crude));
-
+f_crude = f_search(i_crude)%Crude frequency measurement
 
 %Find peak in FFT for fine reading
 [PKS,LOCS]= findpeaks(FFT_SS);
@@ -63,9 +56,6 @@ f_crude = f_search(LOCS(i_crude));
 [minval,i_fine] = min( abs( f(LOCS) - f_crude ) );
 %Sets f_fine to be fine measuremed value
 f_fine = f(LOCS(i_fine));
-
-%test again
-f_fine = f_crude
 
 if plot_selection
     %Plots function if chosen
