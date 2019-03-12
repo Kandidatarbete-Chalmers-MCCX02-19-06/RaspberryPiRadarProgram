@@ -10,6 +10,7 @@ class Radar (threading.Thread):
     def __init__(self):
         self.sequences = 5
         self.num_points = 2
+        self.matrix_idx = 0
         self.matrix = np.zeros((self.sequences, self.num_points), dtype=np.csingle) # matris som kan fyllas med mätdata
         self.lock = threading.RLock()   # Det här är tydligen bra för något. Bör kollas upp...
         super(Radar, self).__init__()
@@ -21,19 +22,30 @@ class Radar (threading.Thread):
 
     def run(self):
         with self.lock:
-            self.fill_matrix()
+            for k in range(0,self.sequences):
+                self.fill_matrix()
+                self.matris_funk()
 
     def fill_matrix(self):
-        k = 1
-        while k < 2:        # Anger hur länge man ska mäta. Tänker att det ska vara en oändlig loop med en avbrottsfunktion sen.
-            with self.lock:
-                for i in range(0, self.sequences):          # Loopar igenom matrisen.
-                    rand_array = np.random.rand(self.num_points)    # skapa array med random tal.
-                    self.matrix[i][:] = rand_array[:]               # Fyll matrisen
-                    print("Radar: \n", self.matrix)
-                    time.sleep(2)                                   # Vänta
-                k += 1     
+        with self.lock:
+            if self.matrix_idx < self.sequences:
+                rand_array = np.random.rand(self.num_points)    # skapa array med random tal.
+                self.matrix[self.matrix_idx][:] = rand_array[:]               # Fyll matrisen
+                print("Radar: \n", self.matrix)
+                time.sleep(2)                                   # Vänta  
+            self.matrix_idx += 1
+            if self.matrix_idx == self.sequences:
+                self.matrix_idx = 0
 
+    def matris_funk(self):  # kan ta in ett argument matrix också.
+        #def matris_funk(self,matrix):  # kan ta in ett argument matrix också.
+        #self.matrix = matrix 
+        with self.lock:
+            matrix = 1*self.matrix
+            for i in range(0, self.sequences):
+                matrix[i][0] = 2
+            print("Filter: \n", matrix)
+            time.sleep(2)  # vänta
 
 
 ### Filtrerar matrisen från Radar-klassen. 
@@ -83,22 +95,22 @@ def main():
     # Initiera två trådar
     radar = Radar()
 
-    filter_matris = np.ones((5,10)) #Test-input-matris
-    filter = Filter(filter_matris)
+    #filter_matris = np.ones((5,10)) #Test-input-matris
+    #filter = Filter(filter_matris)
 
     # Nedan printas den lokala variabeln i Filter och matrisen i Radar. 
     # Och båda trådarna startas
     print(radar.matrix)
-    print(filter.matrix)
+    #print(filter.matrix)
 
     radar.start()
-    filter.start()
+    #filter.start()
 
     #time.sleep(4)
 
     #matris = np.zeros((5,10))
     matris = radar.matrix
-    filter.set_matrix(matris)
+    #filter.set_matrix(matris)
        
     #for i in range(0, radar.sequences):
        # print(radar.matrix)
