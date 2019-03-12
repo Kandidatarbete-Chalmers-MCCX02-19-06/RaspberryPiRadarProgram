@@ -3,30 +3,29 @@
 clc
 clear all
 format shorteng
-Fs = 20
-T_sample = 20% seconds of sampled data
+Fs = 25
+T_sample = 240% seconds of sampled data
 L_seq = round(T_sample*Fs)%number of samples
 
-SNR_dB = 100%dB
-SNR = 10^(SNR_dB/10);
+SNR_dB = 20%dB
+SNR = 10^(SNR_dB/10)
 
 t = 1/Fs * (0:L_seq-1);
-f0 = 1
+f0 = 1.1
 
-f2 = 1.5
+f2 = 1.3
 f3 = 0.9
 f4 = 2.3
 target_delta_distance = 5e-6*cos(2*pi*f0*t);%base
 target_delta_distance = target_delta_distance + 4e-6*cos(2*pi*2*f0*t);% 2nd harmonic
 target_delta_distance = target_delta_distance + 3e-6*cos(2*pi*3*f0*t);% 3rd harmonic
 
-target_delta_distance = 5e-6 *square(2*pi*t*f0);
 S_o = target_delta_distance;
 
 target_delta_distance = awgn(target_delta_distance,SNR);%noise
-target_delta_distance = target_delta_distance + 2e-6*cos(2*pi*f2*t);%Random tone
-target_delta_distance = target_delta_distance + 1e-6*cos(2*pi*f3*t);%Random tone
-target_delta_distance = target_delta_distance + 2e-6*cos(2*pi*f4*t);%Random tone
+%target_delta_distance = target_delta_distance + 7e-6*cos(2*pi*f2*t);%Random tone
+%target_delta_distance = target_delta_distance + 3e-6*cos(2*pi*f3*t);%Random tone
+%target_delta_distance = target_delta_distance + 8e-6*cos(2*pi*f4*t);%Random tone
 
 
 target_delta_distance_withnoise = target_delta_distance;
@@ -66,7 +65,7 @@ target_delta_distance = filter(HpFilt,target_delta_distance);
 
 %Windowing
 W = window(@flattopwin,1,L_seq)';
-%target_delta_distance = target_delta_distance .* W;
+target_delta_distance = target_delta_distance .* W;
 
 
 %Padded FFT
@@ -82,13 +81,13 @@ target_delta_distance_fft = P1;%FFT for delta distance from phase of target
 
 
 figure(1)
-semilogy(f,target_delta_distance_fft)
+plot(f,target_delta_distance_fft)
 xlabel('Frequency [Hz]')
 ylabel('Amplitude [m]')
 
-
+disp('tone finding')
 %Finding dominant tone
-BW = 0.05% [Hz] bandwidth of peak finding
+BW = 0.1% [Hz] bandwidth of peak finding
 i_BW_ss = round(L_fft/Fs*BW/2)%bandwidth in number of frequency samples.
 
 %F resolution
@@ -109,6 +108,8 @@ i_f_search = i_Fmin + (0:(N_f-1))*i_BW_ss*2;
 
 for i = 1:length(i_f_search)
     P_sum_3(i) = mean( target_delta_distance_fft(i_f_search(i)-i_BW_ss: i_f_search(i)+i_BW_ss ) );
+    P_sum_3(i) = P_sum_3(i) + mean( 2*target_delta_distance_fft(i_f_search(i)-i_BW_ss: 2*i_f_search(i)+i_BW_ss ) );
+    P_sum_3(i) = P_sum_3(i) + mean( 3*target_delta_distance_fft(i_f_search(i)-i_BW_ss: 3*i_f_search(i)+i_BW_ss ) );
 
 end
 
@@ -123,20 +124,36 @@ f_crude = f_search(i_crude)%Crude frequency measurement
 %Sets f_fine to be fine measuremed value
 f_fine = f(LOCS(i_fine))
 
-
+disp('test of f')
 Fscan_min = 0.9
 Fscan_max = 2
-BW_comb = 0.05
-[f_fine] = basetone_finder(f,target_delta_distance_fft,Fs,Fscan_min,Fscan_max,BW_comb)
+BW_comb = 0.005
+N_harm = 3
+[f_search,P_sum_N,f_fine] = basetone_finder(f,target_delta_distance_fft,Fs,Fscan_min,Fscan_max,BW_comb,N_harm,true);
 
+f_fine = f_fine
+
+
+%Test of pspectrum
+figure(3)
+T_resolution = 30 % Time resolution[s]
+%F_resolution = 1/60*10
+overlap = 99% overlap of slidiing frames [%]
+S_leakage = 1 % Leakge from tones 
+
+
+pspectrum(target_delta_distance,Fs,'spectrogram', ...
+     'TimeResolution',T_resolution,'Overlap',overlap,'Leakage',S_leakage)
+
+%%
 figure(2)
 plot(f_search,P_sum_3)
 xlabel('Frequeny')
 ylabel('Mean value of the three first harmonics')
 
-
+disp('Recreate')
 %Test to recreate signal.
-BW_comb = 0.01 %[Hz]
+BW_comb = 0.05 %[Hz]
 
 S_filtered = bandpass(target_delta_distance_withnoise,[f_fine-BW_comb f_fine+BW_comb],Fs);
 S_filtered = S_filtered + bandpass(target_delta_distance_withnoise,[2*f_fine-BW_comb 2*f_fine+BW_comb],Fs);

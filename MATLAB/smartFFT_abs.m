@@ -4,7 +4,13 @@ function [f,S_o] = smartFFT_abs(S_i,Fs,F_resolution)
 %   Outputs the amplitude of a single side band FFT and the frequency
 %   vector, for a given minimum frequency resolution.
 
+
 L_seq = length(S_i);
+% %Window here
+W = window(@flattopwin,L_seq);
+S_i = S_i .* W';
+
+%FFT
 L_fft = 2 * round (max(Fs/F_resolution,L_seq)/2 )%needed length of FFT, or orignial.
 f = Fs*(0:(L_fft/2))/L_fft;
 
