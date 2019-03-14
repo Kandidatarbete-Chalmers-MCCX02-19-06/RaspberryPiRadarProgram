@@ -7,8 +7,8 @@ format shorteng
 %addpath("IQ Read")
 %addpath("Target tracking")
 
-filename = 'Manniska_1m_0305_Test1.csv'
-%filename = 'Manniska_lang_0305_Test1.csv'
+%filename = 'Manniska_1m_0305_Test1.csv'
+filename = 'Manniska_lang_0305_Test1.csv'
 
 [dist,amp, phase,t,gain, L_start, L_end, L_data, L_seq, Fs] = IQ_read_3(filename);
 gain = gain
@@ -99,8 +99,9 @@ F_high_BR = 0.8
 F_low_HR = 0.7
 F_high_HR = 6
 BWrel_transband_BR = 0.5
-BWrel_transband_HR = 0.2
-Atten_stopband = 80
+BWrel_transband_HR = 0.15
+Atten_stopband = 60 %(!)
+%Atten_stopband = 60
 [delta_distance_BR] = bandpassfilter(target_delta_distance,Fs,F_low_BR,F_high_BR,BWrel_transband_BR,Atten_stopband);
 [delta_distance_HR] = bandpassfilter(target_delta_distance,Fs,F_low_HR,F_high_HR,BWrel_transband_HR,Atten_stopband);
 
@@ -115,7 +116,7 @@ Atten_stopband = 80
 % delta_distance_BR = delta_distance_BR(i_start:i_stop);
 
 %FFTs
-F_resolution = 0.01 %[Hz]
+%F_resolution = 0.01 %[Hz]
 F_resolution = 1/60 %[Hz]
 [f_BR,delta_distance_BR_FFT] = smartFFT_abs(delta_distance_BR,Fs,F_resolution);
 [f_HR,delta_distance_HR_FFT] = smartFFT_abs(delta_distance_HR,Fs,F_resolution);
@@ -124,13 +125,14 @@ F_resolution = 1/60 %[Hz]
 
 %Frequency finding
 BW_comb = 2/60 %[Hz] Tightness of tone scanning
-N_harmonics = 2%number of harmonics to look at, incl fundamental
+BW_comb = 3/60
+N_harmonics = 3%number of harmonics to look at, incl fundamental
 %Scan span for breating rate
 %Fscan_lower_BR = F_low_BR
 %Fscan_upper_BR = F_low_BR/3
 
 %Scan span for heartrate
-Fscan_lower_HR = 0.833
+Fscan_lower_HR = 0.75
 Fscan_upper_HR = 2.5
 %f_detected_BR = basetone_finder(f_BR,delta_distance_BR_FFT,Fs,F_low_BR,F_high_BR,BW_comb)
 [f_search,P_sum_N,f_fine] = basetone_finder(f_HR,delta_distance_HR_FFT,Fs,Fscan_lower_HR,Fscan_upper_HR,BW_comb,N_harmonics,true);
@@ -141,13 +143,13 @@ BPM_HR = 60*f_detected_HR
 figure(5)
 subplot(2,2,1)
 plot(f_BR,delta_distance_BR_FFT)
-ylabel('FFT of HR spectrum')
+ylabel('FFT of HR spectrum [m]')
 xlabel('f [Hz]')
 xlim([F_low_BR F_high_BR])
 
 subplot(2,2,2)
 plot(f_HR,delta_distance_HR_FFT)
-ylabel('FFT of HR spectrum')
+ylabel('FFT of HR spectrum [m]')
 xlabel('f [Hz]')
 xlim([F_low_HR F_high_HR])
 
@@ -155,28 +157,28 @@ xlim([F_low_HR F_high_HR])
 %time 
 subplot(2,2,3)
 plot(t,delta_distance_BR)
-ylabel('Plot of BR [m]')
+ylabel('Plot of BR bandwidth [m]')
 xlabel('Time [s]')
 
 subplot(2,2,4)
 plot(t,delta_distance_HR)
-ylabel('Plot of BR [m]')
+ylabel('Plot of HR bandwidth [m]')
 xlabel('Time [s]')
 
 
 %Waterfall FFT plot of HR
 
 figure(6)
-%T_resolution = 30 % Time resolution[s]
-F_resolution = 1/60*5
-overlap = 90% overlap of slidiing frames [%]
-S_leakage = 0.7 % Leakge from tones 
+T_resolution = 30 % Time resolution[s]
+%F_resolution = 1/60*1.5
+overlap = 95% overlap of slidiing frames [%]
+S_leakage = 0.8 % Leakage from tones 
+
+% [P,F,T] = pspectrum(delta_distance_HR,Fs,'spectrogram', ...
+%     'FrequencyResolution',F_resolution,'Overlap',overlap,'Leakage',S_leakage);
 
 [P,F,T] = pspectrum(delta_distance_HR,Fs,'spectrogram', ...
-    'FrequencyResolution',F_resolution,'Overlap',overlap,'Leakage',S_leakage);
-
-% pspectrum(delta_distance_HR,Fs,'spectrogram', ...
-%      'TimeResolution',T_resolution,'Overlap',overlap,'Leakage',S_leakage)
+     'TimeResolution',T_resolution,'Overlap',overlap,'Leakage',S_leakage)
 
 
 pcolor(T,F,log10(P));

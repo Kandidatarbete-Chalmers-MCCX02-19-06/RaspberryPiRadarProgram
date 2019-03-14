@@ -31,25 +31,28 @@ f_search = f(i_f_search);
 
 
 for i = 1:length(i_f_search)
-    P_sum_N(i) = 1;
+    P_sum_N(i) = 0;
     for i_harm = 1:N_harmonics
         %Snittar värde
         %P_sum_N(i) = P_sum_N(i) + mean( i_harm*FFT_SS(i_f_search(i)-i_BW_ss: i_harm*i_f_search(i)+i_BW_ss ) );
         
         S_square = FFT_SS(i_harm*(i_f_search(i)-i_BW_ss): i_harm*(i_f_search(i)+i_BW_ss) );
         
-        %P_sum_N(i) = P_sum_N(i) +  sqrt( mean( S_square ) );
-        P_sum_N(i) = P_sum_N(i) *  sqrt( mean( S_square ) );
+        P_sum_N(i) = P_sum_N(i) +  sqrt( mean( S_square ) );
+        %P_sum_N(i) = P_sum_N(i) *  sqrt( mean( S_square ) );
     end
     
 
 end
 
+%normalize
+P_sum_N = P_sum_N./mean(P_sum_N);
 
 [maxval,i_crude] = max(P_sum_N);%Finds index of crude measurement of frequency.
 f_crude = f_search(i_crude);%Crude frequency measurement
 %Change to peak finding.... (test)
-height = 0.1*(max(P_sum_N)-min(P_sum_N));
+height = 0.05*(max(P_sum_N)-min(P_sum_N));
+height = 0;
 
 %Find peak instead of max val..
 [PKS,LOCS]= findpeaks(P_sum_N,'MinPeakProminence',height);
@@ -65,7 +68,7 @@ f_crude = f_search(LOCS(i_crude));
 f_fine = f(LOCS(i_fine));
 
 %test again
-f_fine = f_crude
+f_fine = f_crude;
 
 if plot_selection
     %Plots function if chosen
