@@ -18,6 +18,7 @@ try:
 except:
     print("Bluetooth Binding Failed")
 
+
 class ConnectDevicesThread(threading.Thread):
     def __init__(self,):
         super(ConnectDevicesThread, self).__init__()
@@ -32,6 +33,7 @@ class ConnectDevicesThread(threading.Thread):
             readThreadList[len(readThreadList)-1].start()
             #print("Client:", c)
 
+
 class ReadDeviceThread(threading.Thread):
     client = None
     def __init__(self, client):
@@ -45,6 +47,7 @@ class ReadDeviceThread(threading.Thread):
                 print(data.decode('utf-8'))
         except:
             pass
+
 
 connectDevices = ConnectDevicesThread()
 connectDevices.start()
