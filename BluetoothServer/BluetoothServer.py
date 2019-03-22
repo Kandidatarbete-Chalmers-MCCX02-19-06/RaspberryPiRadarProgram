@@ -39,10 +39,12 @@ class ReadDeviceThread(threading.Thread):
         super(ReadDeviceThread, self).__init__()
 
     def run(self):
-        while True:
-            data = self.client.recv(1024)
-            print(data.decode('utf-8'))
-
+        try:
+            while True:
+                data = self.client.recv(1024)
+                print(data.decode('utf-8'))
+        except:
+            pass
 
 connectDevices = ConnectDevicesThread()
 connectDevices.start()
