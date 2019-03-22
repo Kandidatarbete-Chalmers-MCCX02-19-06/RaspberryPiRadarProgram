@@ -1,6 +1,7 @@
 # Importing the Bluetooth Socket library
 import bluetooth
 import threading
+import time
 
 clientList = []
 addressList = []
@@ -56,7 +57,8 @@ connectDevices.start()
 #     pass
 
 # try:
-for i in range(1,3):
+for i in range(1,10):
+    time.sleep(1)
     # Receivng the data.
     # data = client.recv(1024)  # 1024 is the buffer size.
     # command = data.decode("utf-8")  # converts binary to string
