@@ -75,7 +75,8 @@ for i in range(1,3):
     #     send_data = "Type 1 or 0 "
     # Sending the data.
     # client.send(send_data)
-
+    while len(clientList) == 0:
+        pass
     write = 'String from Raspberry Pi after received message'
     # print(write)
     print(write.encode('utf-8'))
