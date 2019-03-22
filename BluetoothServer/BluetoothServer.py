@@ -31,7 +31,8 @@ except:
 
 
 class ConnectDevicesThread(threading.Thread):
-    def __init__(self):
+    def __init__(self,):
+        super(ConnectDevicesThread, self).__init__()
         server.listen(7)
 
     def run(self):
@@ -40,6 +41,8 @@ class ConnectDevicesThread(threading.Thread):
             clientList.append(c)
             addressList.append(a)
             print("Client:", c)
+
+
 connectDevices = ConnectDevicesThread()
 connectDevices.start()
 
