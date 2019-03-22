@@ -1,0 +1,6 @@
+basic.py importerar:
+	# RegClient från utils.reg.client
+		# Klassen ärver en abstrakt klass Baseclient från clients.base
+		# Importerar: 
+			# protocol från clients.reg
+				# Verkar på något sätt ta hand om datastream från chippet
