@@ -47,45 +47,22 @@ class ConnectDevicesThread(threading.Thread):
 connectDevices = ConnectDevicesThread()
 connectDevices.start()
 
-# try:
-#     #pass
-#     write = 'String from Raspberry Pi'
-#     print(write)
-#     #print(write.encode('utf-8'))
-#     client.send(write.encode('utf-8'))
-# except:
-#     pass
-
-# try:
-for i in range(1,10):
+for i in range(1,100):
     time.sleep(1)
-    # Receivng the data.
-    # data = client.recv(1024)  # 1024 is the buffer size.
-    # command = data.decode("utf-8")  # converts binary to string
-    #
-    # data2 = client2.recv(1024)  # 1024 is the buffer size.
-    # command2 = data2.decode("utf-8")  # converts binary to string
-    #  print(data)  # data is binary
-    # print(command)
-    # print(command2)
-    #
-    # if data == "1":
-    #     send_data = "Light On "
-    # elif data == "0":
-    #     send_data = "Light Off "
-    # else:
-    #     send_data = "Type 1 or 0 "
-    # Sending the data.
-    # client.send(send_data)
     while len(clientList) == 0:
         pass
-    write = 'String from Raspberry Pi after received message'
-    # print(write)
-    print(write.encode('utf-8'))
+    write = 'String from Raspberry Pi after received message' + i
+    print(write)
+    # print(write.encode('utf-8'))
     for client in clientList:
+        print(clientList.index(client))
         try:
             client.send(write.encode('utf-8'))
         except:
             # Closing the client and server connection
             client.close()
+            clientList.remove(client)
+            print('remove: '+client)
+
+
 server.close()
