@@ -41,6 +41,8 @@ class ConnectDevicesThread(threading.Thread):
             clientList.append(c)
             addressList.append(a)
             print("Client:", c)
+
+
 connectDevices = ConnectDevicesThread()
 connectDevices.start()
 
