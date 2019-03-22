@@ -64,7 +64,7 @@ for i in range(1,100):
             # Closing the client and server connection
             client.close()
             clientList.remove(client)
-            print('remove : '+addressList[client.index(client)])
+            print('remove : '+addressList[clientList.index(client)])
 
 
 server.close()
