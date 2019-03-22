@@ -56,7 +56,7 @@ for i in range(1,100):
     print(write)
     # print(write.encode('utf-8'))
     for client in clientList:
-        print(addressList[clientList.index(client)] + ' Length ' + str(len(clientList)) + 'client: ' + str(client))
+        print(addressList[clientList.index(client)] + ' Length ' + 'client: ' + str(client))
         try:
             client.send(write.encode('utf-8'))
         except:
