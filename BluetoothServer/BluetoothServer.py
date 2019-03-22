@@ -19,7 +19,7 @@ def addData(i):
     data = math.sin(i)
     noise = random.random()
     data += (noise - 0.5)
-    return data
+    return str(data)
 
 # Creaitng Socket Bluetooth RFCOMM communication
 server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
