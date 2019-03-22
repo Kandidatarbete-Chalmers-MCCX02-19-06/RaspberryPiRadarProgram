@@ -80,7 +80,7 @@ for i in range(1,100):
         print(addressList[clientList.index(client)])
         print("Length " + str(len(clientList)))
         try:
-            client.send(write.encode('utf-8'))
+            client.send(write)      # write.encode('utf-8')
         except:
             # Closing the client and server connection
             client.close()
