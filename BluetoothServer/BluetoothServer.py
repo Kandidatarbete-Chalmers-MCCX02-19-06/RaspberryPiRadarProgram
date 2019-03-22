@@ -51,7 +51,7 @@ for i in range(1,100):
     time.sleep(1)
     while len(clientList) == 0:
         pass
-    write = 'String from Raspberry Pi after received message' + i
+    write = 'String from Raspberry Pi after received message' + str(i)
     print(write)
     # print(write.encode('utf-8'))
     for client in clientList:
