@@ -51,18 +51,19 @@ for i in range(1,100):
     time.sleep(1)
     while len(clientList) == 0:
         pass
+    print('list: ' + str(clientList))
     write = 'String from Raspberry Pi after received message' + str(i)
     print(write)
     # print(write.encode('utf-8'))
     for client in clientList:
-        print(addressList[clientList.index(client)])
+        print(addressList[clientList.index(client)] + ' Length ' + str(len(clientList)) + 'client: ' + str(client))
         try:
             client.send(write.encode('utf-8'))
         except:
             # Closing the client and server connection
             client.close()
             clientList.remove(client)
-            print('remove: '+str(client))
+            print('remove : '+addressList[client.index(client)])
 
 
 server.close()
