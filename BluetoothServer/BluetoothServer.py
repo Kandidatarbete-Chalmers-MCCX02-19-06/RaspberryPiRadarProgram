@@ -63,8 +63,8 @@ for i in range(1,100):
         except:
             # Closing the client and server connection
             client.close()
+            print('remove : ' + addressList[clientList.index(client)])
             clientList.remove(client)
-            print('remove : '+addressList[clientList.index(client)])
 
 
 server.close()
