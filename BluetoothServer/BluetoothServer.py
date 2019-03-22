@@ -36,11 +36,11 @@ class ReadDeviceThread(threading.Thread):
     client = None
     def __init__(self, client):
         self.client = client
-        super(ReadDeviceThread, self, client).__init__()
+        super(ReadDeviceThread, self).__init__()
 
     def run(self):
         while True:
-            data = client.recv(1024)
+            data = self.client.recv(1024)
             print(data.decode('utf-8'))
 
 
