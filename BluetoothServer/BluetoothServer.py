@@ -31,7 +31,8 @@ except:
 
 
 class ConnectDevicesThread(threading.Thread):
-    def __init__(self):
+    def __init__(self,):
+        super(ConnectDevicesThread, self).__init__()
         server.listen(7)
 
     def run(self):
