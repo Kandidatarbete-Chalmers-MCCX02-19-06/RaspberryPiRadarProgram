@@ -1,3 +1,0 @@
-Följande filer existerar:
-
-# fil_namn: gör något
