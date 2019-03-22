@@ -55,14 +55,14 @@ for i in range(1,100):
     print(write)
     # print(write.encode('utf-8'))
     for client in clientList:
-        print(clientList.index(client))
+        print(addressList[clientList.index(client)])
         try:
             client.send(write.encode('utf-8'))
         except:
             # Closing the client and server connection
             client.close()
             clientList.remove(client)
-            print('remove: '+client)
+            print('remove: '+str(client))
 
 
 server.close()
