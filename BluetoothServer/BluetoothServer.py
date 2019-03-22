@@ -23,7 +23,7 @@ def addData(i):
     data[1] += noise
     data[0] = round(data[0])
     data[1] = round(data[1])
-    return str(data)
+    return bytearray(data)
 
 # Creaitng Socket Bluetooth RFCOMM communication
 server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
