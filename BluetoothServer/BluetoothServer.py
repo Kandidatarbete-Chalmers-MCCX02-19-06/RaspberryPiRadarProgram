@@ -35,8 +35,8 @@ class ConnectDevicesThread(threading.Thread):
 class ReadDeviceThread(threading.Thread):
     client = None
     def __init__(self, client):
-        super(ReadDeviceThread, self).__init__()
         self.client = client
+        super(ReadDeviceThread, self).__init__()
 
     def run(self):
         while True:
