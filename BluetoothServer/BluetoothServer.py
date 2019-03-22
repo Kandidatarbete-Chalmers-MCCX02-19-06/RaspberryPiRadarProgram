@@ -5,6 +5,7 @@ import time
 
 clientList = []
 addressList = []
+readThreadList = []
 
 host = ""
 port = 1  # Raspberry Pi uses port 1 for Bluetooth Communication
@@ -17,20 +18,6 @@ try:
 except:
     print("Bluetooth Binding Failed")
 
-# for i in range(1,2):
-#server.listen(2)  # One connection at a time
-# Server accepts the clients request and assigns a mac address.
-#client, address = server.accept()
-#print("Connected To", address)
-#print("Client:", client)
-
-# server.listen(2)  # One connection at a time
-# Server accepts the clients request and assigns a mac address.
-#client2, address2 = server.accept()
-#print("Connected To", address2)
-#print("Client:", client2)
-
-
 class ConnectDevicesThread(threading.Thread):
     def __init__(self,):
         super(ConnectDevicesThread, self).__init__()
@@ -41,7 +28,19 @@ class ConnectDevicesThread(threading.Thread):
             c, a = server.accept()
             clientList.append(c)
             addressList.append(a)
-            print("Client:", c)
+            readThreadList.append(ReadDeviceThread(c))       # one thread for each connected device
+            readThreadList[len(readThreadList)-1].start()
+            #print("Client:", c)
+
+class ReadDeviceThread(threading.Thread):
+    def __init__(self, client):
+        super(ReadDeviceThread, self).__init__()
+        self.client = client
+
+    def run(self):
+        while True:
+            data = client.recv(1024)
+            print(data.decode('utf-8'))
 
 
 connectDevices = ConnectDevicesThread()
@@ -51,13 +50,12 @@ for i in range(1,100):
     time.sleep(1)
     while len(clientList) == 0:
         pass
-    print(clientList)
     write = 'String from Raspberry Pi after received message' + str(i)
     print(write)
     # print(write.encode('utf-8'))
     for client in clientList:
         print(addressList[clientList.index(client)])
-        print("Length " + str(len(clientList)) + "client: " + str(client))
+        print("Length " + str(len(clientList)))
         try:
             client.send(write.encode('utf-8'))
         except:
@@ -65,6 +63,5 @@ for i in range(1,100):
             client.close()
             print('remove : ' + str(addressList[clientList.index(client)]))
             clientList.remove(client)
-
 
 server.close()
