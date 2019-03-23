@@ -58,7 +58,9 @@ class ReadDeviceThread(threading.Thread):
                 data = self.client.recv(1024)       # important to write self.client everywhere in the class/thread
                 print(data.decode('utf-8'))
         except:
-            pass
+            self.client.close()
+            print('remove : ' + str(addressList[clientList.index(self.client)]))
+            clientList.remove(self.client)
 
 
 connectDevices = ConnectDevicesThread()
@@ -79,9 +81,11 @@ for i in range(1,100):
             client.send(write.encode('utf-8'))
         except:
             # Closing the client and server connection
-            client.close()
-            print('remove : ' + str(addressList[clientList.index(client)]))
-            clientList.remove(client)
+            # client.close()
+            # print('remove : ' + str(addressList[clientList.index(client)]))
+            # clientList.remove(client)
+            print("Error")
+
     sinvalue += 0.157
 
 server.close()
