@@ -16,10 +16,14 @@ host = ""
 port = 1  # Raspberry Pi uses port 1 for Bluetooth Communication
 
 def addData(i):
-    data = math.sin(i)
+    data = [70 + math.sin(i), 20 + math.sin(i+math.pi/4)]
     noise = random.random()
-    data += (noise - 0.5)
-    return data
+    data[0] += 5*(noise - 0.5)
+    noise = random.random()
+    data[1] += noise
+    data[0] = round(data[0])
+    data[1] = round(data[1])
+    return str(data)
 
 # Creaitng Socket Bluetooth RFCOMM communication
 server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
@@ -78,7 +82,7 @@ for i in range(1,100):
         print(addressList[clientList.index(client)])
         print("Length " + str(len(clientList)))
         try:
-            client.send(write.encode('utf-8'))
+            client.send(write.encode('utf-8'))      # write.encode('utf-8')
         except:
             # Closing the client and server connection
             # client.close()
