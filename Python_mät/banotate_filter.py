@@ -23,6 +23,7 @@ def main():
     config.sensor = args.sensors
 
     tid = 10
+
     sekvenser = tid * config.sweep_rate
     filename = "Reflektor_2.csv"
 
@@ -39,11 +40,14 @@ def main():
 
     while not interrupt_handler.got_signal:
         info, sweep = client.get_next()
+        amplitude = np.abs(sweep)
         plot_data = {
             "amplitude": np.abs(sweep),
             "phase": np.angle(sweep),
+            "ymax": amplitude.max(),
+            "xmax": config.range_interval[0] + (config.range_interval[1] - config.range_interval[0]) *
+            (np.argmax(amplitude)/num_points),
         }
-
         try:
             plot_process.put_data(plot_data)
         except PlotProccessDiedException:
@@ -59,6 +63,9 @@ def config_setup():
     config.range_interval = [0.4, 0.8]
     config.sweep_rate = 2
     config.gain = 1
+    config.session_profile = configs.EnvelopeServiceConfig.MAX_DEPTH_RESOLUTION
+    #config.session_profile = configs.EnvelopeServiceConfig.MAX_SNR
+    print(config.gain)
     return config
 
 
@@ -87,24 +94,37 @@ class FigureUpdater2(FigureUpdater):
 
     def first(self, data):
         self.process_data(data)
+        xmax = 0
+        ymax = 0
+        text = "x={:.2f}, y={:.2f}".format(data["xmax"], data["ymax"])
+        bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
+        arrowprops = dict(arrowstyle="->", connectionstyle="angle,angleA=0,angleB=90")
+        kw = dict(xycoords='data', textcoords="axes fraction",
+                  arrowprops=arrowprops, bbox=bbox_props, ha="right", va="top")
 
         self.artists = {}
 
         self.artists["amplitude"] = self.amplitude_ax.plot(self.xs,    data["amplitude"])[0]
-
+        self.artists["annotate"] = self.amplitude_ax.annotate(
+            text, xy=(data["xmax"], data["ymax"]), xytext=(0.96, 0.96), **kw)
         return self.artists.values()
 
     def update(self, data):
         self.process_data(data)
+        text = "x={:.2f}, y={:.2f}".format(data["xmax"], data["ymax"])
+        bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
+        arrowprops = dict(arrowstyle="->", connectionstyle="angle,angleA=0,angleB=90")
+        kw = dict(xycoords='data', textcoords="axes fraction",
+                  arrowprops=arrowprops, bbox=bbox_props, ha="right", va="top")
+
+        self.artists["annotate"] = self.amplitude_ax.annotate(
+            text, xy=(data["xmax"], data["ymax"]), xytext=(0.96, 0.96), **kw)
 
         self.artists["amplitude"].set_ydata(data["amplitude"])
 
     def process_data(self, data):
         # if self.plot_index == 0:
         self.xs = np.linspace(*self.config.range_interval, data["amplitude"].size)
-        self.ymax = data["amplitude"].max
-        self.xmax = self.config.range_interval[0] + (self.config.range_interval[1] - self.config.range_interval[0]) * \
-            (np.argmax(data["amplitude"])/self.num_points)
 
         self.plot_index += 1
 

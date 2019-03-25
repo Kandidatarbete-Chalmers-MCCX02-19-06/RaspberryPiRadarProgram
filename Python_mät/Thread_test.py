@@ -3,8 +3,8 @@ import time
 import numpy as np
 
 
-### Tråd som fyller matris med mätdata från radarn.
-### Returnerar matrisen med rimliga tidsintervall.
+# Tråd som fyller matris med mätdata från radarn.
+# Returnerar matrisen med rimliga tidsintervall.
 class Radar (threading.Thread):
 
     def __init__(self):
@@ -83,10 +83,10 @@ def main():
     # Initiera två trådar
     radar = Radar()
 
-    filter_matris = np.ones((5,10)) #Test-input-matris
+    filter_matris = np.ones((5, 10))  # Test-input-matris
     filter = Filter(filter_matris)
 
-    # Nedan printas den lokala variabeln i Filter och matrisen i Radar. 
+    # Nedan printas den lokala variabeln i Filter och matrisen i Radar.
     # Och båda trådarna startas
     print(radar.matrix)
     print(filter.matrix)
@@ -94,30 +94,22 @@ def main():
     radar.start()
     filter.start()
 
-    #time.sleep(4)
-
-    #matris = np.zeros((5,10))
-    matris = radar.matrix
-    filter.set_matrix(matris)
-       
-    #for i in range(0, radar.sequences):
-       # print(radar.matrix)
-        #print(filter.matrix)
-        #time.sleep(3.1)
-
+    for i in range(0, radar.sequences):
+        print(radar.matrix)
+        print(filter.matrix)
+        time.sleep(3.1)
 
     # Här startas filter igen men med en annan matris
-    #filter_matris = np.zeros((5,10)) #Test-input-matris
-    #filter = Filter(filter_matris)
-    #filter.start()
-    
-    #for i in range(0, radar.sequences):
-    #    print(filter.matrix)
-    #    time.sleep(3.1)
+    filter_matris = np.zeros((5, 10))  # Test-input-matris
+    filter = Filter(filter_matris)
+    filter.start()
 
+    for i in range(0, radar.sequences):
+        print(filter.matrix)
+        time.sleep(3.1)
 
-    ### Gamla loopen som startar en massa trådar.
-    #for x in range(4):                                     # Four times...
+    # Gamla loopen som startar en massa trådar.
+    # for x in range(4):                                     # Four times...
     #    filterklass = Filter(name="Filter-{}".format(x + 1))  # ...Instantiate a thread and pass a unique ID to it
     #    filterklass.start()                                   # ...Start the thread
     #    radar = Radar(name="Radar-{}".format(x + 1))  # ...Instantiate a thread and pass a unique ID to it
