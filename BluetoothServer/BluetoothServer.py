@@ -18,14 +18,14 @@ port = 1  # Raspberry Pi uses port 1 for Bluetooth Communication
 
 
 def write_data_to_app(data,data_type):
-    print(data + ' ' + data_type)
+    #print(data + ' ' + data_type)
     if data_type == 'pulse rate':
         string = 'PR ' + data
-        print(string)
+        #print(string)
         send_data(string)
     elif data_type == 'breath rate':
         string = 'BR ' + data
-        print(string)
+        #print(string)
         send_data(string)
     elif data_type == 'real time breath':
         string = 'RTB ' + data
@@ -33,10 +33,10 @@ def write_data_to_app(data,data_type):
 
 
 def send_data(write):
-    print(write)
+    print('Send data: ' + write)
     for client in clientList:
-        print(addressList[clientList.index(client)])
-        print("Length " + str(len(clientList)))
+        #print(addressList[clientList.index(client)])
+        #print("Length " + str(len(clientList)))
         try:
             client.send(write.encode('utf-8'))      # write.encode('utf-8')
         except:
