@@ -21,9 +21,11 @@ def write_data_to_app(data,type):
     print(data + ' ' + type)
     if type is 'pulse rate':
         string = 'PR ' + data
+        print(string)
         send_data(string)
     elif type is 'breath rate':
         string = 'BR ' + data
+        print(string)
         send_data(string)
     elif type is 'real time breath':
         string = 'RTB ' + data
@@ -105,7 +107,7 @@ for i in range(1,100):
         pass
     #write = 'String from Raspberry Pi after received message' + str(i)
     data = addData(sinvalue)
-    print('Write data: ' + data + ' ' + data[0])
+    print('Write data: ' + data)
     data_pulse, data_breath = data.split(' ')
     write_data_to_app(data_pulse, 'pulse rate')
     write_data_to_app(data_breath, 'breath rate')
