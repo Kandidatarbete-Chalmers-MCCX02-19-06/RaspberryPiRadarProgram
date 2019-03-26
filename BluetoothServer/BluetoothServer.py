@@ -103,6 +103,7 @@ for i in range(1,100):
         pass
     #write = 'String from Raspberry Pi after received message' + str(i)
     data = addData(sinvalue)
+    print('Write data: ' + data)
     write_data_to_app(data[0], 'pulse rate')
     write_data_to_app(data[1], 'breath rate')
 
