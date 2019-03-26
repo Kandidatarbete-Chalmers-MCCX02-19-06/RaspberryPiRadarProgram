@@ -22,7 +22,7 @@ def main():
 
     # Setup parameters
     filename = "SimonPremiar_0314_Test3.csv"
-    time = 120
+    time = 90
     config = setup_parameters()
     seq = config.sweep_rate * time
     config.sensor = args.sensors
@@ -30,6 +30,7 @@ def main():
     num_points = info["data_length"]
     # print(num_points)
     info_file(filename, config, num_points, time, seq)  # Setup info file
+    print(num_points)
 
     matris = np.zeros((seq, num_points), dtype=np.csingle)
     client.start_streaming()
@@ -52,7 +53,7 @@ def main():
 def setup_parameters():
     config = configs.IQServiceConfig()
     config.range_interval = [0.20, 0.40]
-    config.sweep_rate = 50
+    config.sweep_rate = 100
     config.gain = 1
     # config.running_average_factor = 0.5
     return config
