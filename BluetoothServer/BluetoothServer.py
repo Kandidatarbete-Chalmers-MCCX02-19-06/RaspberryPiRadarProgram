@@ -11,6 +11,7 @@ clientList = []         # list for each connected device, sockets
 addressList = []        # list for mac-adresses from each connected device
 readThreadList = []     # list for threads to recieve from each device
 sinvalue = 0
+run = True
 
 host = ""
 port = 1  # Raspberry Pi uses port 1 for Bluetooth Communication
@@ -18,14 +19,14 @@ port = 1  # Raspberry Pi uses port 1 for Bluetooth Communication
 
 def write_data_to_app(data,type):
     if type is 'pulse rate':
-        str = 'PR ' + data
-        send_data(str)
+        string = 'PR ' + data
+        send_data(string)
     elif type is 'breath rate':
-        str = 'BR ' + data
-        send_data(str)
+        string = 'BR ' + data
+        send_data(string)
     elif type is 'real time breath':
-        str = 'RTB ' + data
-        send_data(str)
+        string = 'RTB ' + data
+        send_data(string)
 
 
 def send_data(write):
@@ -68,7 +69,7 @@ class ConnectDevicesThread(threading.Thread):
         server.listen(7)
 
     def run(self):
-        while True:
+        while run:
             c, a = server.accept()
             clientList.append(c)
             addressList.append(a)
@@ -85,7 +86,7 @@ class ReadDeviceThread(threading.Thread):
 
     def run(self):
         try:
-            while True:
+            while run:
                 data = self.client.recv(1024)       # important to write self.client everywhere in the class/thread
                 print(data.decode('utf-8'))
         except:
@@ -111,4 +112,5 @@ for i in range(1,100):
 
     sinvalue += 0.157
 
+run = False
 server.close()
