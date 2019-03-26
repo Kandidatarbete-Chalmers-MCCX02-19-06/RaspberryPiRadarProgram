@@ -3,7 +3,8 @@ import threading
 import numpy as np
 import queue
 
-import Radar
+#import Radar
+import Class_Thread
 
 # Main method for initiating and running radar measurements, signal processing and sending data through bluetooth to application.
 
@@ -14,19 +15,17 @@ def main():
     #heart_rate_queue = queue.Queue()
     #resp_rate_queue = queue.Queue()
 
-    radar = Radar.Radar(radar_queue, interrupt_queue)
-    radar.start()
+    #radar = Radar.Radar(radar_queue, interrupt_queue)
+    # radar.start()
+
+    radar = Class_Thread.Radar(radar_queue, interrupt_queue)
+    radar.get_data()
 
     # signalprocessing = Signalprocessing(radar_queue,heart_rate_queue,resp_rate_queue)
     # signalprocessing.start()
 
     # bluetooth = Bluetooth(heart_rate_queue,resp_rate_queue)
     # bluetooth.start()
-    time.sleep(10)
-    d = radar_queue.get()
-    print('Queue test \n', d)
-    time.sleep(2)
-    interrupt_queue.put(1)
 
 
 if __name__ == "__main__":
