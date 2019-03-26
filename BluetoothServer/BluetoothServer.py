@@ -15,6 +15,33 @@ sinvalue = 0
 host = ""
 port = 1  # Raspberry Pi uses port 1 for Bluetooth Communication
 
+
+def write_data_to_app(data,type):
+    if type is 'pulse rate':
+        str = 'PR ' + data
+        send_data(str)
+    elif type is 'breath rate':
+        str = 'BR ' + data
+        send_data(str)
+    elif type is 'real time breath':
+        str = 'RTB ' + data
+        send_data(str)
+
+
+def send_data(write):
+    print(write)
+    for client in clientList:
+        print(addressList[clientList.index(client)])
+        print("Length " + str(len(clientList)))
+        try:
+            client.send(write.encode('utf-8'))      # write.encode('utf-8')
+        except:
+            # Closing the client and server connection
+            # client.close()
+            # print('remove : ' + str(addressList[clientList.index(client)]))
+            # clientList.remove(client)
+            print("Error")
+
 def addData(i):
     data = [70 + math.sin(i), 20 + math.sin(i+math.pi/4)]
     noise = random.random()
@@ -75,20 +102,11 @@ for i in range(1,100):
     while len(clientList) == 0:
         pass
     #write = 'String from Raspberry Pi after received message' + str(i)
-    write = addData(sinvalue)
-    print(write)
+    data = addData(sinvalue)
+    write_data_to_app(data[0], 'pulse rate')
+    write_data_to_app(data[1], 'breath rate')
+
     # print(write.encode('utf-8'))
-    for client in clientList:
-        print(addressList[clientList.index(client)])
-        print("Length " + str(len(clientList)))
-        try:
-            client.send(write.encode('utf-8'))      # write.encode('utf-8')
-        except:
-            # Closing the client and server connection
-            # client.close()
-            # print('remove : ' + str(addressList[clientList.index(client)]))
-            # clientList.remove(client)
-            print("Error")
 
     sinvalue += 0.157
 
