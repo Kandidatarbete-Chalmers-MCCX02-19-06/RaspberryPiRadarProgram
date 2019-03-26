@@ -74,7 +74,7 @@ class ConnectDevicesThread(threading.Thread):
             addressList.append(a)
             readThreadList.append(ReadDeviceThread(c))       # one thread for each connected device
             readThreadList[len(readThreadList)-1].start()
-            # print("Client:", c)
+            print("New client: ", a)
 
 
 class ReadDeviceThread(threading.Thread):
@@ -90,7 +90,7 @@ class ReadDeviceThread(threading.Thread):
                 print(data.decode('utf-8'))
         except:
             self.client.close()
-            print('remove : ' + str(addressList[clientList.index(self.client)]))
+            print('remove client: ' + str(addressList[clientList.index(self.client)]))
             clientList.remove(self.client)
 
 
