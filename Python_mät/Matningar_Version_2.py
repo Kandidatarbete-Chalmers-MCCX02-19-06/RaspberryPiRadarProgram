@@ -39,7 +39,7 @@ def main():
     start = timer.time()
     for i in range(0, seq):
         info, sweep = client.get_next()
-        # matris = np.roll(matris, 1, axis=0)
+        matris[seq-i-1][:] = sweep[:]
     end = timer.time()
     print(i+1)
     print((end - start), "s")
