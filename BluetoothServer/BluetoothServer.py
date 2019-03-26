@@ -18,6 +18,7 @@ port = 1  # Raspberry Pi uses port 1 for Bluetooth Communication
 
 
 def write_data_to_app(data,type):
+    print(data + ' ' + type)
     if type is 'pulse rate':
         string = 'PR ' + data
         send_data(string)
