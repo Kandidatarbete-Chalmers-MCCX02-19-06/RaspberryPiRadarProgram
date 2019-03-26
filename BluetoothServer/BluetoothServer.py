@@ -88,6 +88,9 @@ class ReadDeviceThread(threading.Thread):
             while run:
                 data = self.client.recv(1024)       # important to write self.client everywhere in the class/thread
                 print(data.decode('utf-8'))
+                if data.decode('utf-8') == 'poweroff':
+                    # TODO Erik: Power off python program and Raspberry Pi
+                    pass
         except:
             self.client.close()
             print('remove client: ' + str(addressList[clientList.index(self.client)]))
