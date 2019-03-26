@@ -52,7 +52,7 @@ def addData(i):
     data[1] += noise
     data[0] = round(data[0])
     data[1] = round(data[1])
-    return str(data)
+    return str(data[0]) + ' ' + str(data[1])
 
 # Creaitng Socket Bluetooth RFCOMM communication
 server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
@@ -106,8 +106,9 @@ for i in range(1,100):
     #write = 'String from Raspberry Pi after received message' + str(i)
     data = addData(sinvalue)
     print('Write data: ' + data + ' ' + data[0])
-    write_data_to_app(data[0], 'pulse rate')
-    write_data_to_app(data[1], 'breath rate')
+    data_pulse, data_breath = data.split(' ')
+    write_data_to_app(data_pulse, 'pulse rate')
+    write_data_to_app(data_breath, 'breath rate')
 
     # print(write.encode('utf-8'))
 
