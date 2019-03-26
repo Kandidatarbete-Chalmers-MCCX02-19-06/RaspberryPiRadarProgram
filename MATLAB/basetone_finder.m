@@ -21,8 +21,8 @@ i_Fmin = round(Fscan_min*L_fft/Fs);
 i_Fmax = round(Fscan_max*L_fft/Fs);
 %Number of scans and frequencies to be scanned + their indexes
 N_f = round( (i_Fmax - i_Fmin)/i_BW_ss/2 );
-f_search = linspace(Fscan_min,Fscan_max,N_f);
-i_f_search = i_Fmin + (0:(N_f-1))*i_BW_ss*2;
+%f_search = linspace(Fscan_min,Fscan_max,N_f);
+%i_f_search = i_Fmin + (0:(N_f-1))*i_BW_ss*2;
 
 %test
 i_f_search = round(i_Fmin:i_Fmax);%blir inte heltal i rad 34???! 
@@ -31,15 +31,15 @@ f_search = f(i_f_search);
 
 
 for i = 1:length(i_f_search)
-    P_sum_N(i) = 0;
+    P_sum_N(i) = 1;
     for i_harm = 1:N_harmonics
         %Snittar värde
         %P_sum_N(i) = P_sum_N(i) + mean( i_harm*FFT_SS(i_f_search(i)-i_BW_ss: i_harm*i_f_search(i)+i_BW_ss ) );
         
         S_square = FFT_SS(i_harm*(i_f_search(i)-i_BW_ss): i_harm*(i_f_search(i)+i_BW_ss) );
         
-        P_sum_N(i) = P_sum_N(i) +  sqrt( mean( S_square ) );
-        %P_sum_N(i) = P_sum_N(i) *  sqrt( mean( S_square ) );
+        %P_sum_N(i) = P_sum_N(i) +  sqrt( mean( S_square ) );
+        P_sum_N(i) = P_sum_N(i) *  sqrt( mean( S_square ) );
     end
     
 

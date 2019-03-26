@@ -4,13 +4,19 @@ addpath('tracker')
 clc
 clear all
 format shorteng
-%addpath("IQ Read")
-%addpath("Target tracking")
 
-%filename = 'Manniska_1m_0305_Test1.csv'
-filename = 'Manniska_lang_0305_Test1.csv'
+%Reading of Radar data
+%filename_radar = 'Manniska_1m_0305_Test1.csv'
+filename_radar = 'Manniska_lang_0305_Test2.csv'
+%filename_radar = 'PulsMetern_0313_Test1.csv'
+filename_radar = 'SimonPremiar_0314_Test2.csv'
+[dist,amp, phase,t,gain, L_start, L_end, L_data, L_seq, Fs] = IQ_read_3(filename_radar);
 
-[dist,amp, phase,t,gain, L_start, L_end, L_data, L_seq, Fs] = IQ_read_3(filename);
+%Reading of wristband pulse measurements
+%filename_pulsemeter = 'PulsMetern_0313_Test1.tcx'
+filename_pulsemeter = 'SimonPremiar_0314_Test2.tcx'
+[AvHR, MaxHR, HR, tHR] = Read_Pulse(filename_pulsemeter,false);
+
 gain = gain
 L_start = L_start
 L_end = L_end
@@ -28,10 +34,10 @@ MF = flip(MF);
 Emf = sum(abs(MF).^2);
 %conv(data,filter,SHAPE,'same');
 
-for i = 1:L_seq
-    filtered_refl(i,:) = filter(MF,Emf, (amp(i,:).*(cos(phase(i,:)) + 1i*sin(phase(i,:)) ) ));
-    i = i + 1;
-end
+% for i = 1:L_seq
+%     filtered_refl(i,:) = filter(MF,Emf, (amp(i,:).*(cos(phase(i,:)) + 1i*sin(phase(i,:)) ) ));
+%     i = i + 1;
+% end
 
 %amp = abs(filtered_refl);
 %phase = angle(filtered_refl);
@@ -41,7 +47,7 @@ end
 
 %Detektering och följning utav mål
 start_distance = 0.37%m
-start_distance = 1%m
+start_distance = 0.4%m
 N_avg = 10;
 [t,target_amplitude, target_phase, target_distance] = target_tracker_2(t,dist,amp,phase,start_distance,N_avg);
 
@@ -94,12 +100,12 @@ target_delta_distance = wavelength/2/pi/2*target_phase;
 
 %filer data into two bandwidths
 F_low_BR = 0.2
-F_high_BR = 0.8
+F_high_BR = 0.7
 
-F_low_HR = 0.7
+F_low_HR = 0.8
 F_high_HR = 6
 BWrel_transband_BR = 0.5
-BWrel_transband_HR = 0.15
+BWrel_transband_HR = 0.2
 Atten_stopband = 60 %(!)
 %Atten_stopband = 60
 [delta_distance_BR] = bandpassfilter(target_delta_distance,Fs,F_low_BR,F_high_BR,BWrel_transband_BR,Atten_stopband);
@@ -132,8 +138,8 @@ N_harmonics = 3%number of harmonics to look at, incl fundamental
 %Fscan_upper_BR = F_low_BR/3
 
 %Scan span for heartrate
-Fscan_lower_HR = 0.75
-Fscan_upper_HR = 2.5
+Fscan_lower_HR = 50/60
+Fscan_upper_HR = 150/60
 %f_detected_BR = basetone_finder(f_BR,delta_distance_BR_FFT,Fs,F_low_BR,F_high_BR,BW_comb)
 [f_search,P_sum_N,f_fine] = basetone_finder(f_HR,delta_distance_HR_FFT,Fs,Fscan_lower_HR,Fscan_upper_HR,BW_comb,N_harmonics,true);
 f_detected_HR = f_fine
@@ -171,14 +177,14 @@ xlabel('Time [s]')
 figure(6)
 T_resolution = 30 % Time resolution[s]
 %F_resolution = 1/60*1.5
-overlap = 95% overlap of slidiing frames [%]
-S_leakage = 0.8 % Leakage from tones 
+overlap = 50% overlap of slidiing frames [%]
+S_leakage = 1 % Leakage from tones 
 
 % [P,F,T] = pspectrum(delta_distance_HR,Fs,'spectrogram', ...
 %     'FrequencyResolution',F_resolution,'Overlap',overlap,'Leakage',S_leakage);
 
 [P,F,T] = pspectrum(delta_distance_HR,Fs,'spectrogram', ...
-     'TimeResolution',T_resolution,'Overlap',overlap,'Leakage',S_leakage)
+     'TimeResolution',T_resolution,'Overlap',overlap,'Leakage',S_leakage);
 
 
 pcolor(T,F,log10(P));
@@ -189,6 +195,7 @@ ylabel('Frequency [Hz]')
 ylim([0 6])
 F_resolution = F_resolution
 T_resolution = T(2)-T(1)
+BW_comb = F_resolution;
 
 %test with overtone finder
 %ADD sliding window data
@@ -213,18 +220,28 @@ colorbar
 xlabel('Time [s]')
 ylabel('Frequency [Bpm]')
 ylim([40 100])
+%test
+hold on
+plot(tHR,HR,'r','LineWidth',2)
 
 f_found = f_found';
 size(T)
 size(f_found)
+title('Probability map of radar data vs excerice watch')
+
+%plot of BPM over time
 %Kolla errorbaren om de skall vara halva
 E = ones(size(T)).*F_resolution.*60;
-
 figure(9)
 errorbar(T,f_found*60,E,'-s','MarkerSize',10,...
     'MarkerEdgeColor','red','MarkerFaceColor','red')
+hold on
+plot(tHR,HR)
+plot([min(tHR) max(tHR)],[AvHR AvHR],'--r')
+legend('Radar','Pulse watch','Average from pulse watch')
 xlabel('Time [s]')
 ylabel('Frequency [Bpm]')
+ylim(60*[Fscan_lower_HR Fscan_upper_HR])
 
 
 
