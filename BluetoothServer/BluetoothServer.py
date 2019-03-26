@@ -17,17 +17,17 @@ host = ""
 port = 1  # Raspberry Pi uses port 1 for Bluetooth Communication
 
 
-def write_data_to_app(data,type):
-    print(data + ' ' + type)
-    if type is 'pulse rate':
+def write_data_to_app(data,data_type):
+    print(data + ' ' + data_type)
+    if data_type is 'pulse rate':
         string = 'PR ' + data
         print(string)
         send_data(string)
-    elif type is 'breath rate':
+    elif data_type is 'breath rate':
         string = 'BR ' + data
         print(string)
         send_data(string)
-    elif type is 'real time breath':
+    elif data_type is 'real time breath':
         string = 'RTB ' + data
         send_data(string)
 
