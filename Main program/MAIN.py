@@ -5,6 +5,7 @@ import queue
 
 #import Radar
 import Class_Thread
+import Filter
 
 # Main method for initiating and running radar measurements, signal processing and sending data through bluetooth to application.
 
@@ -20,6 +21,9 @@ def main():
 
     radar = Class_Thread.Radar(radar_queue, interrupt_queue)
     radar.get_data()
+
+    filter = Filter.Filter(radar_queue, interrupt_queue)
+    filter.start()
 
     # signalprocessing = Signalprocessing(radar_queue,heart_rate_queue,resp_rate_queue)
     # signalprocessing.start()

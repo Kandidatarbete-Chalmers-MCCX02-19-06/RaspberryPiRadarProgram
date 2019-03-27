@@ -21,8 +21,8 @@ def main():
     client.squeeze = False
 
     # Setup parameters
-    filename = "SimonPremiar_0314_Test3.csv"
-    time = 90
+    filename = "Lins_0326_Test1.csv"
+    time = 120
     config = setup_parameters()
     seq = config.sweep_rate * time
     config.sensor = args.sensors
@@ -39,6 +39,7 @@ def main():
     start = timer.time()
     for i in range(0, seq):
         info, sweep = client.get_next()
+        matris[seq-1-i][:] = sweep[:]
         # matris = np.roll(matris, 1, axis=0)
     end = timer.time()
     print(i+1)
@@ -52,7 +53,7 @@ def main():
 
 def setup_parameters():
     config = configs.IQServiceConfig()
-    config.range_interval = [0.20, 0.40]
+    config.range_interval = [0.50, 0.80]
     config.sweep_rate = 100
     config.gain = 1
     # config.running_average_factor = 0.5

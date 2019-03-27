@@ -60,7 +60,7 @@ def main():
 
 def config_setup():
     config = configs.EnvelopeServiceConfig()
-    config.range_interval = [0.4, 0.8]
+    config.range_interval = [0.4, 1.5]
     config.sweep_rate = 2
     config.gain = 1
     config.session_profile = configs.EnvelopeServiceConfig.MAX_DEPTH_RESOLUTION
