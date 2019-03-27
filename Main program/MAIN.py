@@ -42,6 +42,7 @@ def main():
 
     radar_queue = queue.Queue()
     interrupt_queue = queue.Queue()
+    test_queue = queue.Queue()
     # heart_rate_queue = queue.Queue()
     # resp_rate_queue = queue.Queue()
 
@@ -55,17 +56,26 @@ def main():
     # bluetooth = Bluetooth(heart_rate_queue,resp_rate_queue)
     # bluetooth.start()
     # bluetooth send data
+    # for i in range(1, 2000):
+    #     time.sleep(1)
+    #     while len(clientList) == 0 and run == True:
+    #         pass
+    #     data = addData(sinvalue)
+    #     # print('Write data: ' + data)
+    #     data_pulse, data_breath = data.split(' ')
+    #     write_data_to_app(data_pulse, 'heart rate')
+    #     write_data_to_app(data_breath, 'breath rate')
+    #     sinvalue += 0.157
     for i in range(1, 2000):
         time.sleep(1)
         while len(clientList) == 0 and run == True:
             pass
-        data = addData(sinvalue)
+        data = getDatafromQueue(test_queue)
         # print('Write data: ' + data)
         data_pulse, data_breath = data.split(' ')
         write_data_to_app(data_pulse, 'heart rate')
         write_data_to_app(data_breath, 'breath rate')
         sinvalue += 0.157
-
 
     server.close()
     #TODO Stänga ner raspberry
@@ -109,6 +119,11 @@ def addData(i):
     data[0] = round(data[0])
     data[1] = round(data[1])
     return str(data[0]) + ' ' + str(data[1])
+
+def getDatafromQueue(test_queue):
+    test_queue.put(addData(1))
+    return test_queue.get()
+
 
 class ConnectDevicesThread(threading.Thread):
     def __init__(self):
