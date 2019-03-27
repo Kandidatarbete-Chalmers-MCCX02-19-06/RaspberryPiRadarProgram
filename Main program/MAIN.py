@@ -10,6 +10,9 @@ import bluetooth
 import math
 import random
 
+# Running command line arguments. Shell commands
+import subprocess
+
 # Variables bluetooth:
 clientList = []         # list for each connected device, sockets
 addressList = []        # list for mac-adresses from each connected device
@@ -67,7 +70,7 @@ def main():
     server.close()
     #TODO Stänga ner raspberry
     ConnectDevicesThread.join()     # Waits for the thread to close. Implies all ReadDeviceThreads are also closed.
-
+    subprocess.call(["sudo", "shutdown", "-h", "now"])       # shutdown of Raspberry Pi
 
 
 
