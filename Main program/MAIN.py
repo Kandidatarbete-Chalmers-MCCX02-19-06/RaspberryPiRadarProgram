@@ -126,6 +126,7 @@ def addData(i):
 
 def getDatafromQueue(test_queue):
     test_queue.put(addData(1))
+    print(test_queue.get())
     return test_queue.get()
 
 
