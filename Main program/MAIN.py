@@ -18,7 +18,7 @@ readThreadList = []     # list for threads to recieve from each device
 run = True
 test_queue = queue.Queue()
 host = ""
-port = 1  # Raspberry Pi uses port 1 for Bluetooth Communication
+port = 8888  # Raspberry Pi uses port 1 for Bluetooth Communication
 
 # Queues:
 radar_queue = queue.Queue()
