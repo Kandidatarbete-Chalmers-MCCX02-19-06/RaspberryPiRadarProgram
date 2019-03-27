@@ -9,16 +9,15 @@ class Filter(threading.Thread):
     def __init__(self, radar_queue, interrupt_queue):
         # Setup for collecting data from radar
         
-        self.time = 10  # Duration for a set amount of sequences
-        self.seq = self.config.sweep_rate * self.time
+        self.peak_vector_length = 5
 
-        # Vector for radar values from tracked data
-        self.peak_vector = np.zeros((1, self.seq), dtype=np.csingle)
+        # Vector for radar values from tracked data #Hur lång ska den vara?
+        self.peak_vector = np.zeros((1, self.peak_vector_length), dtype=np.csingle)
         self.data_idx = 0  # Inedex for peak vector used for filtering
 
         self.radar_queue = radar_queue
         self.interrupt_queue = interrupt_queue
-        super(Radar, self).__init__()  # Inherit threading vitals
+        super(Filter, self).__init__()  # Inherit threading vitals
 
     # Loop which collects data from the radar, tracks the maximum peak and filters it for further signal processing. The final filtered data is put into a queue.
     def run(self):
@@ -28,12 +27,11 @@ class Filter(threading.Thread):
             self.filter_HeartRate()
             self.filter_RespRate()
             self.data_idx += 1
-            if self.data_idx >= self.seq:  # Resets matrix index to zero for filtering.
+            if self.data_idx >= self.peak_vector_length:  # Resets matrix index to zero for filtering.
                 self.data_idx = 0
             if self.interrupt_queue.empty() == False:  # Interrupt from main
                 print('Breaking loop')
                 break
-        self.client.disconnect()
 
     # Filter for heart rate using the last X sampels according to data_idx. Saves data to queue
     def filter_HeartRate(self):

@@ -3,18 +3,12 @@ import threading
 import numpy as np
 import queue
 
-# import Radar
-# import Class_Thread
-# import Filter
+import Radar
 
 # Bluetooth:
 import bluetooth
 import math
 import random
-
-#bluetooth
-
-# Main method for initiating and running radar measurements, signal processing and sending data through bluetooth to application.
 
 # Variables bluetooth:
 clientList = []         # list for each connected device, sockets
@@ -34,6 +28,8 @@ try:
 except:
     print("Bluetooth Binding Failed")
 
+
+# Main method for initiating and running radar measurements, signal processing and sending data through bluetooth to application.
 def main():
     global sinvalue     # needed in order to use global variable
     global server
@@ -46,14 +42,8 @@ def main():
     # heart_rate_queue = queue.Queue()
     # resp_rate_queue = queue.Queue()
 
-    # radar = Radar.Radar(radar_queue, interrupt_queue)
-    # radar.start()
-
-    # radar = Class_Thread.Radar(radar_queue, interrupt_queue)
-    # radar.get_data()
-
-    # filter = Filter.Filter(radar_queue, interrupt_queue)
-    # filter.start()
+    radar = Radar.Radar(radar_queue, interrupt_queue)
+    radar.start()
 
 
     # signalprocessing = Signalprocessing(radar_queue,heart_rate_queue,resp_rate_queue)
