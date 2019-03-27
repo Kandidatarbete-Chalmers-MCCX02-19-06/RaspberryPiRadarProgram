@@ -35,7 +35,8 @@ class Radar():
         self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
         self.num_points = self.info["data_length"]  # Amount of data points per sampel
 
-        # Vector for radar values from tracked data
+        #### Det här kanske inte ska vara i den här klassen #####
+        # Vector for radar values from tracked data 
         self.peak_vector = np.zeros((1, self.seq), dtype=np.csingle)
         self.data_idx = 0  # Inedex for peak vector used for filtering
 
