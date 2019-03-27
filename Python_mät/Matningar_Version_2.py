@@ -21,7 +21,7 @@ def main():
     client.squeeze = False
 
     # Setup parameters
-    filename = "Lins_0326_Test1.csv"
+    filename = "Lins_0325_Test1.csv"
     time = 120
     config = setup_parameters()
     seq = config.sweep_rate * time
@@ -52,7 +52,7 @@ def main():
 
 def setup_parameters():
     config = configs.IQServiceConfig()
-    config.range_interval = [0.50, 0.80]
+    config.range_interval = [0.40, 0.80]
     config.sweep_rate = 100
     config.gain = 1
     # config.running_average_factor = 0.5
