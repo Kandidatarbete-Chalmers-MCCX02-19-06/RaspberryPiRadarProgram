@@ -64,7 +64,7 @@ def main():
     # bluetooth send data
     for i in range(1, 2000):
         time.sleep(1)
-        while len(clientList) == 0:
+        while len(clientList) == 0 and run == True:
             pass
         data = addData(sinvalue)
         # print('Write data: ' + data)
@@ -74,8 +74,11 @@ def main():
         sinvalue += 0.157
 
 
-    run = False
     server.close()
+    #TODO Stänga ner raspberry
+    ConnectDevicesThread.join()     # Waits for the thread to close. Implies all ReadDeviceThreads are also closed.
+
+
 
 
 # Bluetooth functions
@@ -127,6 +130,9 @@ class ConnectDevicesThread(threading.Thread):
             readThreadList.append(ReadDeviceThread(c))       # one thread for each connected device
             readThreadList[len(readThreadList)-1].start()
             print("New client: ", a)
+        for thread in readThreadList:       # Makes sure that all our client threads are closed before exiting thread
+            thread.join()
+            print(thread + " is closed")
 
 
 class ReadDeviceThread(threading.Thread):
@@ -142,6 +148,10 @@ class ReadDeviceThread(threading.Thread):
                 print(data.decode('utf-8'))
                 if data.decode('utf-8') == 'poweroff':
                     # TODO Erik: Power off python program and Raspberry Pi
+                    run = False
+                    for client in clientList:
+                        client.close()
+                        clientList.remove(client)
                     pass
         except:
             self.client.close()
