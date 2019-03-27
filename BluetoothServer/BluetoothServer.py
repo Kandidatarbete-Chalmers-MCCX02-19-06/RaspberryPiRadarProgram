@@ -19,8 +19,8 @@ port = 1  # Raspberry Pi uses port 1 for Bluetooth Communication
 
 def write_data_to_app(data,data_type):
     #print(data + ' ' + data_type)
-    if data_type == 'pulse rate':
-        string = ' PR ' + data + ' '
+    if data_type == 'heart rate':
+        string = ' HR ' + data + ' '
         #print(string)
         send_data(string)
     elif data_type == 'breath rate':
@@ -107,7 +107,7 @@ for i in range(1,2000):
     data = addData(sinvalue)
     #print('Write data: ' + data)
     data_pulse, data_breath = data.split(' ')
-    write_data_to_app(data_pulse, 'pulse rate')
+    write_data_to_app(data_pulse, 'heart rate')
     write_data_to_app(data_breath, 'breath rate')
     sinvalue += 0.157
 
