@@ -18,7 +18,7 @@ clientList = []         # list for each connected device, sockets
 addressList = []        # list for mac-adresses from each connected device
 readThreadList = []     # list for threads to recieve from each device
 sinvalue = 0
-run = True
+go = True
 host = ""
 port = 1  # Raspberry Pi uses port 1 for Bluetooth Communication
 
@@ -71,7 +71,7 @@ def main():
         time.sleep(1)
         if time.time() > timeout:
             interrupt_queue.put(1)
-        while len(clientList) == 0 and run == True:
+        while len(clientList) == 0 and go == True:
             pass
         data = getDatafromQueue(test_queue)
         print('Write data: ' + data)
@@ -136,7 +136,7 @@ class ConnectDevicesThread(threading.Thread):
         server.listen(7)
 
     def run(self):
-        while run:
+        while go:
             c, a = server.accept()
             clientList.append(c)
             addressList.append(a)
@@ -157,12 +157,12 @@ class ReadDeviceThread(threading.Thread):
 
     def run(self):
         try:
-            while run:
+            while go:
                 data = self.client.recv(1024)       # important to write self.client everywhere in the class/thread
                 print(data.decode('utf-8'))
                 if data.decode('utf-8') == 'poweroff':
                     # TODO Erik: Power off python program and Raspberry Pi
-                    run = False
+                    go = False
                     for client in clientList:
                         client.close()
                         clientList.remove(client)
