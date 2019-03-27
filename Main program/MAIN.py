@@ -39,6 +39,7 @@ def main():
 
     connectDevices = ConnectDevicesThread()
     connectDevices.start()
+    print("Bluetooth Device Connected")
 
     radar_queue = queue.Queue()
     interrupt_queue = queue.Queue()
@@ -48,7 +49,7 @@ def main():
 
     radar = Radar.Radar(radar_queue, interrupt_queue)
     radar.start()
-    timeout = time.time() + 10 
+    timeout = time.time() + 10 * 60
 
     # signalprocessing = Signalprocessing(radar_queue,heart_rate_queue,resp_rate_queue)
     # signalprocessing.start()
@@ -73,13 +74,14 @@ def main():
         while len(clientList) == 0 and run == True:
             pass
         data = getDatafromQueue(test_queue)
-        # print('Write data: ' + data)
+        print('Write data: ' + data)
         data_pulse, data_breath = data.split(' ')
         write_data_to_app(data_pulse, 'heart rate')
         write_data_to_app(data_breath, 'breath rate')
-        sinvalue += 0.157
+        #sinvalue += 0.157
 
     server.close()
+    print("SLUT")
     #TODO Stänga ner raspberry
     ConnectDevicesThread.join()     # Waits for the thread to close. Implies all ReadDeviceThreads are also closed.
     subprocess.call(["sudo", "shutdown", "-h", "now"])       # shutdown of Raspberry Pi
@@ -140,6 +142,7 @@ class ConnectDevicesThread(threading.Thread):
             readThreadList.append(ReadDeviceThread(c))       # one thread for each connected device
             readThreadList[len(readThreadList)-1].start()
             print("New client: ", a)
+
         for thread in readThreadList:       # Makes sure that all our client threads are closed before exiting thread
             thread.join()
             print(thread + " is closed")
@@ -162,8 +165,8 @@ class ReadDeviceThread(threading.Thread):
                     for client in clientList:
                         client.close()
                         clientList.remove(client)
-                    pass
         except:
+            print("exception")
             self.client.close()
             print('remove client: ' + str(addressList[clientList.index(self.client)]))
             clientList.remove(self.client)
