@@ -83,7 +83,7 @@ def main():
     server.close()
     print("SLUT")
     #TODO Stänga ner raspberry
-    ConnectDevicesThread.join()     # Waits for the thread to close. Implies all ReadDeviceThreads are also closed.
+    connectDevices.join()     # Waits for the thread to close. Implies all ReadDeviceThreads are also closed.
     subprocess.call(["sudo", "shutdown", "-h", "now"])       # shutdown of Raspberry Pi
 
 
