@@ -21,6 +21,7 @@ class Radar(threading.Thread):
         else:
             port = self.args.serial_port or example_utils.autodetect_serial_port()
             self.client = RegClient(port)
+            b = 0
 
         self.client.squeeze = False
         self.config = configs.IQServiceConfig()
@@ -46,7 +47,7 @@ class Radar(threading.Thread):
     # Loop which collects data from the radar, tracks the maximum peak and filters it for further signal processing. The final filtered data is put into a queue.
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
-        while True:
+        while:
             # for i in range(self.seq*2):
             self.get_data()
             self.tracker()
