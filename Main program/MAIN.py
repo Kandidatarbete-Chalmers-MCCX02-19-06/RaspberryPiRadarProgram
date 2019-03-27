@@ -3,9 +3,9 @@ import threading
 import numpy as np
 import queue
 
-#import Radar
-import Class_Thread
-#import Filter
+# import Radar
+# import Class_Thread
+# import Filter
 
 # Bluetooth:
 import bluetooth
@@ -13,7 +13,6 @@ import math
 import random
 
 #bluetooth
-import bluetoothThreads
 
 # Main method for initiating and running radar measurements, signal processing and sending data through bluetooth to application.
 
@@ -26,20 +25,20 @@ run = True
 host = ""
 port = 1  # Raspberry Pi uses port 1 for Bluetooth Communication
 
+# Creaitng Socket Bluetooth RFCOMM communication
+server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+print('Bluetooth Socket Created')
+try:
+    server.bind((host, port))
+    print("Bluetooth Binding Completed")
+except:
+    print("Bluetooth Binding Failed")
 
 def main():
     global sinvalue     # needed in order to use global variable
+    global server
 
-    # Creaitng Socket Bluetooth RFCOMM communication
-    server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-    print('Bluetooth Socket Created')
-    try:
-        server.bind((host, port))
-        print("Bluetooth Binding Completed")
-    except:
-        print("Bluetooth Binding Failed")
-
-    connectDevices = bluetoothThreads.ConnectDevicesThread()
+    connectDevices = ConnectDevicesThread()
     connectDevices.start()
 
     radar_queue = queue.Queue()
@@ -115,6 +114,39 @@ def addData(i):
     data[1] = round(data[1])
     return str(data[0]) + ' ' + str(data[1])
 
+class ConnectDevicesThread(threading.Thread):
+    def __init__(self):
+        super(ConnectDevicesThread, self).__init__()
+        server.listen(7)
+
+    def run(self):
+        while run:
+            c, a = server.accept()
+            clientList.append(c)
+            addressList.append(a)
+            readThreadList.append(ReadDeviceThread(c))       # one thread for each connected device
+            readThreadList[len(readThreadList)-1].start()
+            print("New client: ", a)
+
+
+class ReadDeviceThread(threading.Thread):
+    client = None
+    def __init__(self, client):
+        self.client = client
+        super(ReadDeviceThread, self).__init__()
+
+    def run(self):
+        try:
+            while run:
+                data = self.client.recv(1024)       # important to write self.client everywhere in the class/thread
+                print(data.decode('utf-8'))
+                if data.decode('utf-8') == 'poweroff':
+                    # TODO Erik: Power off python program and Raspberry Pi
+                    pass
+        except:
+            self.client.close()
+            print('remove client: ' + str(addressList[clientList.index(self.client)]))
+            clientList.remove(self.client)
 
 
 if __name__ == "__main__":
