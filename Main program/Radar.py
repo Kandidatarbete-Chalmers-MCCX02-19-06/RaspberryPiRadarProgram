@@ -58,6 +58,7 @@ class Radar(threading.Thread):
             if self.interrupt_queue.empty() == False:  # Interrupt from main
                 print('Breaking loop')
                 break
+            print(self.data_idx)
         self.client.disconnect()
 
     # Method to collect data from the streaming server
@@ -69,7 +70,6 @@ class Radar(threading.Thread):
         HR_peak_vector = copy.copy(self.peak_vector)
         for i in range(5):
             HR_peak_vector[0][i] = 0
-        print(HR_peak_vector)
         self.radar_queue.put(HR_peak_vector)
 
     # Filter for Respitory rate. Saves data to queue

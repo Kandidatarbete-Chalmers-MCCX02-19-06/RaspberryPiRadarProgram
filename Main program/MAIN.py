@@ -47,7 +47,7 @@ def main():
 
     radar = Radar.Radar(radar_queue, interrupt_queue)
     radar.start()
-
+    timeout = time.time() + 10 
 
     # signalprocessing = Signalprocessing(radar_queue,heart_rate_queue,resp_rate_queue)
     # signalprocessing.start()
@@ -57,6 +57,8 @@ def main():
     # bluetooth send data
     for i in range(1, 2000):
         time.sleep(1)
+        if time.time() > timeout:
+            interrupt_queue.put(1)
         while len(clientList) == 0 and run == True:
             pass
         data = addData(sinvalue)
