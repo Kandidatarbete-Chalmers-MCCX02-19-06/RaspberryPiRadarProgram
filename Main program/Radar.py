@@ -47,7 +47,7 @@ class Radar(threading.Thread):
     # Loop which collects data from the radar, tracks the maximum peak and filters it for further signal processing. The final filtered data is put into a queue.
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
-        while:
+        while self.interrupt_queue.empty():
             # for i in range(self.seq*2):
             self.get_data()
             self.tracker()
@@ -56,9 +56,6 @@ class Radar(threading.Thread):
             self.data_idx += 1
             if self.data_idx >= self.seq:  # Resets matrix index to zero for filtering.
                 self.data_idx = 0
-            if self.interrupt_queue.empty() == False:  # Interrupt from main
-                print('Breaking loop')
-                break
             print(self.data_idx)
         self.client.disconnect()
 
