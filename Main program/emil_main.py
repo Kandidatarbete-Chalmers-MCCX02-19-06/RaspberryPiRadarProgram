@@ -16,7 +16,7 @@ import random
 clientList = []         # list for each connected device, sockets
 addressList = []        # list for mac-adresses from each connected device
 readThreadList = []     # list for threads to recieve from each device
-#sinvalue = 0
+# sinvalue = 0
 run = True
 test_queue = queue.Queue()
 host = ""
@@ -33,33 +33,31 @@ def main():
     # resp_rate_queue = queue.Queue()
 
     radar = Radar.Radar(radar_queue, interrupt_queue)
-    radar.start(
+    radar.start()
 
-        # Creaitng Socket Bluetooth RFCOMM communication
-        server=bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-        print('Bluetooth Socket Created')
-        try:
+    # Creaitng Socket Bluetooth RFCOMM communication
+    server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+    print('Bluetooth Socket Created')
+    try:
         server.bind((host, port))
         print("Bluetooth Binding Completed")
-        except:
+    except:
         print("Bluetooth Binding Failed")
 
-        connectDevices=ConnectDevicesThread(server)
-        connectDevices.start()
-
-    )
+    connectDevices = ConnectDevicesThread(server)
+    connectDevices.start()
 
     for i in range(1, 2000):
         time.sleep(1)
         while len(clientList) == 0:
             pass
-        #data = addData(sinvalue)
+        # data = addData(sinvalue)
         data = getDataFromQueue()
-        #print('Write data: ' + data)
+        # print('Write data: ' + data)
         data_pulse, data_breath = data.split(' ')
         write_data_to_app(data_pulse, 'heart rate')
         write_data_to_app(data_breath, 'breath rate')
-        #sinvalue += 0.157
+        # sinvalue += 0.157
 
     interrupt_queue.put(1)
     server.close()
@@ -68,7 +66,7 @@ def main():
 
 
 def write_data_to_app(data, data_type):
-    #print(data + ' ' + data_type)
+    # print(data + ' ' + data_type)
     if data_type == 'heart rate':
         string = ' HR ' + data + ' '
         # print(string)
@@ -86,7 +84,7 @@ def send_data(write):
     print('Send data: ' + write)
     for client in clientList:
         # print(addressList[clientList.index(client)])
-        #print("Length " + str(len(clientList)))
+        # print("Length " + str(len(clientList)))
         try:
             client.send(write.encode('utf-8'))      # write.encode('utf-8')
         except:
