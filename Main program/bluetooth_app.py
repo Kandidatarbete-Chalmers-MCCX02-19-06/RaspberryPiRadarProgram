@@ -20,7 +20,7 @@ class bluetooth_app:
         self.server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
         print('Bluetooth Socket Created')
         try:
-            self.server.bind((host, port))
+            self.server.bind((self.host, self.port))
             print("Bluetooth Binding Completed")
         except:
             print("Bluetooth Binding Failed")
