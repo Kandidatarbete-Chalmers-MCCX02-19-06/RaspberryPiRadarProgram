@@ -22,7 +22,7 @@ test_queue = queue.Queue()
 host = ""
 # Raspberry Pi uses port 1 for Bluetooth Communication
 #port = bluetooth.get_available_port(bluetooth.RFCOMM)
-port = 3
+port = 2
 
 # Queues:
 
