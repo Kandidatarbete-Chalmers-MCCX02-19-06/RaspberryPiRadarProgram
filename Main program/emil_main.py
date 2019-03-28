@@ -32,20 +32,22 @@ def main():
     # heart_rate_queue = queue.Queue()
     # resp_rate_queue = queue.Queue()
 
-    # Creaitng Socket Bluetooth RFCOMM communication
-    server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-    print('Bluetooth Socket Created')
-    try:
+    radar = Radar.Radar(radar_queue, interrupt_queue)
+    radar.start(
+
+        # Creaitng Socket Bluetooth RFCOMM communication
+        server=bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+        print('Bluetooth Socket Created')
+        try:
         server.bind((host, port))
         print("Bluetooth Binding Completed")
-    except:
+        except:
         print("Bluetooth Binding Failed")
 
-    connectDevices = ConnectDevicesThread(server)
-    connectDevices.start()
+        connectDevices=ConnectDevicesThread(server)
+        connectDevices.start()
 
-    radar = Radar.Radar(radar_queue, interrupt_queue)
-    radar.start()
+    )
 
     for i in range(1, 2000):
         time.sleep(1)
