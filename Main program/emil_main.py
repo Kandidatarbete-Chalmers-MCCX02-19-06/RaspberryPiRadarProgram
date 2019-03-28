@@ -32,8 +32,8 @@ def main():
     # heart_rate_queue = queue.Queue()
     # resp_rate_queue = queue.Queue()
 
-    radar = Radar.Radar(radar_queue, interrupt_queue)
-    radar.start()
+    # radar = Radar.Radar(radar_queue, interrupt_queue)
+    # radar.start()
 
     # Creaitng Socket Bluetooth RFCOMM communication
     server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
