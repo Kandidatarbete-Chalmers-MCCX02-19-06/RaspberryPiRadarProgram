@@ -21,7 +21,6 @@ class Radar(threading.Thread):
         else:
             port = self.args.serial_port or example_utils.autodetect_serial_port()
             self.client = RegClient(port)
-            b = 0
 
         self.client.squeeze = False
         self.config = configs.IQServiceConfig()
