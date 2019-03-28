@@ -1,3 +1,5 @@
+from typing import Any, Union
+
 import time
 import threading
 import numpy as np
@@ -18,7 +20,7 @@ readThreadList = []     # list for threads to recieve from each device
 run = True
 test_queue = queue.Queue()
 host = ""
-port = bluetooth.PORT_ANY  # Raspberry Pi uses port 1 for Bluetooth Communication
+port = 1  # Raspberry Pi uses port 1 for Bluetooth Communication
 
 # Queues:
 radar_queue = queue.Queue()
@@ -36,6 +38,8 @@ except:
     print("Bluetooth Binding Failed")
 
 # Bluetooth classes:
+
+
 class ConnectDevicesThread(threading.Thread):
     def __init__(self,):
         super(ConnectDevicesThread, self).__init__()
@@ -53,6 +57,7 @@ class ConnectDevicesThread(threading.Thread):
 
 class ReadDeviceThread(threading.Thread):
     client = None
+
     def __init__(self, client):
         self.client = client
         super(ReadDeviceThread, self).__init__()
@@ -60,7 +65,8 @@ class ReadDeviceThread(threading.Thread):
     def run(self):
         try:
             while run:
-                data = self.client.recv(1024)       # important to write self.client everywhere in the class/thread
+                # important to write self.client everywhere in the class/thread
+                data = self.client.recv(1024)
                 print(data.decode('utf-8'))
                 if data.decode('utf-8') == 'poweroff':
                     # TODO Erik: Power off python program and Raspberry Pi
@@ -72,29 +78,31 @@ class ReadDeviceThread(threading.Thread):
 
 
 # Bluetooth functions:
-def write_data_to_app(data,data_type):
+def write_data_to_app(data, data_type):
     #print(data + ' ' + data_type)
     if data_type == 'heart rate':
         string = ' HR ' + data + ' '
-        #print(string)
+        # print(string)
         send_data(string)
     elif data_type == 'breath rate':
         string = ' BR ' + data + ' '
-        #print(string)
+        # print(string)
         send_data(string)
     elif data_type == 'real time breath':
         string = ' RTB ' + data + ' '
         send_data(string)
 
+
 def send_data(write):
     print('Send data: ' + write)
     for client in clientList:
-        #print(addressList[clientList.index(client)])
+        # print(addressList[clientList.index(client)])
         #print("Length " + str(len(clientList)))
         try:
             client.send(write.encode('utf-8'))      # write.encode('utf-8')
         except:
             print("Error")
+
 
 def addData(i):
     data = [70 + math.sin(i), 20 + math.sin(i+math.pi/4)]
@@ -105,6 +113,7 @@ def addData(i):
     data[0] = round(data[0])
     data[1] = round(data[1])
     return str(data[0]) + ' ' + str(data[1])
+
 
 def getDataFromQueue():
     test_queue.put(addData(1))
@@ -117,7 +126,7 @@ connectDevices.start()
 radar = Radar.Radar(radar_queue, interrupt_queue)
 radar.start()
 
-for i in range(1,2000):
+for i in range(1, 2000):
     time.sleep(1)
     while len(clientList) == 0:
         pass
@@ -131,8 +140,3 @@ for i in range(1,2000):
 
 interrupt_queue.put(1)
 server.close()
-
-
-
-
-
