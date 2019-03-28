@@ -33,8 +33,8 @@ class bluetooth_app:
             time.sleep(1)
         while len(self.client_list) == 0:
             pass
-        #data = addData(sinvalue)
-        data = self.get_data_from_queue()
+        data = self.add_data(1)
+        #data = self.get_data_from_queue()
         #print('Write data: ' + data)
         data_pulse, data_breath = data.split(' ')
         self.write_data_to_app(data_pulse, 'heart rate')
