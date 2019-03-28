@@ -21,8 +21,8 @@ def main():
     client.squeeze = False
 
     # Setup parameters
-    filename = "LowPulse_0328_Test1.csv"
-    time = 60 * 5
+    filename = "Lins50cm_0328_Test1.csv"
+    time = 300
     config = setup_parameters()
     seq = config.sweep_rate * time
     config.sensor = args.sensors
@@ -52,7 +52,7 @@ def main():
 
 def setup_parameters():
     config = configs.IQServiceConfig()
-    config.range_interval = [0.30, 0.70]
+    config.range_interval = [0.40, 0.70]
     config.sweep_rate = 20
     config.gain = 1
     # config.running_average_factor = 0.5
