@@ -1,3 +1,5 @@
+from typing import Any, Union
+
 import time
 import threading
 import numpy as np
