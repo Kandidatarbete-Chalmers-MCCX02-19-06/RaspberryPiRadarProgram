@@ -91,7 +91,7 @@ def send_data(write):
 
 
 def addData(i):
-    data = [40 + math.sin(i), 80 + math.sin(i+math.pi/4)]
+    data = [70 + math.sin(4*i), 20 + math.sin(i+math.pi/4)]
     noise = random.random()
     data[0] += 5*(noise - 0.5)
     noise = random.random()
