@@ -6,30 +6,18 @@ import numpy as np
 import queue
 
 import Radar
+import bluetooth_app
 
 # Bluetooth imports
 import bluetooth
 import math
 import random
 
-# Bluetooth variables
-clientList = []         # list for each connected device, sockets
-addressList = []        # list for mac-adresses from each connected device
-readThreadList = []     # list for threads to recieve from each device
-# sinvalue = 0
-run = True
-test_queue = queue.Queue()
-host = ""
-# Raspberry Pi uses port 1 for Bluetooth Communication
-#port = bluetooth.get_available_port(bluetooth.RFCOMM)
-port = 25
-
-# Queues:
-
 
 def main():
     radar_queue = queue.Queue()
     interrupt_queue = queue.Queue()
+    send_to_app_queue = queue.Queue()
     # heart_rate_queue = queue.Queue()
     # resp_rate_queue = queue.Queue()
 
