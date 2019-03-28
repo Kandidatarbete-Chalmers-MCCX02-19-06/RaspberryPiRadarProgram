@@ -21,7 +21,7 @@ def main():
     client.squeeze = False
 
     # Setup parameters
-    filename = "Lins50cm_0328_Test1.csv"
+    filename = "Lins50cmPuls_0328_Test1.csv"
     time = 300
     config = setup_parameters()
     seq = config.sweep_rate * time
