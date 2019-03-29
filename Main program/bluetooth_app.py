@@ -72,7 +72,10 @@ class bluetooth_app:
                 self.data = c.recv(1024)
                 print(self.data.decode('utf-8'))
                 a = type(self.data.decode('utf-8'))
-                print(a)
+                b = type('poweroff')
+                print("type " + a)
+                print("type" + b)
+                print("Message " + self.data.decode('utf-8'))
                 try:
                     if self.data.decode('utf-8').encode('utf-8') == 'poweroff'.encode('utf-8'):
                         print("Shutdown starting")
