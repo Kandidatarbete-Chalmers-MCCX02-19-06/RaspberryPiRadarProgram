@@ -51,15 +51,15 @@ class bluetooth_app:
             # one thread for each connected device
             # self.read_thread_list.append([c, a])
             # self.thread = threading.Thread(target=self.read_device, args=(c))
-            self.read_thread_list.append(threading.Thread(name="device {}".format(
+            # self.read_thread_list.append(threading.Thread(name="device {}".format(
                 len(self.client_list)), target=self.read_device, args=(c)))
-            self.read_thread_list[-1].start()
+            # self.read_thread_list[-1].start()
             print("New client: ", a)
 
     def read_device(self, client):
         try:
             while self.run:
-                self.data = self.client.recv(1024)
+                self.data=self.client.recv(1024)
                 print(self.data.decode('utf-8'))
                 if self.data.decode('utf-8') == 'poweroff':
                     # TODO Erik: Power off python program and Raspberry Pi
@@ -72,15 +72,15 @@ class bluetooth_app:
     def write_data_to_app(self, data, data_type):
         # print(data + ' ' + data_type)
         if data_type == 'heart rate':
-            string = ' HR ' + data + ' '
+            string=' HR ' + data + ' '
             # print(string)
             self.send_data(string)
         elif data_type == 'breath rate':
-            string = ' BR ' + data + ' '
+            string=' BR ' + data + ' '
             # print(string)
             self.send_data(string)
         elif data_type == 'real time breath':
-            string = ' RTB ' + data + ' '
+            string=' RTB ' + data + ' '
             self.send_data(string)
 
     def send_data(self, write):
@@ -94,13 +94,13 @@ class bluetooth_app:
                 print("Error")
 
     def add_data(self, i):
-        data = [70 + math.sin(i), 20 + math.sin(i+math.pi/4)]
-        noise = random.random()
+        data=[70 + math.sin(i), 20 + math.sin(i+math.pi/4)]
+        noise=random.random()
         data[0] += 5*(noise - 0.5)
-        noise = random.random()
+        noise=random.random()
         data[1] += noise
-        data[0] = round(data[0])
-        data[1] = round(data[1])
+        data[0]=round(data[0])
+        data[1]=round(data[1])
         return str(data[0]) + ' ' + str(data[1])
 
     def get_data_from_queue(self):
