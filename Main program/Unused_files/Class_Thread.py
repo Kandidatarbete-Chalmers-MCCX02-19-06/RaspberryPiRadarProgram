@@ -36,13 +36,14 @@ class Radar():
         self.num_points = self.info["data_length"]  # Amount of data points per sampel
 
         #### Det här kanske inte ska vara i den här klassen #####
-        # Vector for radar values from tracked data 
+        # Vector for radar values from tracked data
         self.peak_vector = np.zeros((1, self.seq), dtype=np.csingle)
         self.data_idx = 0  # Inedex for peak vector used for filtering
 
         self.radar_queue = radar_queue
         self.interrupt_queue = interrupt_queue
         self.timeout = time.time() + self.time
+        b = 0
 
     # Loop which collects data from the radar, tracks the maximum peak and filters it for further signal processing. The final filtered data is put into a queue.
     def get_data(self):

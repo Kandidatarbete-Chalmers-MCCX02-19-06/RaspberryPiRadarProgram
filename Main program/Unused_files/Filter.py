@@ -8,8 +8,9 @@ import copy
 class Filter(threading.Thread):
     def __init__(self, radar_queue, interrupt_queue):
         # Setup for collecting data from radar
-        
+
         self.peak_vector_length = 5
+        b = 0
 
         # Vector for radar values from tracked data #Hur lång ska den vara?
         self.peak_vector = np.zeros((1, self.peak_vector_length), dtype=np.csingle)

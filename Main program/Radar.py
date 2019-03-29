@@ -12,7 +12,7 @@ from acconeer_utils.mpl_process import PlotProcess, PlotProccessDiedException, F
 
 
 class Radar(threading.Thread):
-    def __init__(self, radar_queue, interrupt_queue):
+    def __init__(self, HR_filter_queue, interrupt_queue): # Lägg till RR_filter_queue som inputargument
         # Setup for collecting data from radar
         self.args = example_utils.ExampleArgumentParser().parse_args()
         example_utils.config_logging(self.args)
@@ -39,14 +39,15 @@ class Radar(threading.Thread):
         self.peak_vector = np.zeros((1, self.seq), dtype=np.csingle)
         self.data_idx = 0  # Inedex for peak vector used for filtering
 
-        self.radar_queue = radar_queue
+        self.HR_filter_queue = HR_filter_queue
+        #self.RR_filter_queue = RR_filter_queue
         self.interrupt_queue = interrupt_queue
         super(Radar, self).__init__()  # Inherit threading vitals
 
     # Loop which collects data from the radar, tracks the maximum peak and filters it for further signal processing. The final filtered data is put into a queue.
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
-        while True:
+        while self.interrupt_queue.empty():
             # for i in range(self.seq*2):
             self.get_data()
             self.tracker()
@@ -55,9 +56,10 @@ class Radar(threading.Thread):
             self.data_idx += 1
             if self.data_idx >= self.seq:  # Resets matrix index to zero for filtering.
                 self.data_idx = 0
-            if self.interrupt_queue.empty() == False:  # Interrupt from main
-                print('Breaking loop')
-                break
+            # if self.interrupt_queue.empty() == False:  # Interrupt from main
+            #     print('Breaking loop')
+            #     break
+            print('Interrupt')
         self.client.disconnect()
 
     # Method to collect data from the streaming server
@@ -69,12 +71,15 @@ class Radar(threading.Thread):
         HR_peak_vector = copy.copy(self.peak_vector)
         for i in range(5):
             HR_peak_vector[0][i] = 0
-        print(HR_peak_vector)
-        self.radar_queue.put(HR_peak_vector)
+        self.HR_filter_queue.put(HR_peak_vector)
 
     # Filter for Respitory rate. Saves data to queue
 
     def filter_RespRate(self):
+        # RR_peak_vector = copy.copy(self.peak_vector)
+        # for i in range(5):
+        #     RR_peak_vector[0][i] = 0
+        # self.RR_filter_queue.put(RR_peak_vector)
         pass
 
     # Tracks the maximum peak from collected data which is filtered for further signal processing
