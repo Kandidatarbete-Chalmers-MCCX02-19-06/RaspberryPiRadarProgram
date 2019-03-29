@@ -66,7 +66,7 @@ class bluetooth_app:
 
         for thread in thread_list:
             thread.join()
-            print(thread + " is closed")
+            print(thread.getName() + " is closed")
 
     def read_device(self):
         c = self.client_list[-1]
