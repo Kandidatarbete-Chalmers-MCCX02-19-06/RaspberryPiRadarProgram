@@ -33,19 +33,19 @@ class bluetooth_app:
 
     def app_data(self):
         while self.run:
-            for i in range(1, 2000):
-                time.sleep(1)
-                while len(self.client_list) == 0:
-                    pass
-                d = self.from_radar_queue.get()
-                data = self.add_data(d)
-                # data = self.get_data_from_queue()
-                # print('Write data: ' + data)
-                data_pulse, data_breath = data.split(' ')
-                self.write_data_to_app(data_pulse, 'heart rate')
-                self.write_data_to_app(data_breath, 'breath rate')
-                # sinvalue += 0.157
-            self.server.close()
+            # for i in range(1, 2000):
+            time.sleep(1)
+            while len(self.client_list) == 0:
+                pass
+            d = self.from_radar_queue.get()
+            data = self.add_data(d)
+            # data = self.get_data_from_queue()
+            # print('Write data: ' + data)
+            data_pulse, data_breath = data.split(' ')
+            self.write_data_to_app(data_pulse, 'heart rate')
+            self.write_data_to_app(data_breath, 'breath rate')
+            # sinvalue += 0.157
+        self.server.close()
 
     def connect_device(self):  # Does not work properly
         thread_list = []
@@ -79,9 +79,9 @@ class bluetooth_app:
                 if data.decode('utf-8') == 'poweroff':
                     print("Shutdown starting")
                     # TODO Erik: Power off python program and Raspberry Pi
-                    self.run = False
-                    print("run= " + self.run)
                     try:
+                        self.run = False
+                        print("run= " + self.run)
                         for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
                             client.close()
                             print('remove client: ' +
