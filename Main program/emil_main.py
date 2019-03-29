@@ -24,8 +24,8 @@ def main():
     # radar = Radar.Radar(radar_queue, interrupt_queue)
     # radar.start()
 
-    ble = bluetooth_app.bluetooth_app(send_to_app_queue)
-    ble.app_data()
+    bvme = bluetooth_app.bluetooth_app(send_to_app_queue)
+    bvme.app_data()
 
 
 if __name__ == "__main__":

@@ -34,12 +34,12 @@ class bluetooth_app:
         while len(self.client_list) == 0:
             pass
         data = self.add_data(1)
-        #data = self.get_data_from_queue()
-        #print('Write data: ' + data)
+        # data = self.get_data_from_queue()
+        # print('Write data: ' + data)
         data_pulse, data_breath = data.split(' ')
         self.write_data_to_app(data_pulse, 'heart rate')
         self.write_data_to_app(data_breath, 'breath rate')
-        #sinvalue += 0.157
+        # sinvalue += 0.157
         self.server.close()
 
     def connect_device(self):
@@ -47,6 +47,7 @@ class bluetooth_app:
         while self.run:
             c, a = self.server.accept()
             self.client_list.append(c)
+            print(len(self.client_list))
             self.address_list.append(a)
             # one thread for each connected device
             self.read_thread_list.append([c, a])
@@ -70,7 +71,7 @@ class bluetooth_app:
             self.client_list.remove(self.client)
 
     def write_data_to_app(self, data, data_type):
-        #print(data + ' ' + data_type)
+        # print(data + ' ' + data_type)
         if data_type == 'heart rate':
             string = ' HR ' + data + ' '
             # print(string)
@@ -87,7 +88,7 @@ class bluetooth_app:
         print('Send data: ' + write)
         for client in self.client_list:
             # print(addressList[clientList.index(client)])
-            #print("Length " + str(len(clientList)))
+            # print("Length " + str(len(clientList)))
             try:
                 client.send(write.encode('utf-8'))      # write.encode('utf-8')
             except:
