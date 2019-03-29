@@ -56,10 +56,7 @@ class Radar(threading.Thread):
             self.data_idx += 1
             if self.data_idx >= self.seq:  # Resets matrix index to zero for filtering.
                 self.data_idx = 0
-            # if self.interrupt_queue.empty() == False:  # Interrupt from main
-            #     print('Breaking loop')
-            #     break
-            print('Interrupt')
+            print(self.data_idx)
         self.client.disconnect()
 
     # Method to collect data from the streaming server
