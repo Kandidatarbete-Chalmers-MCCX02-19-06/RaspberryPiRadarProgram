@@ -15,7 +15,7 @@ class bluetooth_app:
         self.run = True
         self.send_to_app_queue = send_to_app_queue
         self.host = ""
-        self.port = 0
+        self.port = 1
         self.client = None
         self.server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
         print('Bluetooth Socket Created')
