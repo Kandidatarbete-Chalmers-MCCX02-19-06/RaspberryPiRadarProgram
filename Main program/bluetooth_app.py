@@ -59,7 +59,7 @@ class bluetooth_app:
             print("New client: ", a)
 
     def read_device(self, client):
-        self.client = self.client_list[client]
+        c = self.client_list[client]
         try:
             while self.run:
                 self.data = self.client.recv(1024)
@@ -68,9 +68,9 @@ class bluetooth_app:
                     # TODO Erik: Power off python program and Raspberry Pi
                     pass
         except:  # never gets here
-            self.client.close()
-            print('remove client: ' + str(self.address_list[self.client_list.index(self.client)]))
-            self.client_list.remove(self.client)
+            c.close()
+            print('remove client: ' + str(self.address_list[self.client_list.index(c)]))
+            self.client_list.remove(c)
 
     def write_data_to_app(self, data, data_type):
         # print(data + ' ' + data_type)
