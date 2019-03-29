@@ -12,7 +12,7 @@ from acconeer_utils.mpl_process import PlotProcess, PlotProccessDiedException, F
 
 
 class Radar(threading.Thread):
-    def __init__(self, radar_queue, interrupt_queue):
+    def __init__(self, HR_filter_queue, interrupt_queue): # Lägg till RR_filter_queue som inputargument
         # Setup for collecting data from radar
         self.args = example_utils.ExampleArgumentParser().parse_args()
         example_utils.config_logging(self.args)
@@ -39,7 +39,8 @@ class Radar(threading.Thread):
         self.peak_vector = np.zeros((1, self.seq), dtype=np.csingle)
         self.data_idx = 0  # Inedex for peak vector used for filtering
 
-        self.radar_queue = radar_queue
+        self.HR_filter_queue = HR_filter_queue
+        #self.RR_filter_queue = RR_filter_queue
         self.interrupt_queue = interrupt_queue
         super(Radar, self).__init__()  # Inherit threading vitals
 
@@ -67,11 +68,15 @@ class Radar(threading.Thread):
         HR_peak_vector = copy.copy(self.peak_vector)
         for i in range(5):
             HR_peak_vector[0][i] = 0
-        self.radar_queue.put(HR_peak_vector)
+        self.HR_filter_queue.put(HR_peak_vector)
 
     # Filter for Respitory rate. Saves data to queue
 
     def filter_RespRate(self):
+        # RR_peak_vector = copy.copy(self.peak_vector)
+        # for i in range(5):
+        #     RR_peak_vector[0][i] = 0
+        # self.RR_filter_queue.put(RR_peak_vector)
         pass
 
     # Tracks the maximum peak from collected data which is filtered for further signal processing

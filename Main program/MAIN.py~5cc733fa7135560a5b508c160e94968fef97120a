@@ -119,10 +119,6 @@ def getDataFromQueue():
     test_queue.put(addData(1))
     return test_queue.get()
 
-        for thread in readThreadList:       # Makes sure that all our client threads are closed before exiting thread
-            thread.join()
-            print(thread + " is closed")
-
 
 connectDevices = ConnectDevicesThread()
 connectDevices.start()
