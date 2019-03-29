@@ -17,12 +17,11 @@ import subprocess       # for Raspberry Pi shutdown
 
 def main():
     radar_queue = queue.Queue()
-    interrupt_queue = queue.Queue()
     send_to_app_queue = queue.Queue()
     # heart_rate_queue = queue.Queue()
     # resp_rate_queue = queue.Queue()
 
-    radar = Radar.Radar(radar_queue, interrupt_queue)
+    radar = Radar.Radar(radar_queue)
     radar.start()
 
     bvme = bluetooth_app.bluetooth_app(send_to_app_queue, radar_queue)
@@ -35,7 +34,6 @@ def main():
     print("connect_device is closed")
     radar.join()
     print("radar is closed")
-
 
     subprocess.call(["sudo", "shutdown", "-r", "now"])
 

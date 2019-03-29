@@ -7,12 +7,13 @@ import random
 
 
 class bluetooth_app:
+    run = True
+
     def __init__(self, send_to_app_queue, from_radar_queue):
         # Bluetooth variables
         self.client_list = []         # list for each connected device, sockets
         self.address_list = []        # list for mac-adresses from each connected device
         self.read_thread_list = []     # list for threads to recieve from each device
-        self.run = True
         self.send_to_app_queue = send_to_app_queue
         self.host = ""
         self.port = 1
@@ -26,9 +27,9 @@ class bluetooth_app:
         except:
             print("Bluetooth Binding Failed")
 
-        self.connect_device_thread = threading.Thread(target=self.connect_device)       # Can be accessed from main-program to wait for it to close by .join()
+        # Can be accessed from main-program to wait for it to close by .join()
+        self.connect_device_thread = threading.Thread(target=self.connect_device)
         self.connect_device_thread.start()
-
 
     def app_data(self):
         for i in range(1, 2000) and self.run:
@@ -63,7 +64,6 @@ class bluetooth_app:
             thread.join()
             print(thread + " is closed")
 
-
     def read_device(self):
         c = self.client_list[-1]
         try:
@@ -75,7 +75,8 @@ class bluetooth_app:
                     self.run = False
                     for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
                         client.close()
-                        print('remove client: ' + str(self.address_list[self.client_list.index(client)]))
+                        print('remove client: ' +
+                              str(self.address_list[self.client_list.index(client)]))
                         self.client_list.remove(c)
         except:  # never gets here
             c.close()
