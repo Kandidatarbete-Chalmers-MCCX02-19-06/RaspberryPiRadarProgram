@@ -21,6 +21,7 @@ class Radar(threading.Thread):
         else:
             port = self.args.serial_port or example_utils.autodetect_serial_port()
             self.client = RegClient(port)
+            print("RADAR Port = " + port)       # Test för att se vilken port som används av radarn
 
         self.client.squeeze = False
         self.config = configs.IQServiceConfig()
