@@ -81,7 +81,7 @@ class bluetooth_app:
                     # TODO Erik: Power off python program and Raspberry Pi
                     try:
                         self.run = False
-                        print("run= " + str(self.run)
+                        print("run= " + str(self.run))
                         for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
                             client.close()
                             print('remove client: ' +
@@ -98,15 +98,15 @@ class bluetooth_app:
     def write_data_to_app(self, data, data_type):
         # print(data + ' ' + data_type)
         if data_type == 'heart rate':
-            string=' HR ' + data + ' '
+            string = ' HR ' + data + ' '
             # print(string)
             self.send_data(string)
         elif data_type == 'breath rate':
-            string=' BR ' + data + ' '
+            string = ' BR ' + data + ' '
             # print(string)
             self.send_data(string)
         elif data_type == 'real time breath':
-            string=' RTB ' + data + ' '
+            string = ' RTB ' + data + ' '
             self.send_data(string)
 
     def send_data(self, write):
@@ -120,13 +120,13 @@ class bluetooth_app:
                 print("Error")
 
     def add_data(self, i):
-        data=[70 + math.sin(i), 20 + math.sin(i+math.pi/4)]
-        noise=random.random()
+        data = [70 + math.sin(i), 20 + math.sin(i+math.pi/4)]
+        noise = random.random()
         data[0] += 5*(noise - 0.5)
-        noise=random.random()
+        noise = random.random()
         data[1] += noise
-        data[0]=round(data[0])
-        data[1]=round(data[1])
+        data[0] = round(data[0])
+        data[1] = round(data[1])
         return str(data[0]) + ' ' + str(data[1])
 
     def get_data_from_queue(self):
