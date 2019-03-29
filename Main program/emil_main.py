@@ -21,14 +21,11 @@ def main():
     # heart_rate_queue = queue.Queue()
     # resp_rate_queue = queue.Queue()
 
-    radar = Radar.Radar(radar_queue, interrupt_queue)
-    radar.start()
+    #radar = Radar.Radar(radar_queue, interrupt_queue)
+    # radar.start()
 
     bvme = bluetooth_app.bluetooth_app(send_to_app_queue)
     bvme.app_data()
-    time.sleep(20)
-    interrupt_queue.put(1)
-    bvme.server.close()
 
 
 if __name__ == "__main__":
