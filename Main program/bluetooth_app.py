@@ -45,7 +45,6 @@ class bluetooth_app:
             self.write_data_to_app(data_pulse, 'heart rate')
             self.write_data_to_app(data_breath, 'breath rate')
             # sinvalue += 0.157
-        self.server.close()
 
     def connect_device(self):  # Does not work properly
         thread_list = []
@@ -88,6 +87,7 @@ class bluetooth_app:
                             print('remove client: ' +
                                   str(self.address_list[self.client_list.index(client)]))
                             self.client_list.remove(c)
+                        self.server.close()
                     except:
                         print("exception in for-loop")
 
