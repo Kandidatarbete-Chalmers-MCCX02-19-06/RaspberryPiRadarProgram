@@ -67,26 +67,22 @@ class bluetooth_app:
 
     def read_device(self):
         c = self.client_list[-1]
+        print(c)
+        print(self.address_list[-1])
         try:
             while self.run:
                 data = c.recv(1024)
                 print(data.decode('utf-8'))
-                print(str(data))
-                p = 'poweroff'
-                print(data.decode('utf-8') == p.encode('utf-8'))
-                try:
-                    if data.decode('utf-8') == p.encode('utf-8'):
-                        print("Shutdown starting")
-                        # TODO Erik: Power off python program and Raspberry Pi
-                        self.run = False
-                        for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
-                            client.close()
-                            print('remove client: ' +
-                                  str(self.address_list[self.client_list.index(client)]))
-                            self.client_list.remove(c)
-                except:
-                    print("Exception")
-                    pass
+                if data.decode('utf-8') == 'poweroff':
+                    print("Shutdown starting")
+                    # TODO Erik: Power off python program and Raspberry Pi
+                    self.run = False
+                    for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
+                        client.close()
+                        print('remove client: ' +
+                              str(self.address_list[self.client_list.index(client)]))
+                        self.client_list.remove(c)
+
         except:
             c.close()
             print('remove client: ' + str(self.address_list[self.client_list.index(c)]))
