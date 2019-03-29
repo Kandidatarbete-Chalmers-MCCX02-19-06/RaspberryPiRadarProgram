@@ -71,7 +71,7 @@ class bluetooth_app:
             while self.run:
                 self.data = c.recv(1024)
                 print(self.data.decode('utf-8'))
-                a = self.data.decode('utf-8') is'poweroff'
+                a = type(self.data.decode('utf-8'))
                 print(a)
                 try:
                     # if self.data.decode('utf-8') == 'poweroff':
