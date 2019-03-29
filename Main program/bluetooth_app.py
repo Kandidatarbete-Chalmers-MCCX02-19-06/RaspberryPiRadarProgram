@@ -26,10 +26,11 @@ class bluetooth_app:
         except:
             print("Bluetooth Binding Failed")
 
-    def app_data(self):
-        connect_device_thread = threading.Thread(target=self.connect_device)
-        connect_device_thread.start()
+        self.connect_device_thread = threading.Thread(target=self.connect_device)       # Can be accessed from main-program to wait for it to close by .join()
+        self.connect_device_thread.start()
 
+
+    def app_data(self):
         for i in range(1, 2000):
             time.sleep(1)
             while len(self.client_list) == 0:
@@ -45,6 +46,7 @@ class bluetooth_app:
         self.server.close()
 
     def connect_device(self):  # Does not work properly
+        thread_list = []
         self.server.listen(7)
         while self.run:
             c, a = self.server.accept()
@@ -52,12 +54,15 @@ class bluetooth_app:
             self.address_list.append(a)
             # one thread for each connected device
             # self.read_thread_list.append([c, a])
-            thread = threading.Thread(target=self.read_device)
-            thread.start()
+            thread_list.append(threading.Thread(target=self.read_device))
+            thread_list[-1].start()
             # self.read_thread_list.append(threading.Thread(target=self.read_device, args=(len(self.client_list)))
-
             # self.read_thread_list[-1].start()
             print("New client: ", a)
+        for thread in thread_list:
+            thread.join()
+            print(thread + " is closed")
+
 
     def read_device(self):
         c = self.client_list[-1]
@@ -67,7 +72,11 @@ class bluetooth_app:
                 print(self.data.decode('utf-8'))
                 if self.data.decode('utf-8') == 'poweroff':
                     # TODO Erik: Power off python program and Raspberry Pi
-                    pass
+                    self.run = False
+                    for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
+                        client.close()
+                        print('remove client: ' + str(self.address_list[self.client_list.index(client)]))
+                        self.client_list.remove(c)
         except:  # never gets here
             c.close()
             print('remove client: ' + str(self.address_list[self.client_list.index(c)]))
