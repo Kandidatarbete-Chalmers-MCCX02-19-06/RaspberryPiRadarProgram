@@ -6,12 +6,14 @@ import threading
 import time
 import math
 import random
+import queue
 
 clientList = []         # list for each connected device, sockets
 addressList = []        # list for mac-adresses from each connected device
 readThreadList = []     # list for threads to recieve from each device
-sinvalue = 0
+#sinvalue = 0
 run = True
+test_queue = queue.Queue()
 
 host = ""
 port = 1  # Raspberry Pi uses port 1 for Bluetooth Communication
@@ -51,6 +53,10 @@ def addData(i):
     data[0] = round(data[0])
     data[1] = round(data[1])
     return str(data[0]) + ' ' + str(data[1])
+
+def getDataFromQueue():
+    test_queue.put(addData(1))
+    return test_queue.get()
 
 # Creaitng Socket Bluetooth RFCOMM communication
 server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
@@ -105,12 +111,13 @@ for i in range(1,2000):
     time.sleep(1)
     while len(clientList) == 0:
         pass
-    data = addData(sinvalue)
+    #data = addData(sinvalue)
+    data = getDataFromQueue()
     #print('Write data: ' + data)
     data_pulse, data_breath = data.split(' ')
     write_data_to_app(data_pulse, 'heart rate')
     write_data_to_app(data_breath, 'breath rate')
-    sinvalue += 0.157
+    #sinvalue += 0.157
 
 run = False
 server.close()

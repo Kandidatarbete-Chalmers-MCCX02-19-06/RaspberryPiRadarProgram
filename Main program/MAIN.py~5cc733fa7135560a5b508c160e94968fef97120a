@@ -20,7 +20,7 @@ readThreadList = []     # list for threads to recieve from each device
 run = True
 test_queue = queue.Queue()
 host = ""
-port = 1  # Raspberry Pi uses port 1 for Bluetooth Communication
+port = bluetooth.get_available_port(bluetooth.RFCOMM)  # Raspberry Pi uses port 1 for Bluetooth Communication
 print("port = " + port)
 # Queues:
 radar_queue = queue.Queue()
@@ -118,10 +118,6 @@ def addData(i):
 def getDataFromQueue():
     test_queue.put(addData(1))
     return test_queue.get()
-
-        for thread in readThreadList:       # Makes sure that all our client threads are closed before exiting thread
-            thread.join()
-            print(thread + " is closed")
 
 
 connectDevices = ConnectDevicesThread()
