@@ -22,7 +22,7 @@ def main():
     # heart_rate_queue = queue.Queue()
     # resp_rate_queue = queue.Queue()
 
-    radar = Radar.Radar(radar_queue)
+    radar = Radar.Radar(radar_queue, a)
     radar.start()
 
     bvme = bluetooth_app.bluetooth_app(send_to_app_queue, radar_queue)
