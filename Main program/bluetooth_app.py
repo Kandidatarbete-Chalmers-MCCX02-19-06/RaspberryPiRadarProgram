@@ -50,7 +50,7 @@ class bluetooth_app:
             self.address_list.append(a)
             # one thread for each connected device
             # self.read_thread_list.append([c, a])
-            thread = threading.Thread(target=self.read_device, args=(c))
+            thread = threading.Thread(target=self.read_device)
             thread.start()
             # self.read_thread_list.append(threading.Thread(target=self.read_device, args=(len(self.client_list)))
 
@@ -58,7 +58,7 @@ class bluetooth_app:
             print("New client: ", a)
 
     def read_device(self, client):
-        c = client
+        c = self.client_list[-1]
         try:
             while self.run:
                 self.data = self.client.recv(1024)
