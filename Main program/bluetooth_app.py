@@ -31,29 +31,28 @@ class bluetooth_app:
 
         for i in range(1, 2000):
             time.sleep(1)
-        while len(self.client_list) == 0:
-            pass
-        data = self.add_data(1)
-        # data = self.get_data_from_queue()
-        # print('Write data: ' + data)
-        data_pulse, data_breath = data.split(' ')
-        self.write_data_to_app(data_pulse, 'heart rate')
-        self.write_data_to_app(data_breath, 'breath rate')
-        # sinvalue += 0.157
-        self.server.close()
+            while len(self.client_list) == 0:
+                pass
+            data = self.add_data(1)
+            # data = self.get_data_from_queue()
+            # print('Write data: ' + data)
+            data_pulse, data_breath = data.split(' ')
+            self.write_data_to_app(data_pulse, 'heart rate')
+            self.write_data_to_app(data_breath, 'breath rate')
+            # sinvalue += 0.157
+            self.server.close()
 
     def connect_device(self):
         self.server.listen(7)
         while self.run:
             c, a = self.server.accept()
             self.client_list.append(c)
-            print(len(self.client_list))
             self.address_list.append(a)
             # one thread for each connected device
-            self.read_thread_list.append([c, a])
-            self.thread = threading.Thread(target=self.read_device, args=(c))
-            # self.read_thread_list.append(threading.Thread(target=self.read_device, args=(c)))
-            # self.read_thread_list[-1].start()
+            # self.read_thread_list.append([c, a])
+            # self.thread = threading.Thread(target=self.read_device, args=(c))
+            self.read_thread_list.append(threading.Thread(target=self.read_device, args=(c)))
+            self.read_thread_list[-1].start()
             print("New client: ", a)
 
     def read_device(self, client):
