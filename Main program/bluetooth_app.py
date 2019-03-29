@@ -40,7 +40,7 @@ class bluetooth_app:
             self.write_data_to_app(data_pulse, 'heart rate')
             self.write_data_to_app(data_breath, 'breath rate')
             # sinvalue += 0.157
-            self.server.close()
+        self.server.close()
 
     def connect_device(self):  # Does not work properly
         self.server.listen(7)
