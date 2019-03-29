@@ -26,7 +26,7 @@ class bluetooth_app:
             print("Bluetooth Binding Failed")
 
     def app_data(self):
-        connect_device_thread = threading.Thread(target=self.connect_device)
+        connect_device_thread = threading.Thread(target=self.connect_device, args=(self.server))
         connect_device_thread.start()
 
         for i in range(1, 2000):
@@ -42,7 +42,8 @@ class bluetooth_app:
             # sinvalue += 0.157
             self.server.close()
 
-    def connect_device(self):
+    def connect_device(self, server):
+        self.server = server
         self.server.listen(7)
         while self.run:
             c, a = self.server.accept()
