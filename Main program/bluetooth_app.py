@@ -74,8 +74,8 @@ class bluetooth_app:
                 a = type(self.data.decode('utf-8'))
                 print(a)
                 try:
-                    # if self.data.decode('utf-8') == 'poweroff':
-                    if c.send(1024).encode('utf-8') == 'poweroff':
+                    if self.data.decode('unicode') == 'poweroff':
+                        # if c.send(1024).encode('utf-8') == 'poweroff':
                         # TODO Erik: Power off python program and Raspberry Pi
                         self.run = False
                         for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
