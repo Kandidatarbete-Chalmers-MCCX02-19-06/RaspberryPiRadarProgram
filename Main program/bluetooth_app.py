@@ -80,11 +80,15 @@ class bluetooth_app:
                     print("Shutdown starting")
                     # TODO Erik: Power off python program and Raspberry Pi
                     self.run = False
-                    for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
-                        client.close()
-                        print('remove client: ' +
-                              str(self.address_list[self.client_list.index(client)]))
-                        self.client_list.remove(c)
+                    print("run= " + self.run)
+                    try:
+                        for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
+                            client.close()
+                            print('remove client: ' +
+                                  str(self.address_list[self.client_list.index(client)]))
+                            self.client_list.remove(c)
+                    except:
+                        print("exception in for-loop")
 
         except:
             c.close()
