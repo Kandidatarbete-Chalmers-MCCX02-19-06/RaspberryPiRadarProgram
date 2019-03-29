@@ -18,7 +18,8 @@ class Radar(threading.Thread):
         example_utils.config_logging(self.args)
         if self.args.socket_addr:
             self.client = JSONClient(self.args.socket_addr)
-            print("RADAR Port = " + self.args.socket_addr)  # Test för att se vilken port som används av radarn
+            # Test för att se vilken port som används av radarn
+            print("RADAR Port = " + self.args.socket_addr)
         else:
             port = self.args.serial_port or example_utils.autodetect_serial_port()
             self.client = RegClient(port)
@@ -28,9 +29,9 @@ class Radar(threading.Thread):
         self.config.sensor = self.args.sensors
 
         self.config.range_interval = [0.2, 0.6]  # Measurement interval
-        self.config.sweep_rate = 1  # Frequency for collecting data
+        self.config.sweep_rate = 100  # Frequency for collecting data
         self.config.gain = 1  # Gain between 0 and 1.
-        self.time = 10  # Duration for a set amount of sequences
+        self.time = 1  # Duration for a set amount of sequences
         self.seq = self.config.sweep_rate * self.time
 
         self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
@@ -55,9 +56,11 @@ class Radar(threading.Thread):
             self.filter_HeartRate()
             self.filter_RespRate()
             self.data_idx += 1
+            if self.data_idx == self.config.sweep_rate
+            print("Still getting data")
             if self.data_idx >= self.seq:  # Resets matrix index to zero for filtering.
                 self.data_idx = 0
-            print(self.data_idx)
+
         self.client.disconnect()
 
     # Method to collect data from the streaming server
