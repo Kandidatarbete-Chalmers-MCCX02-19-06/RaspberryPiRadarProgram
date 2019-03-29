@@ -120,3 +120,7 @@ class bluetooth_app:
     def get_data_from_queue(self):
         self.send_to_app_queue.put(self.add_data(1))
         return self.send_to_app_queue.get()
+
+    @staticmethod
+    def get_run(self):
+        return self.run
