@@ -93,6 +93,7 @@ class bluetooth_app:
                         print("exception in for-loop")
 
         except:
+            print("last exception read_device")
             c.close()
             print('remove client: ' + str(self.address_list[self.client_list.index(c)]))
             self.client_list.remove(c)
@@ -119,7 +120,7 @@ class bluetooth_app:
             try:
                 client.send(write.encode('utf-8'))      # write.encode('utf-8')
             except:
-                print("Error")
+                print("Error send_data")
 
     def add_data(self, i):
         data = [70 + math.sin(i), 20 + math.sin(i+math.pi/4)]
