@@ -78,7 +78,7 @@ class bluetooth_app:
                 print(data.decode('utf-8'))
                 if data.decode('utf-8') == 'poweroff':
                     print("Shutdown starting")
-                    subprocess.call(["sudo", "shutdown", "-r", "now"])
+                    subprocess.call(["sudo", "shutdown", "-h", "now"])
                     # TODO Erik: Power off python program and Raspberry Pi
                     try:
                         self.run = False
