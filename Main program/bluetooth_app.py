@@ -7,13 +7,14 @@ import random
 
 
 class bluetooth_app:
+    run = True
+
     def __init__(self, send_to_app_queue, from_radar_queue):
         # Bluetooth variables
         self.client_list = []         # list for each connected device, sockets
         self.address_list = []        # list for mac-adresses from each connected device
         self.read_thread_list = []     # list for threads to recieve from each device
         self.send_to_app_queue = send_to_app_queue
-        self.run = True
         self.host = ""
         self.port = 1
         self.client = None
