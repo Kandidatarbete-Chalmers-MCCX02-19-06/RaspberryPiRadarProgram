@@ -58,7 +58,7 @@ class bluetooth_app:
             print("New client: ", a)
 
     def read_device(self, client):
-        c = self.client_list[client]
+        c = client
         try:
             while self.run:
                 self.data = self.client.recv(1024)
