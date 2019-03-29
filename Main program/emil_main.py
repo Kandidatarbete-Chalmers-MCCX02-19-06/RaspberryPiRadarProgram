@@ -12,6 +12,7 @@ import bluetooth_app
 import bluetooth
 import math
 import random
+import subprocess       # for Raspberry Pi shutdown
 
 
 def main():
@@ -26,9 +27,14 @@ def main():
 
     bvme = bluetooth_app.bluetooth_app(send_to_app_queue, radar_queue)
     bvme.app_data()
-    time.sleep(300)
+    # time.sleep(300)
     print("Radar exit")
-    interrupt_queue.put(1)
+    # interrupt_queue.put(1)
+
+    bvme.connect_device_thread.join()
+    radar.join()
+
+    subprocess.call(["sudo", "shutdown", "-r", "now"])
 
 
 if __name__ == "__main__":

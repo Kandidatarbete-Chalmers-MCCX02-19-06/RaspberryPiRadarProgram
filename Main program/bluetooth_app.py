@@ -31,7 +31,7 @@ class bluetooth_app:
 
 
     def app_data(self):
-        for i in range(1, 2000):
+        for i in range(1, 2000) and self.run:
             time.sleep(1)
             while len(self.client_list) == 0:
                 pass
