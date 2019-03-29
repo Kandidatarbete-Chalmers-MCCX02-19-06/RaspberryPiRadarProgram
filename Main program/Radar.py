@@ -73,7 +73,7 @@ class Radar(threading.Thread):
         HR_peak_vector = copy.copy(self.peak_vector)
         for i in range(5):
             HR_peak_vector[0][i] = 0
-        self.HR_filter_queue.put(HR_peak_vector)
+        # self.HR_filter_queue.put(HR_peak_vector)
 
     # Filter for Respitory rate. Saves data to queue
 
