@@ -73,8 +73,8 @@ class bluetooth_app:
                 print(data.decode('utf-8'))
                 print(str(data))
                 p = 'poweroff'
+                print(data.decode('utf-8') == p.encode('utf-8'))
                 try:
-                    # print(type(data.decode('utf-8'))
                     if data.decode('utf-8') == p.encode('utf-8'):
                         print("Shutdown starting")
                         # TODO Erik: Power off python program and Raspberry Pi
