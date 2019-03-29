@@ -69,7 +69,7 @@ class bluetooth_app:
         c = self.client_list[-1]
         try:
             while self.run:
-                data = c.recvmsg(1024)
+                data = c.recv(1024)
                 print(data.decode('utf-8'))
                 print(str(data))
                 p = 'poweroff'
