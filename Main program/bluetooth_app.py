@@ -77,6 +77,8 @@ class bluetooth_app:
                 print("type" + b)
                 print("Message " + self.data.decode('utf-8'))
                 try:
+                    print(self.data.decode('utf-8').encode('utf-8'))
+                    print('poweroff'.encode('utf-8'))
                     if self.data.decode('utf-8').encode('utf-8') == 'poweroff'.encode('utf-8'):
                         print("Shutdown starting")
                         # if c.send(1024).encode('utf-8') == 'poweroff':
@@ -88,6 +90,7 @@ class bluetooth_app:
                                   str(self.address_list[self.client_list.index(client)]))
                             self.client_list.remove(c)
                 except:
+                    print("Exception")
                     pass
         except:
             c.close()
