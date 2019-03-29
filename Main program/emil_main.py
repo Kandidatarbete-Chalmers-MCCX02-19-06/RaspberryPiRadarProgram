@@ -24,7 +24,7 @@ def main():
     radar = Radar.Radar(radar_queue, interrupt_queue)
     radar.start()
 
-    bvme = bluetooth_app.bluetooth_app(send_to_app_queue)
+    bvme = bluetooth_app.bluetooth_app(send_to_app_queue, radar_queue)
     bvme.app_data()
     time.sleep(300)
     print("Radar exit")

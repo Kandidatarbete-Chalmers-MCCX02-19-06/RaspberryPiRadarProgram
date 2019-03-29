@@ -58,6 +58,7 @@ class Radar(threading.Thread):
             self.data_idx += 1
             if self.data_idx == self.config.sweep_rate:
                 print("Still getting data")
+                self.HR_filter_queue.put(2)
             if self.data_idx >= self.seq:  # Resets matrix index to zero for filtering.
                 self.data_idx = 0
 

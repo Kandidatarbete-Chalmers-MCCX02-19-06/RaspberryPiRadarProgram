@@ -7,7 +7,7 @@ import random
 
 
 class bluetooth_app:
-    def __init__(self, send_to_app_queue):
+    def __init__(self, send_to_app_queue, from_radar_queue):
         # Bluetooth variables
         self.client_list = []         # list for each connected device, sockets
         self.address_list = []        # list for mac-adresses from each connected device
@@ -18,6 +18,7 @@ class bluetooth_app:
         self.port = 1
         self.client = None
         self.server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+        self.from_radar_queue = from_radar_queue
         print('Bluetooth Socket Created')
         try:
             self.server.bind((self.host, self.port))
@@ -33,7 +34,8 @@ class bluetooth_app:
             time.sleep(1)
             while len(self.client_list) == 0:
                 pass
-            data = self.add_data(1)
+            d = self.from_radar_queue.get()
+            data = add_data(d)
             # data = self.get_data_from_queue()
             # print('Write data: ' + data)
             data_pulse, data_breath = data.split(' ')
