@@ -56,8 +56,8 @@ class Radar(threading.Thread):
             self.filter_HeartRate()
             self.filter_RespRate()
             self.data_idx += 1
-            if self.data_idx == self.config.sweep_rate
-            print("Still getting data")
+            if self.data_idx == self.config.sweep_rate:
+                print("Still getting data")
             if self.data_idx >= self.seq:  # Resets matrix index to zero for filtering.
                 self.data_idx = 0
 
