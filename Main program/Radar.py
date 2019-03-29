@@ -3,7 +3,7 @@ import threading
 import numpy as np
 import queue
 import copy
-import bluetooth_app      # import for static variable run in class
+from bluetooth_app import get_run      # import for static variable run in class
 
 from acconeer_utils.clients.reg.client import RegClient
 from acconeer_utils.clients.json.client import JSONClient
@@ -49,7 +49,7 @@ class Radar(threading.Thread):
     # Loop which collects data from the radar, tracks the maximum peak and filters it for further signal processing. The final filtered data is put into a queue.
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
-        while bluetooth_app.get_run():        # static variable impported from bluetooth_app class
+        while get_run():        # static variable impported from bluetooth_app class
             # for i in range(self.seq*2):
             self.get_data()
             self.tracker()
