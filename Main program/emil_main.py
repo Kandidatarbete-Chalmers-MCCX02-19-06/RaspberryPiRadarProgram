@@ -27,8 +27,8 @@ def main():
 
     bvme = bluetooth_app.bluetooth_app(send_to_app_queue, radar_queue)
     bvme.app_data()
+    print('Exit starting')
     # time.sleep(300)
-    print("Radar exit")
     # interrupt_queue.put(1)
 
     bvme.connect_device_thread.join()
