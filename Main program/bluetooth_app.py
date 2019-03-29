@@ -57,11 +57,11 @@ class bluetooth_app:
             # self.read_thread_list[-1].start()
             print("New client: ", a)
 
-    def read_device(self, client):
+    def read_device(self):
         c = self.client_list[-1]
         try:
             while self.run:
-                self.data = self.client.recv(1024)
+                self.data = c.recv(1024)
                 print(self.data.decode('utf-8'))
                 if self.data.decode('utf-8') == 'poweroff':
                     # TODO Erik: Power off python program and Raspberry Pi
