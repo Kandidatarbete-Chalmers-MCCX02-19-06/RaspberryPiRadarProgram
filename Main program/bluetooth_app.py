@@ -27,9 +27,9 @@ class bluetooth_app:
         except:
             print("Bluetooth Binding Failed")
 
-        self.connect_device_thread = threading.Thread(target=self.connect_device)       # Can be accessed from main-program to wait for it to close by .join()
+        # Can be accessed from main-program to wait for it to close by .join()
+        self.connect_device_thread = threading.Thread(target=self.connect_device)
         self.connect_device_thread.start()
-
 
     def app_data(self):
         while self.run:
@@ -65,20 +65,24 @@ class bluetooth_app:
             thread.join()
             print(thread + " is closed")
 
-
     def read_device(self):
         c = self.client_list[-1]
         try:
             while self.run:
                 self.data = c.recv(1024)
                 print(self.data.decode('utf-8'))
-                if self.data.decode('utf-8') == 'poweroff':
+                try:
+                    # if self.data.decode('utf-8') == 'poweroff':
+                    if c.send(1024) == 'poweroff'
                     # TODO Erik: Power off python program and Raspberry Pi
                     self.run = False
                     for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
-                        client.close()
-                        print('remove client: ' + str(self.address_list[self.client_list.index(client)]))
-                        self.client_list.remove(c)
+                            client.close()
+                            print('remove client: ' +
+                                  str(self.address_list[self.client_list.index(client)]))
+                            self.client_list.remove(c)
+                except:
+                    pass
         except:  # never gets here
             c.close()
             print('remove client: ' + str(self.address_list[self.client_list.index(c)]))
