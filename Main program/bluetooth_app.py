@@ -29,18 +29,17 @@ class bluetooth_app:
         connect_device_thread = threading.Thread(target=self.connect_device)
         connect_device_thread.start()
 
-        for i in range(1, 2000):
-            time.sleep(1)
-            while len(self.client_list) == 0:
-                pass
-            data = self.add_data(1)
-            # data = self.get_data_from_queue()
-            # print('Write data: ' + data)
-            data_pulse, data_breath = data.split(' ')
-            self.write_data_to_app(data_pulse, 'heart rate')
-            self.write_data_to_app(data_breath, 'breath rate')
-            # sinvalue += 0.157
-        self.server.close()
+        # for i in range(1, 2000):
+        #     time.sleep(1)
+        #     while len(self.client_list) == 0:
+        #         pass
+        #     data = self.add_data(1)
+        #     # data = self.get_data_from_queue()
+        #     # print('Write data: ' + data)
+        #     data_pulse, data_breath = data.split(' ')
+        #     self.write_data_to_app(data_pulse, 'heart rate')
+        #     self.write_data_to_app(data_breath, 'breath rate')
+        #     # sinvalue += 0.157
 
     def connect_device(self):  # Does not work properly
         self.server.listen(7)
