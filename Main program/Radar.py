@@ -3,7 +3,7 @@ import threading
 import numpy as np
 import queue
 import copy
-import bluetooth_app
+import bluetooth_app        # import for static variable run in class
 
 from acconeer_utils.clients.reg.client import RegClient
 from acconeer_utils.clients.json.client import JSONClient

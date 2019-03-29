@@ -6,7 +6,7 @@ import numpy as np
 import queue
 
 import Radar
-import bluetooth_app
+import bluetooth_app        # import bluetooth class
 
 # Bluetooth imports
 import bluetooth
@@ -32,7 +32,10 @@ def main():
     # interrupt_queue.put(1)
 
     bvme.connect_device_thread.join()
+    print("connect_device is closed")
     radar.join()
+    print("radar is closed")
+
 
     subprocess.call(["sudo", "shutdown", "-r", "now"])
 
