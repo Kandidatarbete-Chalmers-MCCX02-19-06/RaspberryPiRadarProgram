@@ -18,6 +18,7 @@ import subprocess       # for Raspberry Pi shutdown
 def main():
     radar_queue = queue.Queue()
     send_to_app_queue = queue.Queue()
+    a = []
     # heart_rate_queue = queue.Queue()
     # resp_rate_queue = queue.Queue()
 
@@ -32,6 +33,7 @@ def main():
 
     bvme.connect_device_thread.join()
     print("connect_device is closed")
+    a.append("True")
     radar.join()
     print("radar is closed")
 
