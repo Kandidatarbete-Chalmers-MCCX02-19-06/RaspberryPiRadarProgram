@@ -35,7 +35,7 @@ class bluetooth_app:
             while len(self.client_list) == 0:
                 pass
             d = self.from_radar_queue.get()
-            data = add_data(d)
+            data = self.add_data(d)
             # data = self.get_data_from_queue()
             # print('Write data: ' + data)
             data_pulse, data_breath = data.split(' ')
