@@ -83,6 +83,7 @@ class bluetooth_app:
                         print("run= " + str(self.run))
                         for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
                             print("Try client.close")
+                            print("Length client_list " + str(len(self.client_list)))
                             client.close()
                             print('remove client: ' +
                                   str(self.address_list[self.client_list.index(client)]))
