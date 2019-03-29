@@ -18,10 +18,10 @@ class Radar(threading.Thread):
         example_utils.config_logging(self.args)
         if self.args.socket_addr:
             self.client = JSONClient(self.args.socket_addr)
+            print("RADAR Port = " + self.args.socket_addr)  # Test för att se vilken port som används av radarn
         else:
             port = self.args.serial_port or example_utils.autodetect_serial_port()
             self.client = RegClient(port)
-            print("RADAR Port = " + port)       # Test för att se vilken port som används av radarn
 
         self.client.squeeze = False
         self.config = configs.IQServiceConfig()
