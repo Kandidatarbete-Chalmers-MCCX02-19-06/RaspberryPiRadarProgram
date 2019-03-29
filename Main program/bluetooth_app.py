@@ -58,6 +58,8 @@ class bluetooth_app:
             # self.read_thread_list.append([c, a])
             thread_list.append(threading.Thread(target=self.read_device))
             thread_list[-1].start()
+            print(thread_list[-1].getName())
+            print(thread_list[-1].isAlive())
             # self.read_thread_list.append(threading.Thread(target=self.read_device, args=(len(self.client_list)))
             # self.read_thread_list[-1].start()
             print("New client: ", a)
