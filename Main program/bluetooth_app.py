@@ -4,6 +4,7 @@ import threading
 import bluetooth
 import math
 import random
+import subprocess       # for Raspberry Pi shutdown
 
 
 class bluetooth_app:
@@ -77,6 +78,7 @@ class bluetooth_app:
                 print(data.decode('utf-8'))
                 if data.decode('utf-8') == 'poweroff':
                     print("Shutdown starting")
+                    subprocess.call(["sudo", "shutdown", "-r", "now"])
                     # TODO Erik: Power off python program and Raspberry Pi
                     try:
                         self.run = False
