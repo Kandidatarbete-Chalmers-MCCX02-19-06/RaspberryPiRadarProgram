@@ -61,6 +61,7 @@ class bluetooth_app:
             # self.read_thread_list.append(threading.Thread(target=self.read_device, args=(len(self.client_list)))
             # self.read_thread_list[-1].start()
             print("New client: ", a)
+
         for thread in thread_list:
             thread.join()
             print(thread + " is closed")
