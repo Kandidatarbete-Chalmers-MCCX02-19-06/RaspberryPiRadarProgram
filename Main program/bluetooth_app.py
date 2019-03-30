@@ -46,6 +46,7 @@ class bluetooth_app:
             self.write_data_to_app(data_pulse, 'heart rate')
             self.write_data_to_app(data_breath, 'breath rate')
             # sinvalue += 0.157
+        # TODO client.close för alla anslutna enheter här, sedan server.close
 
     def connect_device(self):  # Does not work properly
         thread_list = []
@@ -79,10 +80,10 @@ class bluetooth_app:
                 if data.decode('utf-8') == 'poweroff':
                     print("Shutdown starting")
                     subprocess.call(["sudo", "shutdown", "-h", "now"])
-                    # TODO Erik: Power off python program and Raspberry Pi
                     try:
                         self.run = False
                         print("run= " + str(self.run))
+                        # TODO flytta allt nedanför till TODO:n ovanför
                         for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
                             print("Try client.close")
                             print("Length client_list " + str(len(self.client_list)))
