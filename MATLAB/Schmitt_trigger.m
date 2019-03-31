@@ -1,87 +1,100 @@
-%Schmitt trigger
+%Schmitt-trigger
 %Skicka in trackad deltadistansvektor, Fs,t
 
 function[R,FinalFreq] = Schmitt_trigger(delta_distance_BR,Fs,t)
+F_low_BR = 0.2 % Sk in egentligen
+F_high_BR = 0.7
 x = delta_distance_BR;
-Rnow=10e-3;%Initially when filtering
-Hcut = Rnow;
+Rlowbound=0.1e-3;
+Scale = 5;
+Rstart = Rlowbound*Scale;
+RelRms = 0.5;
+Hcut = Rstart;
 Lcut = -Hcut;
-R = 0;
-Tc = 10; %Time constant: hysteresis is updated every Tc:th second
-Freqar = zeros(10,2)
+R = Rstart;
+Rnow = Rstart;
+Tc = 5; %Time constant: hysteresis is updated every Tc:th second
+AvOver = 20;
+freqarray = zeros(AvOver,1)
+CurrFreq = 0;
+Schga = 0;
+Schny = 0; 
+count = 1;
+counthys = 1;
+FinalFreq = 0;
 
-for(j=1:length(x))
-    if(mod(j,Fs*Tc)==0) %Update hysteresis every Tc:th second
-        Rnow = rms(x(j-Fs*Tc+1:j));
-        R = [R;Rnow] %only for test
+figure(79)
+h = animatedline('Color','red');
+shg
+xlabel('Tid [s]')
+ylabel('Andningsfrekvens [Hz]')
+
+N=length(x);
+for(j=1:N) %Loopen motsvaras av data som fås sekvensvis från radarn
+    %if(mod(j,Fs*Tc)==0) %Update hysteresis every Tc:th second
+    
+    
+   
+    
+    if(mod(counthys,Fs*Tc)==0)
+        Rnow = rms(x(j-Fs*Tc+1:j))*RelRms;
+        
+        if(Rnow<Rlowbound)
+             Rnow = Rlowbound;
+             count = 1;
+        end
+        R = [R;Rnow]; %only for testing
         Hcut = Rnow;
         Lcut = -Hcut;
+        counthys=0;
     end
-
-    last=0;
-    N=length(x);
-    Flank = zeros(length(x),1)';
-
-    Sm=zeros(length(x),1)';
+  
+    
+    Schny = Schga;
 
 
-    for i=1:N
+    if (x(j)<= Lcut)
 
+      Schny=0;
+      if(Schga == 1)
+          %Fixa massa och skicka till appen
+          %Uppd freqarr (rot och sätt in)
+          %MVB och ta bort utstickare
+          freqarray = circshift(freqarray,1);
+          freqarray(end) = Fs/(count);
+          %freqarray
+          
+          CurrFreq = mean(rmoutliers(nonzeros(freqarray(freqarray <= F_high_BR & freqarray >= F_low_BR))));
+         
+          count = 0;
+      end
 
-        if(last == 0)
-          Sm(i)=0;
+    elseif(x(j)>= Hcut)         
 
-        elseif(last == 1)
-          Sm(i)=1;
-        end
-
-
-        if (x(i)<= Lcut)
-          last=0; 
-          Sm(i)=0;
-
-        elseif(x(i)>= Hcut)         
-          last=1;  
-          Sm(i)=1;
-
-        end
-
-        if(i>1 && Sm(i-1)==1 && Sm(i)==0)
-            Flank = [Flank i]
-        end
+      Schny=1;
 
     end
 
-    Flank = Flank(Flank~=0)
-    Indeces = Flank;
-    Flank = Flank/Fs;
-    for(i = 1:length(Flank)-1)
-        Flank(i) = Flank(i+1)-Flank(i);
-    end
-    Flank(end)=[];
-
-    Freq = 1./Flank;
-
-    FinalFreq = zeros(N);
+    Schga = Schny;
+    count = count +1;
+    counthys = counthys + 1;
+    
+   
+    addpoints(h,t(j),CurrFreq)
+    pause(0.0001)
+    
     
 end
 
-for(i=1:length(Freq))
-    FinalFreq(Indeces(i)) = Freq(i);
-end
+FinalFreq = freqarray; 
+R(end) = [];
+R = repelem(R,Fs*Tc);
 
-FinalFreq(FinalFreq == 0) = NaN;
-figure(53)
-plot(t,FinalFreq,'.','MarkerSize',30)
-title('Andningsfrekvens vs. tid')
-
-figure(51)
-plot(t,Sm,'blue','LineWidth',3);
-title('Schmittad deltadistans vs tid')
-
-figure(50)
-plot(t,x,'r','LineWidth',1.5);
-title('Deltadistans vs tid')
-
-
+figure(5)
+subplot(2,2,3)
+plot(t,delta_distance_BR,'b')
+hold on
+plot(t(1:length(R)),R,'r')
+plot(t(1:length(R)),-R,'r');
+hold off
 
