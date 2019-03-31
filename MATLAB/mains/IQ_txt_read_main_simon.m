@@ -3,19 +3,22 @@ addpath('Dataread')
 addpath('tracker')
 clc
 clear all
+close all
 format shorteng
 
 %Reading of Radar data
 %filename_radar = 'Manniska_1m_0305_Test1.csv'
-filename_radar = 'Manniska_lang_0305_Test2.csv'
+%filename_radar = 'Manniska_lang_0305_Test2.csv'
 %filename_radar = 'PulsMetern_0313_Test1.csv'
-filename_radar = 'SimonPremiar_0314_Test2.csv'
+filename_radar = 'SimonPremiar_0314_Test2.csv' %Tidigare för Schmitt
+%filename_radar = 'Lins50cm_0328_Test1.csv' %Den med färger
+%filename_radar = 'Lins50cmPuls_0328_Test1.csv'
 [dist,amp, phase,t,gain, L_start, L_end, L_data, L_seq, Fs] = IQ_read_3(filename_radar);
 
 %Reading of wristband pulse measurements
 %filename_pulsemeter = 'PulsMetern_0313_Test1.tcx'
-filename_pulsemeter = 'SimonPremiar_0314_Test2.tcx'
-[AvHR, MaxHR, HR, tHR] = Read_Pulse(filename_pulsemeter,false);
+%filename_pulsemeter = 'SimonPremiar_0314_Test2.tcx'
+%[AvHR, MaxHR, HR, tHR] = Read_Pulse(filename_pulsemeter,false);
 
 gain = gain
 L_start = L_start
@@ -45,14 +48,14 @@ Emf = sum(abs(MF).^2);
 [T,D,A,P] = SURF_PREP(dist,amp, phase,t);
 
 
-%Detektering och följning utav mål
+%Detektering och fÃ¶ljning utav mÃ¥l
 start_distance = 0.37%m
 start_distance = 0.4%m
 N_avg = 10;
 [t,target_amplitude, target_phase, target_distance] = target_tracker_2(t,dist,amp,phase,start_distance,N_avg);
 
 
-
+%{
 figure(1)
 subplot(1,2,1)
 plot(dist,amp(1,:))
@@ -78,7 +81,7 @@ ylabel('Distance [m]')
 xlabel('Time [s]')
 zlabel('Reflection phase [rad]')
 
-
+%}
 %unwrap test
 target_phase = unwrap(target_phase);
 
@@ -106,11 +109,12 @@ F_low_HR = 0.8
 F_high_HR = 6
 BWrel_transband_BR = 0.5
 BWrel_transband_HR = 0.2
-Atten_stopband = 60 %(!)
+Atten_stopband_BR = 20 
+Atten_stopband_HR = 60
 %Atten_stopband = 60
-[delta_distance_BR] = bandpassfilter(target_delta_distance,Fs,F_low_BR,F_high_BR,BWrel_transband_BR,Atten_stopband);
-[delta_distance_HR] = bandpassfilter(target_delta_distance,Fs,F_low_HR,F_high_HR,BWrel_transband_HR,Atten_stopband);
-
+[delta_distance_BR] = bandpassfilter_simon(target_delta_distance,Fs,F_low_BR,F_high_BR,BWrel_transband_BR,Atten_stopband_BR);
+%[delta_distance_HR] = bandpassfilter_simon(target_delta_distance,Fs,F_low_HR,F_high_HR,BWrel_transband_HR,Atten_stopband_HR);
+delta_distance_HR = target_delta_distance; %För att slippa köra HR-grejer hela tiden
 %splitting data
 % T_start = 50
 % T_end = 65
@@ -146,6 +150,7 @@ f_detected_HR = f_fine
 BPM_HR = 60*f_detected_HR
 
 %Plots
+
 figure(5)
 subplot(2,2,1)
 plot(f_BR,delta_distance_BR_FFT)
@@ -163,18 +168,29 @@ xlim([F_low_HR F_high_HR])
 %time 
 subplot(2,2,3)
 plot(t,delta_distance_BR)
+ylim([-7e-3 7e-3])
+hold on
 ylabel('Plot of BR bandwidth [m]')
 xlabel('Time [s]')
+
+
 
 subplot(2,2,4)
 plot(t,delta_distance_HR)
 ylabel('Plot of HR bandwidth [m]')
 xlabel('Time [s]')
 
+hold off
+[RM,A] = Schmitt_trigger(delta_distance_BR,Fs,t);
+
+RM
+A
+%%
 
 %Waterfall FFT plot of HR
 
-figure(6)
+
+%figure(6)
 T_resolution = 30 % Time resolution[s]
 %F_resolution = 1/60*1.5
 overlap = 50% overlap of slidiing frames [%]
@@ -212,6 +228,7 @@ for i = 2:length(T)
 end
 
 
+%{
 
 figure(8)
 pcolor(T,BPM_search,P_N');
@@ -223,15 +240,17 @@ ylim([40 100])
 %test
 hold on
 plot(tHR,HR,'r','LineWidth',2)
+%}
 
 f_found = f_found';
 size(T)
 size(f_found)
-title('Probability map of radar data vs excerice watch')
+%title('Probability map of radar data vs excerice watch')
 
 %plot of BPM over time
 %Kolla errorbaren om de skall vara halva
 E = ones(size(T)).*F_resolution.*60;
+%{
 figure(9)
 errorbar(T,f_found*60,E,'-s','MarkerSize',10,...
     'MarkerEdgeColor','red','MarkerFaceColor','red')
@@ -241,6 +260,7 @@ plot([min(tHR) max(tHR)],[AvHR AvHR],'--r')
 legend('Radar','Pulse watch','Average from pulse watch')
 xlabel('Time [s]')
 ylabel('Frequency [Bpm]')
+%}
 ylim(60*[Fscan_lower_HR Fscan_upper_HR])
 
 
@@ -248,6 +268,7 @@ ylim(60*[Fscan_lower_HR Fscan_upper_HR])
 
 %Tracked data
 
+%{
 figure(10)
 subplot(2,2,1)
 plot(t,target_amplitude)
@@ -270,7 +291,5 @@ xlabel('t [s]')
 ylabel('Delta distance of tracked target [m]')
 
 
-
-
-
+%}
 
