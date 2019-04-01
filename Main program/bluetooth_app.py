@@ -122,7 +122,7 @@ class bluetooth_app:
 
                         #self.server.shutdown(self.server.SHUT_RDWR)
                         self.server.close()
-                        self.server = None
+                        self.server.shutdown(1)
                         print("server is now closed")
                         # print("run= " + str(self.run))
                         # for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
