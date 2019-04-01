@@ -43,7 +43,7 @@ class Radar(threading.Thread):
         self.peak_vector = np.zeros((1, self.seq), dtype=np.csingle)
         self.data_idx = 0  # Inedex for peak vector used for filtering
         self.data_matrix = np.zeros((self.seq, self.num_points))      # matrix for old data values
-        self.I_peak = np.zeros(self.seq, 1)       # indexes of peaks
+        self.I_peak = np.zeros((self.seq, 1))       # indexes of peaks
 
         self.HR_filter_queue = HR_filter_queue
         self.a = a
