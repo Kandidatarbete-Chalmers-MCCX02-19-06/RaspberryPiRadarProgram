@@ -115,8 +115,8 @@ for i in range(1,2000):
     data = getDataFromQueue()
     #print('Write data: ' + data)
     data_pulse, data_breath = data.split(' ')
-    write_data_to_app(data_pulse, 'heart rate')
-    write_data_to_app(data_breath, 'breath rate')
+    #write_data_to_app(data_pulse, 'heart rate')
+    #write_data_to_app(data_breath, 'breath rate')
     write_data_to_app(data_breath, 'real time breath')
     #sinvalue += 0.157
 
