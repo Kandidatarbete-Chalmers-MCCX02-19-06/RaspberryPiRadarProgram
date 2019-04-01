@@ -113,7 +113,7 @@ class bluetooth_app:
                         for client in self.client_list:
                             print('try to remove client ' +
                                   str(self.address_list[self.client_list.index(client)]))
-                            client.shutdown()
+                            # client.shutdown()
                             client.close()
                             print('remove client ' +
                                   str(self.address_list[self.client_list.index(client)]))
