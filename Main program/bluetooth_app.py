@@ -21,7 +21,7 @@ class bluetooth_app:
         self.client = None
         self.server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
         self.from_radar_queue = from_radar_queue
-        self.timeout = time.time() + 60
+        self.timeout = time.time() + 10
         print('Bluetooth Socket Created')
         try:
             self.server.bind((self.host, self.port))
@@ -64,14 +64,16 @@ class bluetooth_app:
             # self.read_thread_list.append(threading.Thread(target=self.read_device, args=(len(self.client_list)))
             # self.read_thread_list[-1].start()
             print("New client: ", a)
-        # for client in self.client_list:
-        #     client.shutdown()
-        #     client.close()
-        #     print('remove client ' + str(self.address_list[self.client_list.index(client)]))
-        # self.server.close()
-        # for thread in thread_list:
-        #    thread.join()
-        #    print(thread.getName() + " is closed")
+        if len(self.client_list) >= 1:
+            for client in self.client_list:
+                client.shutdown()
+                client.close()
+                print('remove client ' + str(self.address_list[self.client_list.index(client)]))
+        self.server.close()
+        if len(thread_list) >= 1:
+            for thread in thread_list:
+                thread.join()
+                print(thread.getName() + " is closed")
 
     def read_device(self):
         c = self.client_list[-1]
@@ -79,27 +81,34 @@ class bluetooth_app:
         print(self.address_list[-1])
         try:
             while self.run:
-                data = c.recv(1024)
-                data = data.decode('utf-8')
-                data = data.strip()
-                print(data)
+                try:
+                    data = c.recv(1024)
+                    data = data.decode('utf-8')
+                    data = data.strip()
+                    print(data)
+                except:
+                    time.sleep(1)
+                    if self.run == False:
+                        break
+                    continue
+
                 if data == 'poweroff' or time.time() > self.timeout:
                     print("Shutdown starting")
                     #subprocess.call(["sudo", "shutdown", "-h", "now"])
                     # TODO Erik: Power off python program and Raspberry Pi
                     try:
                         self.run = False
-                        print("run= " + str(self.run))
-                        for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
-                            print("Try client.close")
-                            print("Length client_list " + str(len(self.client_list)))
-                            # try calling <client.shutdown()> before because close does release resources allocated for client but does not close it straight away.
-                            client.shutdown()
-                            client.close()
-                            print('remove client: ' +
-                                  str(self.address_list[self.client_list.index(client)]))
-                            # self.client_list.remove(c)
-                        self.server.close()
+                        # print("run= " + str(self.run))
+                        # for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
+                        #     print("Try client.close")
+                        #     print("Length client_list " + str(len(self.client_list)))
+                        #     # try calling <client.shutdown()> before because close does release resources allocated for client but does not close it straight away.
+                        #     client.shutdown()
+                        #     client.close()
+                        #     print('remove client: ' +
+                        #           str(self.address_list[self.client_list.index(client)]))
+                        #     # self.client_list.remove(c)
+                        # self.server.close()
                     except:
                         print("exception in for-loop")
 
