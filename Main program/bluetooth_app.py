@@ -69,9 +69,9 @@ class bluetooth_app:
             client.close()
             print('remove client ' + str(self.address_list[self.client_list.index(client)]))
         self.server.close()
-        for thread in thread_list:
-            thread.join()
-            print(thread.getName() + " is closed")
+        # for thread in thread_list:
+        #    thread.join()
+        #    print(thread.getName() + " is closed")
 
     def read_device(self):
         c = self.client_list[-1]
@@ -80,8 +80,10 @@ class bluetooth_app:
         try:
             while self.run:
                 data = c.recv(1024)
-                print(data.decode('utf-8'))
-                if data.decode('utf-8') == 'poweroff' or data.decode('utf-8') == 'poweroff \n' or time.time() > self.timeout:
+                data = data.decode('utf-8')
+                data = data.strip()
+                print(data)
+                if data == 'poweroff' or time.time() > self.timeout:
                     print("Shutdown starting")
                     #subprocess.call(["sudo", "shutdown", "-h", "now"])
                     # TODO Erik: Power off python program and Raspberry Pi
