@@ -56,13 +56,13 @@ class bluetooth_app:
         # os.system("echo 'power on\nquit' | bluetoothctl")  # Startup for bluetooth on rpi
         thread_list = []  # List which adds devices
         self.server.listen(7)  # Amount of devices that can simultaniously recive data.
-        while self.go:
+        while not self.go:
             # Loop which takes listens for a new device, adds it to our list
             # and starts a new thread for listening on input from device
             try:
                 c, a = self.server.accept()
             except Exception as error:
-                if self.go == False:
+                if self.go == True:
                     break
                 #print("Still accepting new phones" + str(error))
                 continue
@@ -88,7 +88,7 @@ class bluetooth_app:
         print(c)
         print(self.address_list[-1])
         try:
-            while self.go:
+            while not self.go:
                 data = c.recv(1024)  # Input argument from device
                 data = data.decode('utf-8')
                 data = data.strip()
@@ -97,7 +97,7 @@ class bluetooth_app:
                 if data == 'poweroff':
                     print("Shutdown starting")
                     try:
-                        self.go = False
+                       #self.run = False
                         self.go = self.go.append("True")
                         print("run= " + str(self.go))
                         for client in self.client_list:
