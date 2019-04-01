@@ -101,6 +101,7 @@ class bluetooth_app:
             c.close()
             print('remove client: ' + str(self.address_list[self.client_list.index(c)]))
             self.client_list.remove(c)
+            self._is_running = False
 
     def write_data_to_app(self, data, data_type):
         # print(data + ' ' + data_type)
