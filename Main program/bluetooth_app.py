@@ -78,6 +78,7 @@ class bluetooth_app:
             print(str(thread.getName()) + str(thread.isAlive()))
             thread.join()
             print(str(thread.getName()) + " is closed")
+        print("End of connect_device thread")
 
     def read_device(self):
         c = self.client_list[-1]  # Takes last added device and connects it.

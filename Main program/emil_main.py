@@ -31,11 +31,11 @@ def main():
 
     bvme = bluetooth_app.bluetooth_app(radar_queue, go)
     bvme.app_data()
-    print('Exit starting')
+    print('End of bluetooth_app')
     # time.sleep(300)
     # interrupt_queue.put(1)
 
-    # a.append("True")
+    go.append("True")
     radar.join()
     print("radar is closed")
     bvme.connect_device_thread.join()
