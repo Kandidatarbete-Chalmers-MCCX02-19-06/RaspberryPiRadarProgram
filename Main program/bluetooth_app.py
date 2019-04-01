@@ -94,7 +94,7 @@ class bluetooth_app:
                     print("Shutdown starting")
                     try:
                         self.run = False
-                        self.go = False
+                        self.go = [False]
                         print("run= " + str(self.run))
                         for client in self.client_list:
                             print('try to remove client ' +
