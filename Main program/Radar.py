@@ -13,7 +13,8 @@ from acconeer_utils.mpl_process import PlotProcess, PlotProccessDiedException, F
 
 class Radar(threading.Thread):
 
-    def __init__(self, HR_filter_queue, a):  # Lägg till RR_filter_queue som inputargument
+    def __init__(self, HR_filter_queue, go):  # Lägg till RR_filter_queue som inputargument
+        self.go = go
         # Setup for collecting data from radar
         self.args = example_utils.ExampleArgumentParser().parse_args()
         example_utils.config_logging(self.args)
@@ -33,7 +34,7 @@ class Radar(threading.Thread):
         self.config.sweep_rate = 100  # Frequency for collecting data
         self.config.gain = 1  # Gain between 0 and 1.
         self.time = 1  # Duration for a set amount of sequences
-        self.seq = self.config.sweep_rate * self.time
+        self.seq = self.config.sweep_rate * self.time  # Amount of sequences during a set time and sweep freq
 
         self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
         self.num_points = self.info["data_length"]  # Amount of data points per sampel
@@ -42,35 +43,39 @@ class Radar(threading.Thread):
         self.seq = 1200     # number of sequences to save
         self.peak_vector = np.zeros((1, self.seq), dtype=np.csingle)
         self.data_idx = 0  # Inedex for peak vector used for filtering
-        self.data_matrix = np.zeros(self.seq, self.num_points)      # matrix for old data values
-        self.I_peak = np.zeros(self.seq, 1)       # indexes of peaks
+        self.data_matrix = np.zeros((self.seq, self.num_points))      # matrix for old data values
+        self.I_peak = np.zeros((self.seq, 1))       # indexes of peaks
 
         self.HR_filter_queue = HR_filter_queue
-        self.a = a
+        #self.a = a
         #self.RR_filter_queue = RR_filter_queue
         super(Radar, self).__init__()  # Inherit threading vitals
 
     # Loop which collects data from the radar, tracks the maximum peak and filters it for further signal processing. The final filtered data is put into a queue.
     def run(self):
+
         self.client.start_streaming()  # Starts Acconeers streaming server
-        while not self.a:        # static variable impported from bluetooth_app class
+        # static variable impported from bluetooth_app class (In final version)
+        while not self.go:
             # for i in range(self.seq*2):
             self.get_data()
             self.tracker()
             self.filter_HeartRate()
             self.filter_RespRate()
             self.data_idx += 1
-            if self.data_idx == self.config.sweep_rate:
+            if self.data_idx % self.config.sweep_rate == 0:
                 print("Still getting data")
                 self.HR_filter_queue.put(2)
             if self.data_idx >= self.seq:  # Resets matrix index to zero for filtering.
                 self.data_idx = 0
+        print("End of getting data from radar")
 
         self.client.disconnect()
 
     # Method to collect data from the streaming server
     def get_data(self):
-        self.info, self.data = self.client.get_next()       # self.data should be accessable from all other methods
+        # self.data should be accessable from all other methods
+        self.info, self.data = self.client.get_next()
 
     # Filter for heart rate using the last X sampels according to data_idx. Saves data to queue
     def filter_HeartRate(self):
