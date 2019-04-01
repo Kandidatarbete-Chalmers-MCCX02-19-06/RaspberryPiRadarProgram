@@ -6,6 +6,7 @@ import math
 import random
 import socket
 import subprocess       # for Raspberry Pi shutdown
+import os
 
 
 class bluetooth_app:
@@ -135,7 +136,8 @@ class bluetooth_app:
                         #subprocess.call(["bluetoothctl"])
                         #subprocess.call(["power off"])
                         #subprocess.call(["quit"])
-                        subprocess.call(["echo", "-e", "\'power off\nquit\'", "|", "bluetoothctl"])
+                        #subprocess.call(["echo", "-e", "\'power off\nquit\'", "|", "bluetoothctl"])
+                        os.system("echo -e 'power off\nquit' | bluetoothctl")
                         # print("run= " + str(self.run))
                         # for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
                         #     print("Try client.close")
