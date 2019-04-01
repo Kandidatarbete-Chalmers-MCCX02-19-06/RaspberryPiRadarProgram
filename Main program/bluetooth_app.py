@@ -137,8 +137,8 @@ class bluetooth_app:
                     except Exception as error:
                         print("exception in for-loop in read_device: " + error)
 
-        except:
-            print("last exception read_device")
+        except Exception as error:
+            print("last exception read_device: " + error)
             c.close()
             print('remove client: ' + str(self.address_list[self.client_list.index(c)]))
             self.client_list.remove(c)
