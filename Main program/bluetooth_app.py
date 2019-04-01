@@ -4,6 +4,7 @@ import threading
 import bluetooth
 import math
 import random
+import socket
 import subprocess       # for Raspberry Pi shutdown
 
 
@@ -20,6 +21,7 @@ class bluetooth_app:
         self.port = 1
         self.client = None
         self.server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+        self.server.setblocking(0)
         self.from_radar_queue = from_radar_queue
         self.timeout = time.time() + 10
         print('Bluetooth Socket Created')
@@ -129,7 +131,7 @@ class bluetooth_app:
                         self.server.close()
                         # self.server.shutdown(1)
                         print("server is now closed")
-                        subprocess.call(["echo", "-e", "power on\nquit", "|", "bluetoothctl"])
+                        #subprocess.call(["echo", "-e", "power on\nquit", "|", "bluetoothctl"])
                         # print("run= " + str(self.run))
                         # for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
                         #     print("Try client.close")
