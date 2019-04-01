@@ -73,9 +73,9 @@ class bluetooth_app:
             print("New client: ", a)
 
         print("Out of while True in connect device")
-        #print("in exception for connect_device")
+        # print("in exception for connect_device")
         for thread in thread_list:
-            print(thread.getName() + thread.isAlive())
+            print(str(thread.getName()) + str(thread.isAlive())
             thread.join()
             print(thread.getName() + " is closed")
 
@@ -95,15 +95,15 @@ class bluetooth_app:
         #     print(thread.getName() + " is closed")
 
     def read_device(self):
-        c = self.client_list[-1]
+        c=self.client_list[-1]
         print(c)
         print(self.address_list[-1])
         try:
             while self.run:
                 try:
-                    data = c.recv(1024)
-                    data = data.decode('utf-8')
-                    data = data.strip()
+                    data=c.recv(1024)
+                    data=data.decode('utf-8')
+                    data=data.strip()
                     print(data)
                 except:
                     time.sleep(1)
@@ -113,11 +113,11 @@ class bluetooth_app:
 
                 if data == 'poweroff':
                     print("Shutdown starting")
-                    #subprocess.call(["sudo", "shutdown", "-h", "now"])
+                    # subprocess.call(["sudo", "shutdown", "-h", "now"])
                     # TODO Erik: Power off python program and Raspberry Pi
                     try:
-                        self.run = False
-                        #print("Out of while True in Connect_device")
+                        self.run=False
+                        # print("Out of while True in Connect_device")
                         for client in self.client_list:
                             print('try to remove client ' +
                                   str(self.address_list[self.client_list.index(client)]))
@@ -131,7 +131,7 @@ class bluetooth_app:
                         self.server.close()
                         # self.server.shutdown(1)
                         print("server is now closed")
-                        #subprocess.call(["echo", "-e", "power on\nquit", "|", "bluetoothctl"])
+                        # subprocess.call(["echo", "-e", "power on\nquit", "|", "bluetoothctl"])
                         # print("run= " + str(self.run))
                         # for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
                         #     print("Try client.close")
@@ -151,20 +151,20 @@ class bluetooth_app:
             c.close()
             print('remove client: ' + str(self.address_list[self.client_list.index(c)]))
             self.client_list.remove(c)
-            self._is_running = False
+            self._is_running=False
 
     def write_data_to_app(self, data, data_type):
         # print(data + ' ' + data_type)
         if data_type == 'heart rate':
-            string = ' HR ' + data + ' '
+            string=' HR ' + data + ' '
             # print(string)
             self.send_data(string)
         elif data_type == 'breath rate':
-            string = ' BR ' + data + ' '
+            string=' BR ' + data + ' '
             # print(string)
             self.send_data(string)
         elif data_type == 'real time breath':
-            string = ' RTB ' + data + ' '
+            string=' RTB ' + data + ' '
             self.send_data(string)
 
     def send_data(self, write):
@@ -178,13 +178,13 @@ class bluetooth_app:
                 print("Error send_data")
 
     def add_data(self, i):
-        data = [70 + math.sin(i), 20 + math.sin(i+math.pi/4)]
-        noise = random.random()
+        data=[70 + math.sin(i), 20 + math.sin(i+math.pi/4)]
+        noise=random.random()
         data[0] += 5*(noise - 0.5)
-        noise = random.random()
+        noise=random.random()
         data[1] += noise
-        data[0] = round(data[0])
-        data[1] = round(data[1])
+        data[0]=round(data[0])
+        data[1]=round(data[1])
         return str(data[0]) + ' ' + str(data[1])
 
     def get_data_from_queue(self):
