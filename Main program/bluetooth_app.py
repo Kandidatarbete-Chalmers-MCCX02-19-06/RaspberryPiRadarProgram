@@ -61,7 +61,7 @@ class bluetooth_app:
             except:
                 if self.run == False:
                     break
-                pass
+                continue
 
             self.client_list.append(c)
             self.address_list.append(a)
@@ -137,7 +137,7 @@ class bluetooth_app:
                         #subprocess.call(["power off"])
                         # subprocess.call(["quit"])
                         #subprocess.call(["echo", "-e", "\'power off\nquit\'", "|", "bluetoothctl"])
-                        #os.system("echo 'power off\nquit' | bluetoothctl")
+                        os.system("echo 'power off\nquit' | bluetoothctl")
                         # print("run= " + str(self.run))
                         # for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
                         #     print("Try client.close")
