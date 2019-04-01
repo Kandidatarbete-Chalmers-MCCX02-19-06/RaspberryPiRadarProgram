@@ -56,7 +56,7 @@ class Radar(threading.Thread):
 
         self.client.start_streaming()  # Starts Acconeers streaming server
         # static variable impported from bluetooth_app class (In final version)
-        while self.go:
+        while not self.go:
             # for i in range(self.seq*2):
             self.get_data()
             self.tracker()
