@@ -10,7 +10,7 @@ import os
 
 
 class bluetooth_app:
-    # run = True  # Argument for shuting down all loops at the same time with input from one device.
+    run = True  # Argument for shuting down all loops at the same time with input from one device.
 
     def __init__(self, from_radar_queue, go):
         self.go = go  # Argument for shutting down all threads and loops at the same time.
@@ -39,7 +39,7 @@ class bluetooth_app:
         self.connect_device_thread.start()
 
     def app_data(self):  # The main loop which takes data from processing and sends data to all clients
-        while not self.go:
+        while self.run:
             # time.sleep(1)
             while len(self.client_list) == 0:
                 continue
@@ -56,13 +56,13 @@ class bluetooth_app:
         # os.system("echo 'power on\nquit' | bluetoothctl")  # Startup for bluetooth on rpi
         thread_list = []  # List which adds devices
         self.server.listen(7)  # Amount of devices that can simultaniously recive data.
-        while not self.go:
+        while self.run:
             # Loop which takes listens for a new device, adds it to our list
             # and starts a new thread for listening on input from device
             try:
                 c, a = self.server.accept()
             except:
-                if len(self.go) >= 1:
+                if self.run == False:
                     break
                 #print("Still accepting new phones" + str(error))
                 continue
@@ -88,7 +88,7 @@ class bluetooth_app:
         print(c)
         print(self.address_list[-1])
         try:
-            while not self.go:
+            while self.run:
                 data = c.recv(1024)  # Input argument from device
                 data = data.decode('utf-8')
                 data = data.strip()
@@ -97,9 +97,9 @@ class bluetooth_app:
                 if data == 'poweroff':
                     print("Shutdown starting")
                     try:
-                       #self.run = False
+                        self.run = False
                         self.go = self.go.append("True")
-                        print("go= " + len(self.go))
+                        print("run= " + str(self.run))
                         for client in self.client_list:
                             print('try to remove client ' +
                                   str(self.address_list[self.client_list.index(client)]))
