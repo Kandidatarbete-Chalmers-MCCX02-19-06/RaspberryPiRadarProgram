@@ -61,8 +61,8 @@ class bluetooth_app:
             # and starts a new thread for listening on input from device
             try:
                 c, a = self.server.accept()
-            except Exception as error:
-                if self.go == True:
+            except:
+                if len(self.go) >= 1:
                     break
                 #print("Still accepting new phones" + str(error))
                 continue
@@ -99,7 +99,7 @@ class bluetooth_app:
                     try:
                        #self.run = False
                         self.go = self.go.append("True")
-                        print("run= " + str(self.go))
+                        print("go= " + len(self.go))
                         for client in self.client_list:
                             print('try to remove client ' +
                                   str(self.address_list[self.client_list.index(client)]))
