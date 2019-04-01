@@ -52,6 +52,7 @@ class bluetooth_app:
             # sinvalue += 0.157
 
     def connect_device(self):  # Does not work properly
+        os.system("echo 'power on\nquit' | bluetoothctl")
         thread_list = []
         self.server.listen(7)
         while self.run:
