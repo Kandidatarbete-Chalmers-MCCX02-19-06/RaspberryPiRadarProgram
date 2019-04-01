@@ -35,7 +35,7 @@ def main():
     # time.sleep(300)
     # interrupt_queue.put(1)
 
-    go.append("True")
+    # go.append("True")
     radar.join()
     print("radar is closed")
     bvme.connect_device_thread.join()
