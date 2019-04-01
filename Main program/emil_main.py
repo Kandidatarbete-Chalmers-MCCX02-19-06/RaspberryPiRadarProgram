@@ -17,11 +17,11 @@ import subprocess       # for Raspberry Pi shutdown
 
 def main():
     subprocess.call(
-        "sudo", "./Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c")
+        "./Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c")
     time.sleep(5)
 
     radar_queue = queue.Queue()
-    send_to_app_queue = queue.Queue()
+    #send_to_app_queue = queue.Queue()
     a = []
     # heart_rate_queue = queue.Queue()
     # resp_rate_queue = queue.Queue()
@@ -29,7 +29,7 @@ def main():
     radar = Radar.Radar(radar_queue, a)
     radar.start()
 
-    bvme = bluetooth_app.bluetooth_app(send_to_app_queue, radar_queue)
+    bvme = bluetooth_app.bluetooth_app(radar_queue)
     bvme.app_data()
     print('Exit starting')
     # time.sleep(300)

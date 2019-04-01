@@ -12,12 +12,11 @@ import os
 class bluetooth_app:
     run = True  # Argument for shuting down all loops at the same time with input from one device.
 
-    def __init__(self, send_to_app_queue, from_radar_queue):
+    def __init__(self, from_radar_queue):
         # Bluetooth variables
         self.client_list = []         # list for each connected device, sockets
         self.address_list = []        # list for mac-adresses from each connected device
         self.read_thread_list = []     # list for threads to recieve from each device
-        self.send_to_app_queue = send_to_app_queue
         self.host = ""
         self.port = 1
         self.client = None
@@ -151,9 +150,9 @@ class bluetooth_app:
         data[1] = round(data[1])
         return str(data[0]) + ' ' + str(data[1])
 
-    def get_data_from_queue(self):
-        self.send_to_app_queue.put(self.add_data(1))
-        return self.send_to_app_queue.get()
+    # def get_data_from_queue(self):
+    #     self.send_to_app_queue.put(self.add_data(1))
+    #     return self.send_to_app_queue.get()
 
     @staticmethod  # Test to send run variable to other threads, does not work yet.
     def get_run(self):
