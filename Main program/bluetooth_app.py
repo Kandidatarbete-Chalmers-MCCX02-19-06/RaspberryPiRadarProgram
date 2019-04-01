@@ -4,6 +4,7 @@ import threading
 import bluetooth
 import math
 import random
+import socket
 import subprocess       # for Raspberry Pi shutdown
 
 
@@ -20,6 +21,7 @@ class bluetooth_app:
         self.port = 1
         self.client = None
         self.server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+        self.server.setblocking(0)
         self.from_radar_queue = from_radar_queue
         self.timeout = time.time() + 10
         print('Bluetooth Socket Created')
