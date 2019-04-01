@@ -84,15 +84,10 @@ class bluetooth_app:
         print(self.address_list[-1])
         try:
             while self.run:
-                try:
-                    data = c.recv(1024)  # Input argument from device
-                    data = data.decode('utf-8')
-                    data = data.strip()
-                    print(data)
-                except:
-                    if self.run == False:
-                        break
-                    continue
+                data = c.recv(1024)  # Input argument from device
+                data = data.decode('utf-8')
+                data = data.strip()
+                print(data)
                 # When device sends "poweroff" initiate shutdown by setting run to false, removing all clients and closing all threads.
                 if data == 'poweroff':
                     print("Shutdown starting")
