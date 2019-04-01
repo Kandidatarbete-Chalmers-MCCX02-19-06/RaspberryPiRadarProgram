@@ -13,7 +13,8 @@ from acconeer_utils.mpl_process import PlotProcess, PlotProccessDiedException, F
 
 class Radar(threading.Thread):
 
-    def __init__(self, HR_filter_queue, a):  # Lägg till RR_filter_queue som inputargument
+    def __init__(self, HR_filter_queue, go):  # Lägg till RR_filter_queue som inputargument
+        self.go = go
         # Setup for collecting data from radar
         self.args = example_utils.ExampleArgumentParser().parse_args()
         example_utils.config_logging(self.args)
@@ -46,15 +47,16 @@ class Radar(threading.Thread):
         self.I_peak = np.zeros((self.seq, 1))       # indexes of peaks
 
         self.HR_filter_queue = HR_filter_queue
-        self.a = a
+        #self.a = a
         #self.RR_filter_queue = RR_filter_queue
         super(Radar, self).__init__()  # Inherit threading vitals
 
     # Loop which collects data from the radar, tracks the maximum peak and filters it for further signal processing. The final filtered data is put into a queue.
     def run(self):
+
         self.client.start_streaming()  # Starts Acconeers streaming server
         # static variable impported from bluetooth_app class (In final version)
-        while not self.a:
+        while self.go:
             # for i in range(self.seq*2):
             self.get_data()
             self.tracker()
