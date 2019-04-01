@@ -38,7 +38,7 @@ def main():
     print("connect_device is closed")
 
     print('Shut down succeed')
-    #subprocess.call(["sudo", "shutdown", "-r", "now"])
+    subprocess.call(["sudo", "shutdown", "-r", "now"])
 
 
 if __name__ == "__main__":

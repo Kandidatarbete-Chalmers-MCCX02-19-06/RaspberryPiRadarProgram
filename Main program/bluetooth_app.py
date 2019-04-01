@@ -22,7 +22,7 @@ class bluetooth_app:
         self.port = 1
         self.client = None
         self.server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-        self.server.setblocking(0)
+        # self.server.setblocking(0)
         self.from_radar_queue = from_radar_queue
         self.timeout = time.time() + 10
         print('Bluetooth Socket Created')
@@ -55,31 +55,26 @@ class bluetooth_app:
         os.system("echo 'power on\nquit' | bluetoothctl")
         thread_list = []
         self.server.listen(7)
-        while self.run:
-            try:
+        try:
+            while self.run:
                 c, a = self.server.accept()
-            except:
-                if self.run == False:
-                    break
-                continue
-            self.client_list.append(c)
-            self.address_list.append(a)
-            # one thread for each connected device
-            # self.read_thread_list.append([c, a])
-            thread_list.append(threading.Thread(target=self.read_device))
-            thread_list[-1].start()
-            print(thread_list[-1].getName())
-            print(thread_list[-1].isAlive())
-            # self.read_thread_list.append(threading.Thread(target=self.read_device, args=(len(self.client_list)))
-            # self.read_thread_list[-1].start()
-            print("New client: ", a)
-
-        print("Out of while True in connect device")
-        # print("in exception for connect_device")
-        for thread in thread_list:
-            print(str(thread.getName()) + str(thread.isAlive()))
-            thread.join()
-            print(str(thread.getName()) + " is closed")
+                self.client_list.append(c)
+                self.address_list.append(a)
+                # one thread for each connected device
+                # self.read_thread_list.append([c, a])
+                thread_list.append(threading.Thread(target=self.read_device))
+                thread_list[-1].start()
+                print(thread_list[-1].getName())
+                print(thread_list[-1].isAlive())
+                # self.read_thread_list.append(threading.Thread(target=self.read_device, args=(len(self.client_list)))
+                # self.read_thread_list[-1].start()
+                print("New client: ", a)
+        except:
+            print("Out of while True in connect device")
+            for thread in thread_list:
+                print(str(thread.getName()) + str(thread.isAlive()))
+                thread.join()
+                print(str(thread.getName()) + " is closed")
 
         # print("Out of while True in Connect_device")
         # for client in self.client_list:
@@ -134,9 +129,9 @@ class bluetooth_app:
                         # self.server.shutdown(1)
                         print("server is now closed")
                         #subprocess.call(["echo", "-e", "power on\nquit", "|", "bluetoothctl"])
-                        #subprocess.call(["bluetoothctl"])
+                        # subprocess.call(["bluetoothctl"])
                         #subprocess.call(["power off"])
-                        #subprocess.call(["quit"])
+                        # subprocess.call(["quit"])
                         #subprocess.call(["echo", "-e", "\'power off\nquit\'", "|", "bluetoothctl"])
                         os.system("echo 'power off\nquit' | bluetoothctl")
                         # print("run= " + str(self.run))
