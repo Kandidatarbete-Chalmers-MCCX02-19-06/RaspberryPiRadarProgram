@@ -108,7 +108,7 @@ connectDevices = ConnectDevicesThread()
 connectDevices.start()
 
 for i in range(1,2000):
-    time.sleep(0.2)
+    time.sleep(0.03)
     while len(clientList) == 0:
         pass
     #data = addData(sinvalue)
