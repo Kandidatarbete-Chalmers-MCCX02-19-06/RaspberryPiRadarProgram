@@ -120,7 +120,7 @@ class bluetooth_app:
                                   str(self.address_list[self.client_list.index(client)]))
                             time.sleep(1)
 
-                        # self.server.shutdown()
+                        self.server.shutdown()
                         self.server.close()
                         print("server is now closed")
                         # print("run= " + str(self.run))
