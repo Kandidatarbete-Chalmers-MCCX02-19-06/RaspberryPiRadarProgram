@@ -21,7 +21,7 @@ class bluetooth_app:
         self.client = None
         self.server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
         self.from_radar_queue = from_radar_queue
-        self.timeout = time.time() + 10
+        self.timeout = time.time() + 60
         print('Bluetooth Socket Created')
         try:
             self.server.bind((self.host, self.port))
@@ -81,14 +81,14 @@ class bluetooth_app:
             while self.run:
                 data = c.recv(1024)
                 print(data.decode('utf-8'))
-                # if data.decode('utf-8') == 'poweroff':
-                if time.time() > self.timeout:
+                if data.decode('utf-8') == 'poweroff' or data.decode('utf-8') == 'poweroff \n' or time.time() > self.timeout:
                     print("Shutdown starting")
                     #subprocess.call(["sudo", "shutdown", "-h", "now"])
                     # TODO Erik: Power off python program and Raspberry Pi
                     try:
                         self.run = False
                         print("run= " + str(self.run))
+                        break
                         # for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
                         #     print("Try client.close")
                         #     print("Length client_list " + str(len(self.client_list)))
