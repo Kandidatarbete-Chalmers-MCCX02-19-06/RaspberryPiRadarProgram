@@ -68,6 +68,7 @@ class Radar(threading.Thread):
                 self.HR_filter_queue.put(2)
             if self.data_idx >= self.seq:  # Resets matrix index to zero for filtering.
                 self.data_idx = 0
+        print("No more radar data")
 
         self.client.disconnect()
 
