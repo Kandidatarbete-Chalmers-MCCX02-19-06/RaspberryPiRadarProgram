@@ -37,7 +37,8 @@ def main():
     bvme.connect_device_thread.join()
     print("connect_device is closed")
 
-    subprocess.call(["sudo", "shutdown", "-r", "now"])
+    print('Shut down succeed')
+    #subprocess.call(["sudo", "shutdown", "-r", "now"])
 
 
 if __name__ == "__main__":
