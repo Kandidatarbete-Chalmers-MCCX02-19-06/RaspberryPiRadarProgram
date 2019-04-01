@@ -67,7 +67,8 @@ class Radar(threading.Thread):
 
     # Method to collect data from the streaming server
     def get_data(self):
-        self.info, self.data = self.client.get_next()       # self.data should be accessable from all other methods
+        # self.data should be accessable from all other methods
+        self.info, self.data = self.client.get_next()
 
     # Filter for heart rate using the last X sampels according to data_idx. Saves data to queue
     def filter_HeartRate(self):
