@@ -31,11 +31,11 @@ def main():
     # time.sleep(300)
     # interrupt_queue.put(1)
 
-    bvme.connect_device_thread.join()
-    print("connect_device is closed")
     a.append("True")
     radar.join()
     print("radar is closed")
+    bvme.connect_device_thread.join()
+    print("connect_device is closed")
 
     subprocess.call(["sudo", "shutdown", "-r", "now"])
 

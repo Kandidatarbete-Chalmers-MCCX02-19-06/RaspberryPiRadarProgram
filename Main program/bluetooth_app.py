@@ -21,6 +21,7 @@ class bluetooth_app:
         self.client = None
         self.server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
         self.from_radar_queue = from_radar_queue
+        self.timeout = time.time() + 10
         print('Bluetooth Socket Created')
         try:
             self.server.bind((self.host, self.port))
@@ -46,7 +47,6 @@ class bluetooth_app:
             self.write_data_to_app(data_pulse, 'heart rate')
             self.write_data_to_app(data_breath, 'breath rate')
             # sinvalue += 0.157
-        # TODO client.close för alla anslutna enheter här, sedan server.close
 
     def connect_device(self):  # Does not work properly
         thread_list = []
@@ -64,7 +64,11 @@ class bluetooth_app:
             # self.read_thread_list.append(threading.Thread(target=self.read_device, args=(len(self.client_list)))
             # self.read_thread_list[-1].start()
             print("New client: ", a)
-
+        for client in self.client_list:
+            client.shutdown()
+            client.close()
+            print('remove client ' + str(self.address_list[self.client_list.index(client)]))
+        self.server.close()
         for thread in thread_list:
             thread.join()
             print(thread.getName() + " is closed")
@@ -77,21 +81,24 @@ class bluetooth_app:
             while self.run:
                 data = c.recv(1024)
                 print(data.decode('utf-8'))
-                if data.decode('utf-8') == 'poweroff':
+                # if data.decode('utf-8') == 'poweroff':
+                if time.time() > self.timeout:
                     print("Shutdown starting")
-                    subprocess.call(["sudo", "shutdown", "-h", "now"])
+                    #subprocess.call(["sudo", "shutdown", "-h", "now"])
+                    # TODO Erik: Power off python program and Raspberry Pi
                     try:
                         self.run = False
                         print("run= " + str(self.run))
-                        # TODO flytta allt nedanför till TODO:n ovanför
-                        for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
-                            print("Try client.close")
-                            print("Length client_list " + str(len(self.client_list)))
-                            client.close()
-                            print('remove client: ' +
-                                  str(self.address_list[self.client_list.index(client)]))
-                            # self.client_list.remove(c)
-                        self.server.close()
+                        # for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
+                        #     print("Try client.close")
+                        #     print("Length client_list " + str(len(self.client_list)))
+                        #     # try calling <client.shutdown()> before because close does release resources allocated for client but does not close it straight away.
+                        #     client.shutdown()
+                        #     client.close()
+                        #     print('remove client: ' +
+                        #           str(self.address_list[self.client_list.index(client)]))
+                        #     # self.client_list.remove(c)
+                        # self.server.close()
                     except:
                         print("exception in for-loop")
 
@@ -100,6 +107,7 @@ class bluetooth_app:
             c.close()
             print('remove client: ' + str(self.address_list[self.client_list.index(c)]))
             self.client_list.remove(c)
+            self._is_running = False
 
     def write_data_to_app(self, data, data_type):
         # print(data + ' ' + data_type)
