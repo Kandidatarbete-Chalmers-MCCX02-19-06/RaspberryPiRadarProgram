@@ -64,7 +64,11 @@ class bluetooth_app:
             # self.read_thread_list.append(threading.Thread(target=self.read_device, args=(len(self.client_list)))
             # self.read_thread_list[-1].start()
             print("New client: ", a)
-
+        for client in self.client_list:
+            client.shutdown()
+            client.close()
+            print('remove client ' + str(self.address_list[self.client_list.index(client)]))
+        self.server.close()
         for thread in thread_list:
             thread.join()
             print(thread.getName() + " is closed")
@@ -85,16 +89,16 @@ class bluetooth_app:
                     try:
                         self.run = False
                         print("run= " + str(self.run))
-                        for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
-                            print("Try client.close")
-                            print("Length client_list " + str(len(self.client_list)))
-                            # try calling <client.shutdown()> before because close does release resources allocated for client but does not close it straight away.
-                            client.shutdown()
-                            client.close()
-                            print('remove client: ' +
-                                  str(self.address_list[self.client_list.index(client)]))
-                            # self.client_list.remove(c)
-                        self.server.close()
+                        # for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
+                        #     print("Try client.close")
+                        #     print("Length client_list " + str(len(self.client_list)))
+                        #     # try calling <client.shutdown()> before because close does release resources allocated for client but does not close it straight away.
+                        #     client.shutdown()
+                        #     client.close()
+                        #     print('remove client: ' +
+                        #           str(self.address_list[self.client_list.index(client)]))
+                        #     # self.client_list.remove(c)
+                        # self.server.close()
                     except:
                         print("exception in for-loop")
 
