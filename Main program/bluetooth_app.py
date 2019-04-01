@@ -43,7 +43,10 @@ class bluetooth_app:
             # time.sleep(1)
             while len(self.client_list) == 0:
                 continue
-            d = self.from_radar_queue.get(timeout=1)  # TEMP: Takes data from another thread
+            try:
+                d = self.from_radar_queue.get(timeout=1)  # TEMP: Takes data from another thread
+            except:
+                pass
             data = self.add_data(d)  # TEMP: Makes random data for testing of communication
             data_pulse, data_breath = data.split(' ')  # Splits data in pulse and heart rate
             self.write_data_to_app(data_pulse, 'heart rate')  # Sends pulse to app
