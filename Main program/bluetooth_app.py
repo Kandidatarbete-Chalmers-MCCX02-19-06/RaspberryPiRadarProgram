@@ -13,7 +13,7 @@ class bluetooth_app:
     run = True  # Argument for shuting down all loops at the same time with input from one device.
 
     def __init__(self, from_radar_queue, go):
-        global go
+        self.go = go
         # Bluetooth variables
         self.client_list = []         # list for each connected device, sockets
         self.address_list = []        # list for mac-adresses from each connected device
@@ -80,7 +80,6 @@ class bluetooth_app:
             print(str(thread.getName()) + " is closed")
 
     def read_device(self):
-        global go
         c = self.client_list[-1]  # Takes last added device and connects it.
         print(c)
         print(self.address_list[-1])
@@ -95,7 +94,7 @@ class bluetooth_app:
                     print("Shutdown starting")
                     try:
                         self.run = False
-                        go = False
+                        self.go = False
                         print("run= " + str(self.run))
                         for client in self.client_list:
                             print('try to remove client ' +
