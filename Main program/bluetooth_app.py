@@ -78,7 +78,7 @@ class bluetooth_app:
                 data = c.recv(1024)
                 print(data.decode('utf-8'))
                 # if data.decode('utf-8') == 'poweroff':
-                if time.time() > timeout:
+                if time.time() > self.timeout:
                     print("Shutdown starting")
                     subprocess.call(["sudo", "shutdown", "-h", "now"])
                     # TODO Erik: Power off python program and Raspberry Pi
