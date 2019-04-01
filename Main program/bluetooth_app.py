@@ -51,27 +51,32 @@ class bluetooth_app:
     def connect_device(self):  # Does not work properly
         thread_list = []
         self.server.listen(7)
-        try:
-            while self.run:
+        while self.run:
+            try:
                 c, a = self.server.accept()
-                self.client_list.append(c)
-                self.address_list.append(a)
-                # one thread for each connected device
-                # self.read_thread_list.append([c, a])
-                thread_list.append(threading.Thread(target=self.read_device))
-                thread_list[-1].start()
-                print(thread_list[-1].getName())
-                print(thread_list[-1].isAlive())
-                # self.read_thread_list.append(threading.Thread(target=self.read_device, args=(len(self.client_list)))
-                # self.read_thread_list[-1].start()
-                print("New client: ", a)
-        except:
-            print("in exception for connect_device")
-            for thread in thread_list:
-                print(thread.getName() + thread.isAlive())
-                thread.join()
-                print(thread.getName() + " is closed")
+            except:
+                if self.run == False:
+                    break
+                continue
+            self.client_list.append(c)
+            self.address_list.append(a)
+            # one thread for each connected device
+            # self.read_thread_list.append([c, a])
+            thread_list.append(threading.Thread(target=self.read_device))
+            thread_list[-1].start()
+            print(thread_list[-1].getName())
+            print(thread_list[-1].isAlive())
+            # self.read_thread_list.append(threading.Thread(target=self.read_device, args=(len(self.client_list)))
+            # self.read_thread_list[-1].start()
+            print("New client: ", a)
+
         print("Out of while True in connect device")
+        #print("in exception for connect_device")
+        for thread in thread_list:
+            print(thread.getName() + thread.isAlive())
+            thread.join()
+            print(thread.getName() + " is closed")
+
         # print("Out of while True in Connect_device")
         # for client in self.client_list:
         #     print('try to remove client ' + str(self.address_list[self.client_list.index(client)]))
@@ -104,7 +109,7 @@ class bluetooth_app:
                         break
                     continue
 
-                if data == 'poweroff' or time.time() > self.timeout:
+                if data == 'poweroff':
                     print("Shutdown starting")
                     #subprocess.call(["sudo", "shutdown", "-h", "now"])
                     # TODO Erik: Power off python program and Raspberry Pi
@@ -120,8 +125,9 @@ class bluetooth_app:
                                   str(self.address_list[self.client_list.index(client)]))
                             time.sleep(1)
 
-                        self.server.shutdown()
+                        # self.server.shutdown(self.server.SHUT_RDWR)
                         self.server.close()
+                        self.server.shutdown(1)
                         print("server is now closed")
                         # print("run= " + str(self.run))
                         # for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
@@ -134,11 +140,11 @@ class bluetooth_app:
                         #           str(self.address_list[self.client_list.index(client)]))
                         #     # self.client_list.remove(c)
                         # self.server.close()
-                    except:
-                        print("exception in for-loop")
+                    except Exception as error:
+                        print("exception in for-loop in read_device: " + str(error))
 
-        except:
-            print("last exception read_device")
+        except Exception as error:
+            print("last exception read_device: " + str(error))
             c.close()
             print('remove client: ' + str(self.address_list[self.client_list.index(c)]))
             self.client_list.remove(c)
