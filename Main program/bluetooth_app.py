@@ -137,7 +137,7 @@ class bluetooth_app:
                         #subprocess.call(["power off"])
                         #subprocess.call(["quit"])
                         #subprocess.call(["echo", "-e", "\'power off\nquit\'", "|", "bluetoothctl"])
-                        os.system("echo -e 'power off\nquit' | bluetoothctl")
+                        os.system("'echo -e' 'power off\nquit' | bluetoothctl")
                         # print("run= " + str(self.run))
                         # for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
                         #     print("Try client.close")
