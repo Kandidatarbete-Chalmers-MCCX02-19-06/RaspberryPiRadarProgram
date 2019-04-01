@@ -73,11 +73,11 @@ class bluetooth_app:
             print("New client: ", a)
 
         print("Out of while True in connect device")
-        #print("in exception for connect_device")
+        # print("in exception for connect_device")
         for thread in thread_list:
-            print(thread.getName() + str(thread.isAlive()))
+            print(str(thread.getName()) + str(thread.isAlive()))
             thread.join()
-            print(thread.getName() + " is closed")
+            print(str(thread.getName()) + " is closed")
 
         # print("Out of while True in Connect_device")
         # for client in self.client_list:
@@ -113,11 +113,11 @@ class bluetooth_app:
 
                 if data == 'poweroff':
                     print("Shutdown starting")
-                    #subprocess.call(["sudo", "shutdown", "-h", "now"])
+                    # subprocess.call(["sudo", "shutdown", "-h", "now"])
                     # TODO Erik: Power off python program and Raspberry Pi
                     try:
                         self.run = False
-                        #print("Out of while True in Connect_device")
+                        # print("Out of while True in Connect_device")
                         for client in self.client_list:
                             print('try to remove client ' +
                                   str(self.address_list[self.client_list.index(client)]))
