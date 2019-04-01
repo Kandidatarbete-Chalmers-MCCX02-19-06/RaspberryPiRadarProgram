@@ -22,7 +22,7 @@ class bluetooth_app:
         self.port = 1
         self.client = None
         self.server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-        self.server.setblocking(0)
+        self.server.setblocking(1)
         self.from_radar_queue = from_radar_queue
         self.timeout = time.time() + 10
         print('Bluetooth Socket Created')
@@ -58,9 +58,11 @@ class bluetooth_app:
         while self.run:
             try:
                 c, a = self.server.accept()
-            except:
+
+            except Exception as error:
                 if self.run == False:
                     break
+                print("Still accepting new phones" + str(error))
                 continue
 
             self.client_list.append(c)
@@ -137,7 +139,7 @@ class bluetooth_app:
                         #subprocess.call(["power off"])
                         # subprocess.call(["quit"])
                         #subprocess.call(["echo", "-e", "\'power off\nquit\'", "|", "bluetoothctl"])
-                        #os.system("echo 'power off\nquit' | bluetoothctl")
+                        os.system("echo 'power off\nquit' | bluetoothctl")
                         # print("run= " + str(self.run))
                         # for client in self.client_list:     # closes and removes clients from list to cause exceptions and thereby closing the thread
                         #     print("Try client.close")
