@@ -131,7 +131,7 @@ class bluetooth_app:
                         self.server.close()
                         # self.server.shutdown(1)
                         print("server is now closed")
-                        subprocess.call(["echo", "-e", "power on\nquit", "|", "bluetoothctl"])
+                        #subprocess.call(["echo", "-e", "power on\nquit", "|", "bluetoothctl"])
                         subprocess.call(["bluetoothctl"])
                         subprocess.call(["power off"])
                         subprocess.call(["quit"])
