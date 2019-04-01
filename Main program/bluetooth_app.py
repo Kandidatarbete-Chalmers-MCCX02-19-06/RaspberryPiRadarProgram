@@ -64,16 +64,20 @@ class bluetooth_app:
             # self.read_thread_list.append(threading.Thread(target=self.read_device, args=(len(self.client_list)))
             # self.read_thread_list[-1].start()
             print("New client: ", a)
-        if len(self.client_list) >= 1:
-            for client in self.client_list:
-                client.shutdown()
-                client.close()
-                print('remove client ' + str(self.address_list[self.client_list.index(client)]))
+        print("Out of while True in Connect_device")
+        for client in self.client_list:
+            print('try to remove client ' + str(self.address_list[self.client_list.index(client)]))
+            client.shutdown()
+            client.close()
+            print('remove client ' + str(self.address_list[self.client_list.index(client)]))
+
         self.server.close()
-        if len(thread_list) >= 1:
-            for thread in thread_list:
-                thread.join()
-                print(thread.getName() + " is closed")
+        print("server is now closed")
+
+        for thread in thread_list:
+            print(thread.getName() + thread.isAlive())
+            thread.join()
+            print(thread.getName() + " is closed")
 
     def read_device(self):
         c = self.client_list[-1]
