@@ -51,39 +51,36 @@ class bluetooth_app:
     def connect_device(self):  # Does not work properly
         thread_list = []
         self.server.listen(7)
-        while self.run:
-            try:
+        try:
+            while self.run:
                 c, a = self.server.accept()
-            except:
-                if self.run == False:
-                    break
-                continue
-            self.client_list.append(c)
-            self.address_list.append(a)
-            # one thread for each connected device
-            # self.read_thread_list.append([c, a])
-            thread_list.append(threading.Thread(target=self.read_device))
-            thread_list[-1].start()
-            print(thread_list[-1].getName())
-            print(thread_list[-1].isAlive())
-            # self.read_thread_list.append(threading.Thread(target=self.read_device, args=(len(self.client_list)))
-            # self.read_thread_list[-1].start()
-            print("New client: ", a)
+                self.client_list.append(c)
+                self.address_list.append(a)
+                # one thread for each connected device
+                # self.read_thread_list.append([c, a])
+                thread_list.append(threading.Thread(target=self.read_device))
+                thread_list[-1].start()
+                print(thread_list[-1].getName())
+                print(thread_list[-1].isAlive())
+                # self.read_thread_list.append(threading.Thread(target=self.read_device, args=(len(self.client_list)))
+                # self.read_thread_list[-1].start()
+                print("New client: ", a)
+        except:
+            print("in exception for connect_device")
+            for thread in thread_list:
+                print(thread.getName() + thread.isAlive())
+                thread.join()
+                print(thread.getName() + " is closed")
+        print("Out of while True in connect device")
+        # print("Out of while True in Connect_device")
+        # for client in self.client_list:
+        #     print('try to remove client ' + str(self.address_list[self.client_list.index(client)]))
+        #     client.shutdown()
+        #     client.close()
+        #     print('remove client ' + str(self.address_list[self.client_list.index(client)]))
 
-        print("in exception for connect_device")
-        for thread in thread_list:
-            print(thread.getName() + thread.isAlive())
-            thread.join()
-            print(thread.getName() + " is closed")
-            # print("Out of while True in Connect_device")
-            # for client in self.client_list:
-            #     print('try to remove client ' + str(self.address_list[self.client_list.index(client)]))
-            #     client.shutdown()
-            #     client.close()
-            #     print('remove client ' + str(self.address_list[self.client_list.index(client)]))
-
-            # self.server.close()
-            # print("server is now closed")
+        # self.server.close()
+        # print("server is now closed")
 
         # for thread in thread_list:
         #     print(thread.getName() + thread.isAlive())
@@ -113,7 +110,7 @@ class bluetooth_app:
                     # TODO Erik: Power off python program and Raspberry Pi
                     try:
                         self.run = False
-                        print("Out of while True in Connect_device")
+                        #print("Out of while True in Connect_device")
                         for client in self.client_list:
                             print('try to remove client ' +
                                   str(self.address_list[self.client_list.index(client)]))
@@ -121,7 +118,9 @@ class bluetooth_app:
                             client.close()
                             print('remove client ' +
                                   str(self.address_list[self.client_list.index(client)]))
+                            time.sleep(1)
 
+                        # self.server.shutdown()
                         self.server.close()
                         print("server is now closed")
                         # print("run= " + str(self.run))
