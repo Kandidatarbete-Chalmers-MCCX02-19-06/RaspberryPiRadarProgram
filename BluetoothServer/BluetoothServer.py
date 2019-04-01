@@ -108,16 +108,20 @@ connectDevices = ConnectDevicesThread()
 connectDevices.start()
 
 for i in range(1,2000):
-    time.sleep(0.1)
+    time.sleep(0.05)
     while len(clientList) == 0:
         pass
     #data = addData(sinvalue)
     data = getDataFromQueue()
     #print('Write data: ' + data)
     data_pulse, data_breath = data.split(' ')
-    write_data_to_app(data_pulse, 'heart rate')
-    write_data_to_app(data_breath, 'breath rate')
+
     write_data_to_app(data_breath, 'real time breath')
+    time.sleep(0.3)
+    write_data_to_app(data_pulse, 'heart rate')
+    time.sleep(0.1)
+    write_data_to_app(data_breath, 'breath rate')
+
     #sinvalue += 0.157
 
 run = False
