@@ -33,7 +33,7 @@ class Radar(threading.Thread):
         self.config.sweep_rate = 100  # Frequency for collecting data
         self.config.gain = 1  # Gain between 0 and 1.
         self.time = 1  # Duration for a set amount of sequences
-        self.seq = self.config.sweep_rate * self.time
+        self.seq = self.config.sweep_rate * self.time  # Amount of sequences during a set time and sweep freq
 
         self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
         self.num_points = self.info["data_length"]  # Amount of data points per sampel
@@ -53,14 +53,15 @@ class Radar(threading.Thread):
     # Loop which collects data from the radar, tracks the maximum peak and filters it for further signal processing. The final filtered data is put into a queue.
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
-        while not self.a:        # static variable impported from bluetooth_app class
+        # static variable impported from bluetooth_app class (In final version)
+        while not self.a:
             # for i in range(self.seq*2):
             self.get_data()
             self.tracker()
             self.filter_HeartRate()
             self.filter_RespRate()
             self.data_idx += 1
-            if self.data_idx == self.config.sweep_rate:
+            if self.data_idx % self.config.sweep_rate == 0:
                 print("Still getting data")
                 self.HR_filter_queue.put(2)
             if self.data_idx >= self.seq:  # Resets matrix index to zero for filtering.
