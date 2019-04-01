@@ -75,7 +75,7 @@ class bluetooth_app:
         print("Out of while True in connect device")
         #print("in exception for connect_device")
         for thread in thread_list:
-            print(thread.getName() + thread.isAlive())
+            print(thread.getName() + str(thread.isAlive()))
             thread.join()
             print(thread.getName() + " is closed")
 
