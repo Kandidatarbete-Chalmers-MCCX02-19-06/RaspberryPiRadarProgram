@@ -32,13 +32,9 @@ ylabel('Andningsfrekvens [Hz]')
 N=length(x);
 for(j=1:N) %Loopen motsvaras av data som fås sekvensvis från radarn
     %if(mod(j,Fs*Tc)==0) %Update hysteresis every Tc:th second
-    
-    
-   
-    
+
     if(mod(counthys,Fs*Tc)==0)
         Rnow = rms(x(j-Fs*Tc+1:j))*RelRms;
-        
         if(Rnow<Rlowbound)
              Rnow = Rlowbound;
              count = 1;
@@ -48,13 +44,10 @@ for(j=1:N) %Loopen motsvaras av data som fås sekvensvis från radarn
         Lcut = -Hcut;
         counthys=0;
     end
-  
-    
+
     Schny = Schga;
 
-
     if (x(j)<= Lcut)
-
       Schny=0;
       if(Schga == 1)
           %Fixa massa och skicka till appen
@@ -69,20 +62,16 @@ for(j=1:N) %Loopen motsvaras av data som fås sekvensvis från radarn
           count = 0;
       end
 
-    elseif(x(j)>= Hcut)         
-
+    elseif(x(j)>= Hcut)
       Schny=1;
-
     end
 
     Schga = Schny;
-    count = count +1;
+    count = count + 1;
     counthys = counthys + 1;
-    
-   
+
     addpoints(h,t(j),CurrFreq)
     pause(0.0001)
-    
     
 end
 
