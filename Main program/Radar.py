@@ -13,7 +13,7 @@ from acconeer_utils.mpl_process import PlotProcess, PlotProccessDiedException, F
 
 class Radar(threading.Thread):
 
-    def __init__(self, HR_filter_queue, go):  # Lägg till RR_filter_queue som inputargument
+    def __init__(self, HR_filter_queue, run_measurement, go):  # Lägg till RR_filter_queue som inputargument
         self.go = go
         # Setup for collecting data from radar
         self.args = example_utils.ExampleArgumentParser().parse_args()
@@ -25,7 +25,8 @@ class Radar(threading.Thread):
         else:
             port = self.args.serial_port or example_utils.autodetect_serial_port()
             self.client = RegClient(port)
-
+        # List to only send real data when devices want data and send zeros when no device needs data.
+        self.run_measurement = run_measurement
         self.client.squeeze = False
         self.config = configs.IQServiceConfig()
         self.config.sensor = self.args.sensors
@@ -75,7 +76,13 @@ class Radar(threading.Thread):
     # Method to collect data from the streaming server
     def get_data(self):
         # self.data should be accessable from all other methods
-        self.info, self.data = self.client.get_next()
+        if self.run_measurement == True:
+            self.info, self.data = self.client.get_next()
+            print("Real radar data is taken")
+        else:
+            self.data = np.zeros((1, self.num_points))
+            print("No data available")
+            print(self.data)
 
     # Filter for heart rate using the last X sampels according to data_idx. Saves data to queue
     def filter_HeartRate(self):

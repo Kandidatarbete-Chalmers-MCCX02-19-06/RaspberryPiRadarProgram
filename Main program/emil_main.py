@@ -18,18 +18,19 @@ import subprocess       # for Raspberry Pi shutdown
 def main():
     # subprocess.call(
     #    "./Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c")
-    time.sleep(5)
-
+    # time.sleep(5)
+    # List to only send real data when devices want data and send zeros when no device needs data.
+    run_measurement = []
     radar_queue = queue.Queue()
     #send_to_app_queue = queue.Queue()
     go = ["True"]
     # heart_rate_queue = queue.Queue()
     # resp_rate_queue = queue.Queue()
 
-    radar = Radar.Radar(radar_queue, go)
+    radar = Radar.Radar(radar_queue, run_measurement, go)
     radar.start()
 
-    bvme = bluetooth_app.bluetooth_app(radar_queue, go)
+    bvme = bluetooth_app.bluetooth_app(radar_queue, run_measurement, go)
     bvme.app_data()
     print('End of bluetooth_app')
     # time.sleep(300)

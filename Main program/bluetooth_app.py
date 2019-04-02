@@ -12,7 +12,7 @@ import os
 class bluetooth_app:
     run = True  # Argument for shuting down all loops at the same time with input from one device.
 
-    def __init__(self, from_radar_queue, go):
+    def __init__(self, from_radar_queue, run_measurement, go):
         self.go = go  # Argument for shutting down all threads and loops at the same time.
         # Bluetooth variables
         self.client_list = []         # list for each connected device, sockets
@@ -26,6 +26,7 @@ class bluetooth_app:
         self.server.setblocking(0)  # Makes server.accept() non-blocking, used for "poweroff"
         # TEMP: Data from radar used to make sure data can be accepted between threads
         self.from_radar_queue = from_radar_queue  # Queue from radar class to test if queue communication work
+        self.run_measurement = run_measurement
         print('Bluetooth Socket Created')
         try:
             self.server.bind((self.host, self.port))
@@ -111,6 +112,13 @@ class bluetooth_app:
                         os.system("echo 'power off\nquit' | bluetoothctl")
                     except Exception as error:
                         print("exception in for-loop in read_device: " + str(error))
+
+                elif data == 'startMeasurement':
+                    self.run_measurement.append(c)
+
+                elif data == 'stopMeasurement':
+                    if c in self.run_measurement:
+                        self.run_measurement.remove(c)
 
         except Exception as error:
             print("last exception read_device: " + str(error))
