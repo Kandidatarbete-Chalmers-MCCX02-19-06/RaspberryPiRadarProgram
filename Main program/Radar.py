@@ -32,7 +32,7 @@ class Radar(threading.Thread):
         self.config.sensor = self.args.sensors
 
         self.config.range_interval = [0.2, 0.6]  # Measurement interval
-        self.config.sweep_rate = 100  # Frequency for collecting data
+        self.config.sweep_rate = 1  # Frequency for collecting data
         self.config.gain = 1  # Gain between 0 and 1.
         self.time = 1  # Duration for a set amount of sequences
         self.seq = self.config.sweep_rate * self.time  # Amount of sequences during a set time and sweep freq
@@ -82,7 +82,7 @@ class Radar(threading.Thread):
         else:
             self.data = np.zeros((1, self.num_points))
             print("No data available")
-            print(self.data)
+            # print(self.data)
 
     # Filter for heart rate using the last X sampels according to data_idx. Saves data to queue
     def filter_HeartRate(self):
