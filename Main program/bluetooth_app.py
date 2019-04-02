@@ -126,6 +126,8 @@ class bluetooth_app:
             print("last exception read_device: " + str(error))
             c.close()
             print('remove client: ' + str(self.address_list[self.client_list.index(c)]))
+            if c in self.run_measurement:
+                self.run_measurement.remove(c)
             self.client_list.remove(c)
 
     def write_data_to_app(self, data, data_type):
