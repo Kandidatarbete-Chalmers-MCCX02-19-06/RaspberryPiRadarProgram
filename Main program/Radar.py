@@ -56,7 +56,7 @@ class Radar(threading.Thread):
 
         self.client.start_streaming()  # Starts Acconeers streaming server
         # static variable impported from bluetooth_app class (In final version)
-        while not self.go:
+        while self.go:
             # for i in range(self.seq*2):
             self.get_data()
             self.tracker()
@@ -68,8 +68,8 @@ class Radar(threading.Thread):
                 self.HR_filter_queue.put(2)
             if self.data_idx >= self.seq:  # Resets matrix index to zero for filtering.
                 self.data_idx = 0
-        print("End of getting data from radar")
 
+        print("End of getting data from radar")
         self.client.disconnect()
 
     # Method to collect data from the streaming server

@@ -22,7 +22,7 @@ def main():
 
     radar_queue = queue.Queue()
     #send_to_app_queue = queue.Queue()
-    go = []
+    go = ["True"]
     # heart_rate_queue = queue.Queue()
     # resp_rate_queue = queue.Queue()
 
@@ -42,7 +42,7 @@ def main():
     print("connect_device is closed")
 
     print('Shut down succeed')
-    subprocess.call(["sudo", "shutdown", "-r", "now"])
+    #subprocess.call(["sudo", "shutdown", "-r", "now"])
 
 
 if __name__ == "__main__":
