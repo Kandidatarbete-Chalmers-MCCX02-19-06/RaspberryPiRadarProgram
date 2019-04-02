@@ -64,9 +64,9 @@ class Radar(threading.Thread):
             self.filter_HeartRate()
             self.filter_RespRate()
             self.data_idx += 1
-            if self.data_idx % self.config.sweep_rate == 0:
-                print("Still getting data")
-                self.HR_filter_queue.put(2)
+            # if self.data_idx % self.config.sweep_rate == 0:
+            #    print("Still getting data")
+            self.HR_filter_queue.put(2)
             if self.data_idx >= self.seq:  # Resets matrix index to zero for filtering.
                 self.data_idx = 0
 
@@ -81,7 +81,7 @@ class Radar(threading.Thread):
             print("Real radar data is taken")
         else:
             self.data = np.zeros((1, self.num_points))
-            print("No data available")
+            #print("No data available")
             # print(self.data)
 
     # Filter for heart rate using the last X sampels according to data_idx. Saves data to queue
