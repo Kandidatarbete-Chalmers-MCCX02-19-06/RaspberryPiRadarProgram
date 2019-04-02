@@ -41,7 +41,7 @@ class bluetooth_app:
 
     def app_data(self):  # The main loop which takes data from processing and sends data to all clients
         while self.run:
-            # time.sleep(1)
+            time.sleep(1)
             while len(self.client_list) == 0:
                 continue
             try:
