@@ -76,7 +76,7 @@ class Radar(threading.Thread):
     # Method to collect data from the streaming server
     def get_data(self):
         # self.data should be accessable from all other methods
-        if self.run_measurement == True:
+        if self.run_measurement:
             self.info, self.data = self.client.get_next()
             print("Real radar data is taken")
         else:
