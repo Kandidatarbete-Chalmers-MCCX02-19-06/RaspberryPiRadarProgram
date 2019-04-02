@@ -83,7 +83,7 @@ class Radar(threading.Thread):
             time.sleep(1)
             self.data = np.zeros((1, self.num_points))
             self.client.get_next()
-            #print("No data available")
+            print("No data available")
             # print(self.data)
 
     # Filter for heart rate using the last X sampels according to data_idx. Saves data to queue
