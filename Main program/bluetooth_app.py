@@ -113,12 +113,14 @@ class bluetooth_app:
                     except Exception as error:
                         print("exception in for-loop in read_device: " + str(error))
 
-                elif data == 'startMeasurement':
+                elif data == 'startMeasure':
                     self.run_measurement.append(c)
+                    print("Device added")
 
-                elif data == 'stopMeasurement':
+                elif data == 'stopMeasure':
                     if c in self.run_measurement:
                         self.run_measurement.remove(c)
+                        print("Device removed")
 
         except Exception as error:
             print("last exception read_device: " + str(error))
