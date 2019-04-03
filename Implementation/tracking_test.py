@@ -227,6 +227,7 @@ class Tracking:
             # Emil
             print(self.I_peaks)
 
+            print(self.I_peaks_filtered)
             print(self.I_peaks_filtered[0][int(self.data_idx)])
             self.tracked_distance[0][self.data_idx] = self.I_peaks_filtered[0][self.data_idx] / dist * interval
 
