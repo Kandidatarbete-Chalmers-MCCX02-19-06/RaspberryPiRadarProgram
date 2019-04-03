@@ -176,6 +176,8 @@ class Tracking:
 
             self.I_peaks[0] = I
             self.locks = signal.find_peaks(np.abs(self.data))
+            print("I_peaks: " + self.I_peaks[0])
+            print("Locks: " + self.locks)
             I = np.amin(np.abs(self.locks - self.I_peaks[0]))
             self.I_peaks[0] = self.locks[I]
             self.I_peaks_filtered[0] = self.I_peaks[0]
