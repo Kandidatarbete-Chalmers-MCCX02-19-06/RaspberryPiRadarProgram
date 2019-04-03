@@ -174,7 +174,7 @@ class Tracking:
             # I = np.abs(self.data).index(sp.signal.find_peaks(np.abs(self.data)))
             print(I)
 
-            self.I_peaks[0] = I
+            self.I_peaks[0][0] = I
             self.locks = signal.find_peaks(np.abs(self.data))
             print(self.I_peaks[0])
             print(self.locks)
