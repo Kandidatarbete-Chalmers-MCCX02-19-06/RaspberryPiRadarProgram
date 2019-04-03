@@ -178,7 +178,7 @@ class Tracking:
             self.tracked_phase[0][self.data_idx] = np.angle(
                 self.data[int(self.I_peaks_filtered[0][self.data_idx])])
 
-        return self.tracked_distance
+        return self.peaks
 
 
 if __name__ == "__main__":
