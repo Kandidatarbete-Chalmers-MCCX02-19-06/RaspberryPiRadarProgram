@@ -184,11 +184,9 @@ class Tracking:
             #I = np.amin(np.abs(self.locks - self.I_peaks[0][0]))
             print(self.I_peaks)
             print(I, int(I))
-            self.I_peaks[0][0] = int(I)
+            self.I_peaks[0][0] = I
             # print(self.I_peaks[0][0])
-            index = self.I_peaks[0][0]
-            print(type(index))
-
+            print(type(I), type(int(I)))
             self.I_peaks_filtered[0][0] = self.I_peaks[0][0]
             self.tracked_distance[0][0] = self.I_peaks_filtered[0][0] / dist * interval
             self.tracked_amplitude[0][0] = np.abs(self.data[145])
