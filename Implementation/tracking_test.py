@@ -203,7 +203,13 @@ class Tracking:
             last_max = self.I_peaks_filtered[0][self.data_idx - 1]
             print(last_max)
             print(self.locks)
-            I = np.amax([np.abs(self.data[int(I + last_max)]), np.abs(self.data[int(last_max-I)])])
+            List_of_largest_amp = [np.abs(self.data[int(I + last_max)]),
+                                   np.abs(self.data[int(last_max-I)])]
+            if List_of_largest_amp[0] > List_of_largest_amp[1]:
+                I = I + last_max
+            else:
+                I = last_max - I
+
             print(I)
             if self.locks == None:
                 self.I_peaks[0][self.data_idx] = self.I_peaks[0][self.data_idx-1]
