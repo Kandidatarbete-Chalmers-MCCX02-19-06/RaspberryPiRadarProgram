@@ -54,11 +54,13 @@ def main():
     counter = 0
     while not interrupt_handler.got_signal:
         info, sweep = client.get_next()
+        amplitude = np.abs(sweep)
         track = tracking.tracking(sweep, counter)
         counter += 1
         print(track)
-        amplitude_line.set_ydata(track)
-        # fig.canvas.flush_events()
+        # amplitude_line.set_ydata(track)
+        amplitude_line.set_ydata(amplitude)
+        fig.canvas.flush_events()
 
     print("Disconnecting...")
     client.disconnect()
