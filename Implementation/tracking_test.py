@@ -176,6 +176,7 @@ class Tracking:
             I_idx = np.argmax(self.data)
             print(I)
             print(I_idx)
+            print(dist)
 
             self.I_peaks[0][0] = I
 
