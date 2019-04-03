@@ -221,7 +221,7 @@ class Tracking:
             else:
                 self.i_avg_start = self.data_idx - N_avg
                 counter = 1
-
+            print("test")
             print(self.i_avg_start: self.data_idx)
             print(str(self.i_avg_start: self.data_idx))
 
