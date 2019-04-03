@@ -27,7 +27,7 @@ def main():
     num_points = info["data_length"]
     tracking = Tracking(num_points, config.range_interval)
 
-    amplitude_y_max = 22000
+    amplitude_y_max = 1
 
     fig, (amplitude_ax) = plt.subplots(1)
     fig.set_size_inches(12, 6)
