@@ -179,11 +179,12 @@ class Tracking:
 
             #self.I_peaks[0][0] = I
 
-            #self.locks, _ = signal.find_peaks(np.abs(self.data))
+            self.locks, _ = signal.find_peaks(np.abs(self.data))
+            print(self.locks)
             # print(self.locks)  # Check what happends during the first cycle.
             #I = np.amin(np.abs(self.locks - self.I_peaks[0][0]))
-            print(self.I_peaks)
-            print(I, int(I))
+            # print(self.I_peaks)
+            #print(I, int(I))
             self.I_peaks[0][0] = I
             # print(self.I_peaks[0][0])
             #print(type(I), type(int(I)))
