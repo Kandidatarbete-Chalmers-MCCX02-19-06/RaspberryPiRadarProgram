@@ -223,8 +223,9 @@ class Tracking:
                 counter = 1
             # I_avg_start to data_idx
 
-            for i in range(self.i_avg_start: self.data_idx):
-                last_samples = last_samples + self.I_peaks[0][i]
+            # for i in range(self.i_avg_start: self.data_idx):
+            #   last_samples = last_samples + self.I_peaks[0][i]
+            last_samples = self.I_peaks[0][self.i_avg_start:self.data_idx]
             print("Last samples")
             print(last_samples)
 
