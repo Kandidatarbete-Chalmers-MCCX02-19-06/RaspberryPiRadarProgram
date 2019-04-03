@@ -137,7 +137,8 @@ class Tracking:
             self.locks, _ = signal.find_peaks(np.abs(self.data))
             I = np.amin(self.locks - self.I_peaks_filtered[0][self.data_idx - 1])
             last_max = self.I_peaks_filtered[0][self.data_idx - 1]
-            List_of_largest_amp = [np.abs(self.data[int(I + last_max)]),
+
+            List_of_largest_amp = [np.abs(self.data[int(I + last_max)]),  # if close to one end the last_max and I will go out of bounds
                                    np.abs(self.data[int(last_max-I)])]
             if List_of_largest_amp[0] > List_of_largest_amp[1]:
                 I = I + last_max
