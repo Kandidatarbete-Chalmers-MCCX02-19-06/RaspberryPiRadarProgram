@@ -37,8 +37,8 @@ def main():
         ax.set_xlabel("Depth (m)")
         ax.set_xlim(config.range_interval)
 
-    amplitude_ax.set_ylabel("Amplitude")
-    amplitude_ax.set_ylim(-1, 1)
+    amplitude_ax.set_ylabel("Distance")
+    amplitude_ax.set_ylim(config.range_interval[0], config.range_interval[1])
 
     xs = np.linspace(*config.range_interval, num_points)
     amplitude_line = amplitude_ax.plot(xs, np.zeros_like(xs))[0]
@@ -59,8 +59,8 @@ def main():
         peak = track / num_points * \
             (config.range_interval[1] - config.range_interval[0]) + config.range_interval[0]
         counter += 1
-        print(track)
-        amplitude_line.set_ydata(track)
+        print(peak)
+        amplitude_line.set_ydata(peak)
         # amplitude_line.set_ydata(amplitude)
         fig.canvas.flush_events()
 
