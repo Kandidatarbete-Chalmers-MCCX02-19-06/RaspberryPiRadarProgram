@@ -200,6 +200,9 @@ class Tracking:
             self.locks = None
             self.locks, _ = signal.find_peaks(np.abs(self.data))
             I = np.amin(self.locks - self.I_peaks_filtered[0][self.data_idx - 1])
+            last_max = self.I_peaks_filtered[0][self.data_idx - 1]
+            I = np.amax([np.abs(self.data[I + last_max]), np.abs(self.data[last_max-I])])
+
             if self.locks == None:
                 self.I_peaks[0][self.data_idx] = self.I_peaks[0][self.data_idx-1]
             else:
