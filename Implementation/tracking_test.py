@@ -56,8 +56,9 @@ def main():
         info, sweep = client.get_next()
         track = tracking.tracking(sweep, counter)
         counter += 1
-        amplitude_line.set_ydata(track)
-        fig.canvas.flush_events()
+        print(track)
+        # amplitude_line.set_ydata(track)
+        # fig.canvas.flush_events()
 
     print("Disconnecting...")
     client.disconnect()
