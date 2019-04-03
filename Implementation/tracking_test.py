@@ -31,7 +31,7 @@ def main():
 
     fig, (amplitude_ax) = plt.subplots(1)
     fig.set_size_inches(12, 6)
-    fig.canvas.set_window_title(filename)
+    fig.canvas.set_window_title("filename")
 
     for ax in [amplitude_ax]:
         ax.set_xlabel("Depth (m)")
