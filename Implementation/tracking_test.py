@@ -175,7 +175,7 @@ class Tracking:
             print(I)
 
             self.I_peaks[0][0] = I
-            self.locks = signal.find_peaks(np.abs(self.data))
+            self.locks, _ = signal.find_peaks(np.abs(self.data))
             print(self.I_peaks[0])
             print(self.locks)
             I = np.amin(np.abs(self.locks - self.I_peaks[0][0]))
