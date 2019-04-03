@@ -144,13 +144,13 @@ class Tracking:
     def __init__(self, num_points, range_interval):
         self.num_points = num_points
         self.config_range_interval = range_interval
-        self.I_peaks = []
-        self.locks = []
-        self.I_peaks_filtered = []
-        self.tracked_distance = []
-        self.tracked_amplitude = []
-        self.tracked_phase = []
-        self.data_matrix = []
+        self.I_peaks = np.zeros((1, 1000))
+        self.locks = np.zeros((1, 1000))
+        self.I_peaks_filtered = np.zeros((1, 1000))
+        self.tracked_distance = np.zeros((1, 1000))
+        self.tracked_amplitude = np.zeros((1, 1000))
+        self.tracked_phase = np.zeros((1, 1000))
+        self.data_matrix = np.zeros((1, 1000))
 
         # self.data_idx = configs["data_index"]
 
