@@ -25,10 +25,32 @@ def main():
     config.sensor = args.sensors
     info = client.setup_session(config)
     num_points = info["data_length"]
-    fig_updater = FigureUpdater2(config, num_points)
     tracking = Tracking(num_points, config.range_interval)
-    plot_process = PlotProcess(fig_updater)
-    plot_process.start()
+
+    amplitude_y_max = 22000
+
+    fig, (amplitude_ax) = plt.subplots(1)
+    fig.set_size_inches(12, 6)
+    fig.canvas.set_window_title(filename)
+
+    for ax in [amplitude_ax]:
+        ax.set_xlabel("Depth (m)")
+        ax.set_xlim(config.range_interval)
+        ax.set_xticks(np.linspace(0.4, 0.8, num=5))
+        ax.set_xticks(np.concatenate([np.linspace(0.41, 0.49, num=9), np.linspace(
+            0.51, 0.59, num=9), np.linspace(0.61, 0.69, num=9), np.linspace(0.71, 0.79, num=9)]), minor=True)
+        ax.grid(True, which='major')
+        ax.grid(True, which='minor')
+
+    amplitude_ax.set_ylabel("Amplitude")
+    amplitude_ax.set_ylim(0, amplitude_y_max)
+
+    xs = np.linspace([0, 100], num_points)
+    amplitude_line = amplitude_ax.plot(xs, np.zeros_like(xs))[0]
+
+    fig.tight_layout()
+    plt.ion()
+    plt.show()
 
     interrupt_handler = example_utils.ExampleInterruptHandler()
     print("Press Ctrl-C to end session")
@@ -37,109 +59,24 @@ def main():
     counter = 0
     while not interrupt_handler.got_signal:
         info, sweep = client.get_next()
-        amplitude = np.abs(sweep)
-        phase = np.angle(sweep)
         track = tracking.tracking(sweep, counter)
         counter += 1
-        plot_data = {
-            "amplitude": np.abs(sweep),
-            "phase": np.angle(sweep),
-            "ymax": amplitude.max(),
-            "xmax": config.range_interval[0] + (config.range_interval[1] - config.range_interval[0]) *
-            (np.argmax(amplitude)/num_points),
-            "tracked_distance": track,
-        }
-        try:
-            plot_process.put_data(plot_data)
-        except PlotProccessDiedException:
-            break
+        amplitude_line.set_ydata(track)
+        fig.canvas.flush_events()
 
     print("Disconnecting...")
-    plot_process.close()
     client.disconnect()
 
 
 def config_setup():
     config = configs.IQServiceConfig()
     config.range_interval = [0.3, 0.7]
-    config.sweep_rate = 2
+    config.sweep_rate = 1
     config.gain = 1
     #config.session_profile = configs.EnvelopeServiceConfig.MAX_DEPTH_RESOLUTION
     # config.session_profile = configs.EnvelopeServiceConfig.MAX_SNR
     print(config.gain)
     return config
-
-
-class FigureUpdater2(FigureUpdater):
-    def __init__(self, config, num_points):
-        self.config = config
-        self.num_points = num_points
-        self.plot_index = 0
-        # self.xs = np.linspace(*config.range_interval, num_points)
-
-    def setup(self, fig):
-        fig.set_size_inches(12, 8)
-
-        gs = GridSpec(2, 1)
-        self.amplitude_ax = fig.add_subplot(gs[0, 0])
-        self.amplitude_ax.set_xlabel("Depth(m)")
-        self.amplitude_ax.set_xlim(*self.config.range_interval)
-        self.amplitude_ax.set_ylabel("Amplitude")
-        self.amplitude_ax.set_ylim(0, 20000)
-        self.amplitude_ax.minorticks_on()
-        self.amplitude_ax.grid(True, which='major', color='k')
-        self.amplitude_ax.grid(True, which='minor', color='k')
-
-        self.tracked_distance_ax = fig.add_subplot(gs[1, 0])
-        self.tracked_distance_ax.set_xlabel("time(s)")
-        self.tracked_distance_ax.set_xlim(0, 100)
-        self.tracked_distance_ax.set_ylabel("Amplitude")
-        self.tracked_distance_ax.set_ylim(0, 20000)
-
-        fig.canvas.set_window_title("Test")
-        fig.tight_layout()
-
-    def first(self, data):
-        self.process_data(data)
-        xmax = 0
-        ymax = 0
-        text = "x={:.2f}, y={:.2f}".format(data["xmax"], data["ymax"])
-        bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
-        arrowprops = dict(arrowstyle="->", connectionstyle="angle,angleA=0,angleB=90")
-        kw = dict(xycoords='data', textcoords="axes fraction",
-                  arrowprops=arrowprops, bbox=bbox_props, ha="right", va="top")
-
-        self.artists = {}
-
-        self.artists["amplitude"] = self.amplitude_ax.plot(self.xs,    data["amplitude"])[0]
-        self.artists["annotate"] = self.amplitude_ax.annotate(
-            text, xy=(data["xmax"], data["ymax"]), xytext=(0.96, 0.96), **kw)
-
-        self.artists["tracked_distance"] = self.tracked_distance_ax(
-            self.small, data["tracked_distance"])[0]
-        return self.artists.values()
-
-    def update(self, data):
-        self.process_data(data)
-        text = "x={:.2f}, y={:.2f}".format(data["xmax"], data["ymax"])
-        bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
-        arrowprops = dict(arrowstyle="->", connectionstyle="angle,angleA=0,angleB=90")
-        kw = dict(xycoords='data', textcoords="axes fraction",
-                  arrowprops=arrowprops, bbox=bbox_props, ha="right", va="top")
-
-        self.artists["annotate"] = self.amplitude_ax.annotate(
-            text, xy=(data["xmax"], data["ymax"]), xytext=(0.96, 0.96), **kw)
-
-        self.artists["amplitude"].set_ydata(data["amplitude"])
-        self.artists["tracked_distance"].set_ydata[data["tracked_distance"]]
-
-    def process_data(self, data):
-        # if self.plot_index == 0:
-        self.xs = np.linspace(*self.config.range_interval, data["amplitude"].size)
-        self.small = np.linspace([0, 100], data["tracked_distance"])
-        #self.data_idx = data["data_index"]
-        #self.sweep_rate = data["sweep_rate"]
-        self.plot_index += 1
 
 
 class Tracking:
@@ -202,8 +139,6 @@ class Tracking:
             self.locks, _ = signal.find_peaks(np.abs(self.data))
             I = np.amin(self.locks - self.I_peaks_filtered[0][self.data_idx - 1])
             last_max = self.I_peaks_filtered[0][self.data_idx - 1]
-            print(last_max)
-            print(self.locks)
             List_of_largest_amp = [np.abs(self.data[int(I + last_max)]),
                                    np.abs(self.data[int(last_max-I)])]
             if List_of_largest_amp[0] > List_of_largest_amp[1]:
@@ -211,7 +146,6 @@ class Tracking:
             else:
                 I = last_max - I
 
-            print(I)
             if self.locks == None:
                 self.I_peaks[0][self.data_idx] = self.I_peaks[0][self.data_idx-1]
             else:
@@ -233,7 +167,7 @@ class Tracking:
             # print(self.I_peaks_filtered)
             # print(self.I_peaks_filtered)
             # print(self.I_peaks_filtered[0][int(self.data_idx)])
-            print(self.I_peaks_filtered[0][data_idx])
+            # print(self.I_peaks_filtered[0][data_idx])
             self.tracked_distance[0][self.data_idx] = self.I_peaks_filtered[0][self.data_idx] / dist * interval
 
             self.tracked_amplitude[0][self.data_idx] = np.abs(
