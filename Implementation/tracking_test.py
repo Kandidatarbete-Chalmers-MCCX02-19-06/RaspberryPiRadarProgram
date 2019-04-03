@@ -138,12 +138,13 @@ class Tracking:
             I = np.amin(self.locks - self.I_peaks_filtered[0][self.data_idx - 1])
             last_max = self.I_peaks_filtered[0][self.data_idx - 1]
 
-            List_of_largest_amp = [np.abs(self.data[int(I + last_max)]),  # if close to one end the last_max and I will go out of bounds
-                                   np.abs(self.data[int(last_max-I)])]
-            if List_of_largest_amp[0] > List_of_largest_amp[1]:
-                I = I + last_max
-            else:
-                I = last_max - I
+            if last_max - I < 0 or last_max + I > dist:
+                List_of_largest_amp = [np.abs(self.data[int(I + last_max)]),  # if close to one end the last_max and I will go out of bounds
+                                       np.abs(self.data[int(last_max-I)])]
+                if List_of_largest_amp[0] > List_of_largest_amp[1]:
+                    I = I + last_max
+                else:
+                    I = last_max - I
 
             if self.locks == None:
                 self.I_peaks[0][self.data_idx] = self.I_peaks[0][self.data_idx-1]
