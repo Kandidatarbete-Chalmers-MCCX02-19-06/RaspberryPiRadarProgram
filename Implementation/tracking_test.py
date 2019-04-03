@@ -223,6 +223,7 @@ class Tracking:
 
             self.I_peaks_filtered[0][self.data_idx] = np.round(
                 np.mean(self.I_peaks[0][self.i_avg_start:self.data_idx]))
+            print(self.I_peaks_filtered)
             self.tracked_distance[0][self.data_idx] = self.I_peaks_filtered[0][self.data_idx] / dist * interval
 
             self.tracked_amplitude[0][self.data_idx] = np.abs(
