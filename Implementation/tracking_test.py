@@ -58,8 +58,8 @@ def main():
         track = tracking.tracking(sweep, counter)
         counter += 1
         print(track)
-        # amplitude_line.set_ydata(track)
-        amplitude_line.set_ydata(amplitude)
+        amplitude_line.set_ydata(track)
+        # amplitude_line.set_ydata(amplitude)
         fig.canvas.flush_events()
 
     print("Disconnecting...")
