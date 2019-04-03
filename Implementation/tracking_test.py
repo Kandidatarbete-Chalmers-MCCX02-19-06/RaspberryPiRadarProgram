@@ -178,12 +178,12 @@ class Tracking:
             self.locks = signal.find_peaks(np.abs(self.data))
             print(self.I_peaks[0])
             print(self.locks)
-            I = np.amin(np.abs(self.locks - self.I_peaks[0]))
+            I = np.amin(np.abs(self.locks - self.I_peaks[0][0]))
             self.I_peaks[0] = self.locks[I]
-            self.I_peaks_filtered[0] = self.I_peaks[0]
-            self.tracked_distance[0] = self.I_peaks_filtered[0] / dist * interval
-            self.tracked_amplitude[0] = np.abs(self.data(self.I_peaks_filtered[0]))
-            self.tracked_phase[0] = np.angle(self.data(self.I_peaks_filtered[0]))
+            self.I_peaks_filtered[0][0] = self.I_peaks[0][0]
+            self.tracked_distance[0][0] = self.I_peaks_filtered[0][0] / dist * interval
+            self.tracked_amplitude[0][0] = np.abs(self.data(self.I_peaks_filtered[0][0]))
+            self.tracked_phase[0][0] = np.angle(self.data(self.I_peaks_filtered[0][0]))
 
         # After first seq continous tracking
         else:
