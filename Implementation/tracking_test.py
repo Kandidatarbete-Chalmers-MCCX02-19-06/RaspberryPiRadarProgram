@@ -173,8 +173,9 @@ class Tracking:
 
             #I = np.abs(self.data).index(signal.find_peaks(np.abs(self.data)))
             I = np.amax(self.data)
-            I = I.index(I)
+            I_idx = np.argmax(self.data)
             print(I)
+            print(I_idx)
 
             self.I_peaks[0][0] = I
 
