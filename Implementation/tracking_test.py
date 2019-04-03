@@ -171,7 +171,9 @@ class Tracking:
             I = np.round(
                 ((self.start_distance - self.config_range_interval[0]) / interval) * dist)
 
-            I = np.abs(self.data).index(signal.find_peaks(np.abs(self.data)))
+            #I = np.abs(self.data).index(signal.find_peaks(np.abs(self.data)))
+            I = np.amax(self.data)
+            I = I.index(I)
             print(I)
 
             self.I_peaks[0][0] = I
