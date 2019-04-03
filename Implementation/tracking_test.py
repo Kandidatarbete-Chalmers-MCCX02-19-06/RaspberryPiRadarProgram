@@ -221,6 +221,7 @@ class Tracking:
                 self.i_avg_start = self.data_idx - N_avg
                 counter = 1
 
+            print(self.i_avg_start)
             self.I_peaks_filtered[0][self.data_idx] = np.round(
                 np.mean(self.I_peaks[0][self.i_avg_start:self.data_idx]))
             print(self.I_peaks_filtered)
