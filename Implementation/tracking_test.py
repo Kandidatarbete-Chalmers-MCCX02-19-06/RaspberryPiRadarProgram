@@ -214,21 +214,21 @@ class Tracking:
             if self.locks == None:
                 self.I_peaks[0][self.data_idx] = self.I_peaks[0][self.data_idx-1]
             else:
-                self.I_peaks[0][self.data_idx] = int(I)
+                self.I_peaks[0][self.data_idx] = I
+
             if counter == 0:
                 self.i_avg_start = np.amax([1, self.data_idx - N_avg])
             else:
                 self.i_avg_start = self.data_idx - N_avg
                 counter = 1
 
-            print(self.I_peaks[0][int(self.i_avg_start:self.data_idx)])
+            print(self.i_avg_start: self.data_idx)
+            print(str(self.i_avg_start: self.data_idx))
 
             self.I_peaks_filtered[0][self.data_idx] = np.round(
                 np.mean(self.I_peaks[0][self.i_avg_start:self.data_idx]))
-            # print(self.I_peaks_filtered)
-            # Emil
-           # print(self.I_peaks)
 
+            # print(self.I_peaks_filtered)
             # print(self.I_peaks_filtered)
             # print(self.I_peaks_filtered[0][int(self.data_idx)])
             self.tracked_distance[0][self.data_idx] = self.I_peaks_filtered[0][self.data_idx] / dist * interval
