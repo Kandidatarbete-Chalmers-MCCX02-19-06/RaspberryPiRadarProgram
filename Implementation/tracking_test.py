@@ -165,6 +165,7 @@ class Tracking:
             # print(self.I_peaks_filtered[0][int(self.data_idx)])
             # print(self.I_peaks_filtered[0][data_idx])
             self.tracked_distance[0][self.data_idx] = self.I_peaks_filtered[0][self.data_idx] / dist * interval
+            tracked_distance_now = self.I_peaks_filtered[0][self.data_idx] / dist * interval
 
             self.tracked_amplitude[0][self.data_idx] = np.abs(
                 self.data[int(self.I_peaks_filtered[0][self.data_idx])])
@@ -174,7 +175,7 @@ class Tracking:
             self.tracked_phase[0][self.data_idx] = np.angle(
                 self.data[int(self.I_peaks_filtered[0][self.data_idx])])
 
-        return self.tracked_distance
+        return tracked_distance_now
 
 
 if __name__ == "__main__":
