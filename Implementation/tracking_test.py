@@ -203,7 +203,7 @@ class Tracking:
             if self.locks == None:
                 self.I_peaks[0][self.data_idx] = self.I_peaks[0][self.data_idx-1]
             else:
-                self.I_peaks[0][self.data_idx] = self.locks[0][I]
+                self.I_peaks[0][self.data_idx] = self.locks[I]
             if counter == 0:
                 self.i_avg_start = np.amax([1, self.data_idx - N_avg])
             else:
