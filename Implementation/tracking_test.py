@@ -45,7 +45,7 @@ def main():
     amplitude_ax.set_ylabel("Amplitude")
     amplitude_ax.set_ylim(0, amplitude_y_max)
 
-    xs = np.linspace([0, 100], num_points)
+    xs = np.linspace([git100], num_points)
     amplitude_line = amplitude_ax.plot(xs, np.zeros_like(xs))[0]
 
     fig.tight_layout()
