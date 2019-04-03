@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
+import scipy as sp
 
 from acconeer_utils.clients.reg.client import RegClient
 from acconeer_utils.clients.json.client import JSONClient
@@ -63,7 +64,7 @@ def config_setup():
     config.sweep_rate = 2
     config.gain = 1
     config.session_profile = configs.EnvelopeServiceConfig.MAX_DEPTH_RESOLUTION
-    #config.session_profile = configs.EnvelopeServiceConfig.MAX_SNR
+    # config.session_profile = configs.EnvelopeServiceConfig.MAX_SNR
     print(config.gain)
     return config
 
@@ -73,7 +74,7 @@ class FigureUpdater2(FigureUpdater):
         self.config = config
         self.num_points = num_points
         self.plot_index = 0
-        #self.xs = np.linspace(*config.range_interval, num_points)
+        # self.xs = np.linspace(*config.range_interval, num_points)
 
     def setup(self, fig):
         fig.set_size_inches(12, 8)
@@ -142,8 +143,16 @@ class FigureUpdater2(FigureUpdater):
 class Tracking:
     def __init__(self, num_points, range_interval):
         self.num_points = num_points
-        self.config.range_interval = range_interval
-        #self.data_idx = configs["data_index"]
+        self.config_range_interval = range_interval
+        self.I_peaks = []
+        self.locks = []
+        self.I_peaks_filtered = []
+        self.tracked_distance = []
+        self.tracked_amplitude = []
+        self.tracked_phase = []
+        self.data_matrix = []
+
+        # self.data_idx = configs["data_index"]
 
     def tracking(self, data, data_idx):
         self.data = data
@@ -154,14 +163,14 @@ class Tracking:
         self.data_matrix[self.data_idx][:] = self.data
         dist = self.num_points     # number of datapoints in data # self.num_points
         # maximum value
-        interval = self.config.range_interval[1] - self.config.range_interval[0]
+        interval = self.config_range_interval[1] - self.config_range_interval[0]
 
         if self.data_idx == 0 and counter == 0:      # things that only happens first time
             # chooses index closest to starting distance
             I = np.round(
-                ((self.start_distance - self.config.range_interval[0]) / interval) * dist)
+                ((self.start_distance - self.config_range_interval[0]) / interval) * dist)
 
-            #I = np.abs(self.data).index(sp.signal.find_peaks(np.abs(self.data)))
+            # I = np.abs(self.data).index(sp.signal.find_peaks(np.abs(self.data)))
 
             self.I_peaks[0] = I
             self.locks = sp.signal.find_peaks(np.abs(self.data))
@@ -187,7 +196,8 @@ class Tracking:
                 self.i_avg_start = self.data_idx - N_avg
                 counter = 1
 
-            self.I_peaks_filtered[self.data_idx] = np.round(np.mean(self.I_peaks(self.i_avg_start: self.data_idx)))
+            self.I_peaks_filtered[self.data_idx] = np.round(
+                np.mean(self.I_peaks[self.i_avg_start:self.data_idx]))
             self.tracked_distance[self.data_idx] = self.I_peaks_filtered[self.data_idx] / dist * interval
 
             self.tracked_amplitude[self.data_idx] = np.abs(
