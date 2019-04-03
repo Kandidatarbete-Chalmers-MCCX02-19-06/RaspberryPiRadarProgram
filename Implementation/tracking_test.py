@@ -177,13 +177,15 @@ class Tracking:
             # print(I_idx)
             # print(dist)
 
-            self.I_peaks[0][0] = I
+            #self.I_peaks[0][0] = I
 
-            self.locks, _ = signal.find_peaks(np.abs(self.data))
-            print(self.locks)  # Check what happends during the first cycle.
+            #self.locks, _ = signal.find_peaks(np.abs(self.data))
+            # print(self.locks)  # Check what happends during the first cycle.
             #I = np.amin(np.abs(self.locks - self.I_peaks[0][0]))
+            print(self.I_peaks)
+            print(I, int(I))
             self.I_peaks[0][0] = int(I)
-            print(self.I_peaks[0][0])
+            # print(self.I_peaks[0][0])
             self.I_peaks_filtered[0][0] = self.I_peaks[0][0]
             self.tracked_distance[0][0] = self.I_peaks_filtered[0][0] / dist * interval
             self.tracked_amplitude[0][0] = np.abs(self.data[self.I_peaks_filtered[0][0]])
