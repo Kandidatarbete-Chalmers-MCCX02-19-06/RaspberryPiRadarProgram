@@ -1,6 +1,7 @@
 import queue
 import numpy as np
 import scipy as sp
+import matplotlib.pyplot as plt
 
 
 # data is stored in self.data
@@ -9,10 +10,12 @@ def tracking(self):
     N_avg = 10
     self.data_matrix[self.data_idx][:] = self.data
     dist = self.num_points     # number of datapoints in data # self.num_points
-    interval = self.config.range_interval[1] - self.config.range_interval[0]       # maximum value
+    # maximum value
+    interval = self.config.range_interval[1] - self.config.range_interval[0]
     self.start_distance = 0.37
     # choosen index closest to starting distance
-    I = np.round(((self.start_distance - self.config.range_interval[0]) / interval) * dist)
+    I = np.round(
+        ((self.start_distance - self.config.range_interval[0]) / interval) * dist)
 
     if self.data_idx == 0 and counter == 0:      # things that only happens first time
         self.I_peaks[0] = I
@@ -47,3 +50,5 @@ def tracking(self):
         self.data(self.I_peaks_filtered[self.data_idx])
         self.tracked_phase[self.data_idx] = np.angle(
             self.data(self.I_peaks_filtered[self.data_idx]))
+
+        plt.plot(self.tracked_distance)
