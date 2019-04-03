@@ -179,7 +179,7 @@ class Tracking:
             print(self.I_peaks[0])
             print(self.locks)
             I = np.amin(np.abs(self.locks - self.I_peaks[0][0]))
-            self.I_peaks[0] = self.locks[I]
+            self.I_peaks[0][0] = self.locks[I]
             self.I_peaks_filtered[0][0] = self.I_peaks[0][0]
             self.tracked_distance[0][0] = self.I_peaks_filtered[0][0] / dist * interval
             self.tracked_amplitude[0][0] = np.abs(self.data(self.I_peaks_filtered[0][0]))
@@ -188,7 +188,7 @@ class Tracking:
         # After first seq continous tracking
         else:
             self.locks = None
-            self.locks = signal.find_peaks(np.abs(self.data))
+            self.locks, _ = signal.find_peaks(np.abs(self.data))
             I = np.amin(self.locks - self.I_peaks_filtered[self.data_idx - 1])
             if self.locks == None:
                 self.I_peaks[self.data_idx] = self.I_peaks[self.data_idx-1]
