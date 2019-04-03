@@ -217,7 +217,7 @@ class Tracking:
                 self.I_peaks[0][self.data_idx] = I
 
             if counter == 0:
-                self.i_avg_start = np.amax([2, self.data_idx - N_avg])
+                self.i_avg_start = np.amax([0, self.data_idx - N_avg])
             else:
                 self.i_avg_start = self.data_idx - N_avg
                 counter = 1
