@@ -226,9 +226,10 @@ class Tracking:
             # print(self.I_peaks_filtered)
             # Emil
             print(self.I_peaks)
-            self.tracked_distance[0][self.data_idx] = self.I_peaks_filtered[0][self.data_idx] / dist * interval
 
             print(int(self.I_peaks_filtered[0][self.data_idx]))
+            self.tracked_distance[0][self.data_idx] = self.I_peaks_filtered[0][self.data_idx] / dist * interval
+
             self.tracked_amplitude[0][self.data_idx] = np.abs(
                 self.data[int(self.I_peaks_filtered[0][self.data_idx])])
             self.data(int(self.I_peaks_filtered[0][self.data_idx]))
