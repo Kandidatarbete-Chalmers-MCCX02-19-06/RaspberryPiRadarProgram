@@ -187,6 +187,7 @@ class Tracking:
             self.I_peaks[0][0] = int(I)
             # print(self.I_peaks[0][0])
             index = self.I_peaks[0][0]
+            print(type(index))
 
             self.I_peaks_filtered[0][0] = self.I_peaks[0][0]
             self.tracked_distance[0][0] = self.I_peaks_filtered[0][0] / dist * interval
