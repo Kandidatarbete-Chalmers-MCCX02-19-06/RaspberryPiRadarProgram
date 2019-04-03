@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
-#import scipy as sp
+# import scipy as sp
 from scipy import signal
 
 from acconeer_utils.clients.reg.client import RegClient
@@ -161,7 +161,7 @@ class Tracking:
         counter = 0  # Used only for if statement only for first iteration and not when data_idx goes back to zero
         N_avg = 10  # Number of total peaks to average over
         self.start_distance = 0.37  # Initial guess for where
-        #self.data_matrix[self.data_idx][:] = self.data
+        # self.data_matrix[self.data_idx][:] = self.data
         dist = self.num_points     # number of datapoints in data # self.num_points
         # maximum value
         interval = self.config_range_interval[1] - self.config_range_interval[0]
@@ -171,28 +171,29 @@ class Tracking:
             I = np.round(
                 ((self.start_distance - self.config_range_interval[0]) / interval) * dist)
 
-            #I = np.abs(self.data).index(signal.find_peaks(np.abs(self.data)))
+            # I = np.abs(self.data).index(signal.find_peaks(np.abs(self.data)))
             I_idx = np.argmax(self.data)
             # print(I)
             # print(I_idx)
             # print(dist)
 
-            #self.I_peaks[0][0] = I
+            # self.I_peaks[0][0] = I
 
             self.locks, _ = signal.find_peaks(np.abs(self.data))
             print(self.locks)
             print(I_idx)
             # print(self.locks)  # Check what happends during the first cycle.
-            #I = np.amin(np.abs(self.locks - self.I_peaks[0][0]))
+            # I = np.amin(np.abs(self.locks - self.I_peaks[0][0]))
             # print(self.I_peaks)
-            #print(I, int(I))
+            # print(I, int(I))
             self.I_peaks[0][0] = I
             # print(self.I_peaks[0][0])
-            #print(type(I), type(int(I)))
+            # print(type(I), type(int(I)))
             self.I_peaks_filtered[0][0] = self.I_peaks[0][0]
             self.tracked_distance[0][0] = self.I_peaks_filtered[0][0] / dist * interval
             self.tracked_amplitude[0][0] = np.abs(self.data[int(self.I_peaks_filtered[0][0])])
-            self.tracked_phase[0][0] = np.angle(self.data(int(self.I_peaks_filtered[0][0])))
+
+            self.tracked_phase[0][0] = np.angle(self.data[int(self.I_peaks_filtered[0][0])])
 
         # After first seq continous tracking
         else:
