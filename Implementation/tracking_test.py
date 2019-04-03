@@ -69,7 +69,7 @@ def main():
 def config_setup():
     config = configs.IQServiceConfig()
     config.range_interval = [0.3, 0.7]
-    config.sweep_rate = 1
+    config.sweep_rate = 10
     config.gain = 1
     #config.session_profile = configs.EnvelopeServiceConfig.MAX_DEPTH_RESOLUTION
     # config.session_profile = configs.EnvelopeServiceConfig.MAX_SNR
