@@ -190,7 +190,7 @@ class Tracking:
 
             self.I_peaks_filtered[0][0] = self.I_peaks[0][0]
             self.tracked_distance[0][0] = self.I_peaks_filtered[0][0] / dist * interval
-            self.tracked_amplitude[0][0] = np.abs(self.data[index])
+            self.tracked_amplitude[0][0] = np.abs(self.data[145])
             self.tracked_phase[0][0] = np.angle(self.data(self.I_peaks_filtered[0][0]))
 
         # After first seq continous tracking
