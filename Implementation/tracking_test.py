@@ -199,26 +199,26 @@ class Tracking:
         else:
             self.locks = None
             self.locks, _ = signal.find_peaks(np.abs(self.data))
-            I = np.amin(self.locks - self.I_peaks_filtered[self.data_idx - 1])
+            I = np.amin(self.locks - self.I_peaks_filtered[0][self.data_idx - 1])
             if self.locks == None:
-                self.I_peaks[self.data_idx] = self.I_peaks[self.data_idx-1]
+                self.I_peaks[0][self.data_idx] = self.I_peaks[0][self.data_idx-1]
             else:
-                self.I_peaks[self.data_idx] = self.locks[I]
+                self.I_peaks[0][self.data_idx] = self.locks[0][I]
             if counter == 0:
                 self.i_avg_start = np.amax([1, self.data_idx - N_avg])
             else:
                 self.i_avg_start = self.data_idx - N_avg
                 counter = 1
 
-            self.I_peaks_filtered[self.data_idx] = np.round(
-                np.mean(self.I_peaks[self.i_avg_start:self.data_idx]))
-            self.tracked_distance[self.data_idx] = self.I_peaks_filtered[self.data_idx] / dist * interval
+            self.I_peaks_filtered[0][self.data_idx] = np.round(
+                np.mean(self.I_peaks[0][self.i_avg_start:self.data_idx]))
+            self.tracked_distance[0][self.data_idx] = self.I_peaks_filtered[0][self.data_idx] / dist * interval
 
-            self.tracked_amplitude[self.data_idx] = np.abs(
-                self.data(self.I_peaks_filtered[self.data_idx]))
-            self.data(self.I_peaks_filtered[self.data_idx])
+            self.tracked_amplitude[0][self.data_idx] = np.abs(
+                self.data(self.I_peaks_filtered[0][self.data_idx]))
+            self.data(self.I_peaks_filtered[0][self.data_idx])
             self.tracked_phase[self.data_idx] = np.angle(
-                self.data(self.I_peaks_filtered[self.data_idx]))
+                self.data(self.I_peaks_filtered[0][self.data_idx]))
 
         return self.tracked_distance
 
