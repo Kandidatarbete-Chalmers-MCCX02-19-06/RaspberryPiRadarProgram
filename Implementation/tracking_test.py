@@ -94,7 +94,7 @@ class FigureUpdater2(FigureUpdater):
         self.tracked_distance_ax.set_xlabel("time(s)")
         self.tracked_distance_ax.set_xlim(0, 100)
         self.tracked_distance_ax.set_ylabel("Amplitude")
-        self.tracked_distance_ax.set_ylim(0, 1)
+        self.tracked_distance_ax.set_ylim(0, 20000)
 
         fig.canvas.set_window_title("Test")
         fig.tight_layout()
@@ -116,7 +116,7 @@ class FigureUpdater2(FigureUpdater):
             text, xy=(data["xmax"], data["ymax"]), xytext=(0.96, 0.96), **kw)
 
         self.artists["tracked_distance"] = self.tracked_distance_ax(
-            self.data_idx/self.sweep_rate, data["tracked_distance"])[0]
+            self.small, data["tracked_distance"])[0]
         return self.artists.values()
 
     def update(self, data):
@@ -136,8 +136,9 @@ class FigureUpdater2(FigureUpdater):
     def process_data(self, data):
         # if self.plot_index == 0:
         self.xs = np.linspace(*self.config.range_interval, data["amplitude"].size)
-        self.data_idx = data["data_index"]
-        self.sweep_rate = data["sweep_rate"]
+        self.small = np.linspace([0, 100], data["tracked_distance"])
+        #self.data_idx = data["data_index"]
+        #self.sweep_rate = data["sweep_rate"]
         self.plot_index += 1
 
 
@@ -225,9 +226,6 @@ class Tracking:
 
             # for i in range(self.i_avg_start: self.data_idx):
             #   last_samples = last_samples + self.I_peaks[0][i]
-            last_samples = self.I_peaks[0][self.i_avg_start:self.data_idx]
-            print("Last samples")
-            print(last_samples)
 
             self.I_peaks_filtered[0][self.data_idx] = np.round(
                 np.mean(self.I_peaks[0][self.i_avg_start:self.data_idx]))
