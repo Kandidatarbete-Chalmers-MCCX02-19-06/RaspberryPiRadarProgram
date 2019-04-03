@@ -56,6 +56,8 @@ def main():
         info, sweep = client.get_next()
         amplitude = np.abs(sweep)
         track = tracking.tracking(sweep, counter)
+        peak = track / num_points * \
+            (config.range_interval[1] - config.range_interval[0]) + config.range_interval[0]
         counter += 1
         print(track)
         amplitude_line.set_ydata(track)
