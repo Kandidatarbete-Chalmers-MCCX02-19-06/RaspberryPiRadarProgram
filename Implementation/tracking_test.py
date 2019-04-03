@@ -36,7 +36,7 @@ def main():
     for ax in [amplitude_ax]:
         ax.set_xlabel("Depth (m)")
         ax.set_xlim(config.range_interval)
-        ax.set_xticks(np.linspace(0.4, 0.8, num=5))
+        ax.set_xticks(np.linspace(0, 1, num=5))
         ax.set_xticks(np.concatenate([np.linspace(0.41, 0.49, num=9), np.linspace(
             0.51, 0.59, num=9), np.linspace(0.61, 0.69, num=9), np.linspace(0.71, 0.79, num=9)]), minor=True)
         ax.grid(True, which='major')
@@ -45,7 +45,7 @@ def main():
     amplitude_ax.set_ylabel("Amplitude")
     amplitude_ax.set_ylim(0, amplitude_y_max)
 
-    xs = np.linspace([2], num_points)
+    xs = np.linspace(0, 1, num_points)
     amplitude_line = amplitude_ax.plot(xs, np.zeros_like(xs))[0]
 
     fig.tight_layout()
