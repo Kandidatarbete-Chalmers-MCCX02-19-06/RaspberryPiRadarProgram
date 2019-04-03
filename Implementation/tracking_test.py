@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
-import scipy as sp
-import scipy.signal as sps
+#import scipy as sp
+from scipy import signal
 
 from acconeer_utils.clients.reg.client import RegClient
 from acconeer_utils.clients.json.client import JSONClient
@@ -175,7 +175,7 @@ class Tracking:
             print(I)
 
             self.I_peaks[0] = I
-            self.locks = sps.find_peaks(np.abs(self.data))
+            self.locks = signal.find_peaks(np.abs(self.data))
             I = np.amin(np.abs(self.locks - self.I_peaks[0]))
             self.I_peaks[0] = self.locks[I]
             self.I_peaks_filtered[0] = self.I_peaks[0]
@@ -186,7 +186,7 @@ class Tracking:
         # After first seq continous tracking
         else:
             self.locks = None
-            self.locks = sps.find_peaks(np.abs(self.data))
+            self.locks = signal.find_peaks(np.abs(self.data))
             I = np.amin(self.locks - self.I_peaks_filtered[self.data_idx - 1])
             if self.locks == None:
                 self.I_peaks[self.data_idx] = self.I_peaks[self.data_idx-1]
