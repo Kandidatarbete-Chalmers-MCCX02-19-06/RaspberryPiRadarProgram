@@ -38,7 +38,7 @@ def main():
         ax.set_xlim(config.range_interval)
 
     amplitude_ax.set_ylabel("Amplitude")
-    amplitude_ax.set_ylim(0, amplitude_y_max)
+    amplitude_ax.set_ylim(-1, 1)
 
     xs = np.linspace(*config.range_interval, num_points)
     amplitude_line = amplitude_ax.plot(xs, np.zeros_like(xs))[0]
