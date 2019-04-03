@@ -221,10 +221,9 @@ class Tracking:
             else:
                 self.i_avg_start = self.data_idx - N_avg
                 counter = 1
-            print("test")
-            print(self.i_avg_start: self.data_idx)
-            print(str(self.i_avg_start: self.data_idx))
-
+            # I_avg_start to data_idx
+            last_samples = self.I_peaks[0][self.i_avg_start:self.data_idx]
+            print(last_samples)
             self.I_peaks_filtered[0][self.data_idx] = np.round(
                 np.mean(self.I_peaks[0][self.i_avg_start:self.data_idx]))
 
