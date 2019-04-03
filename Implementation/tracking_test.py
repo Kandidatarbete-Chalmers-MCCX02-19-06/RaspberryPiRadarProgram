@@ -57,7 +57,7 @@ def main():
         track = tracking.tracking(sweep, counter)
         counter += 1
         print(track)
-        # amplitude_line.set_ydata(track)
+        amplitude_line.set_ydata(track)
         # fig.canvas.flush_events()
 
     print("Disconnecting...")
@@ -79,14 +79,13 @@ class Tracking:
     def __init__(self, num_points, range_interval):
         self.num_points = num_points
         self.config_range_interval = range_interval
-        self.I_peaks = np.zeros((1, 1000))
-        self.locks = np.zeros((1, 1000))
-        self.I_peaks_filtered = np.zeros((1, 1000))
-        self.tracked_distance = np.zeros((1, 1000))
-        self.tracked_amplitude = np.zeros((1, 1000))
-        self.tracked_phase = np.zeros((1, 1000))
-        self.data_matrix = np.zeros((1, 1000))
-        self.tracked_distance_now = 0
+        self.I_peaks = np.zeros((1, self.num_points))
+        self.locks = np.zeros((1, self.num_points))
+        self.I_peaks_filtered = np.zeros((1, self.num_points))
+        self.tracked_distance = np.zeros((1, self.num_points))
+        self.tracked_amplitude = np.zeros((1, self.num_points))
+        self.tracked_phase = np.zeros((1, self.num_points))
+        self.data_matrix = np.zeros((1, self.num_points))
 
         # self.data_idx = configs["data_index"]
 
@@ -175,7 +174,7 @@ class Tracking:
             self.tracked_phase[0][self.data_idx] = np.angle(
                 self.data[int(self.I_peaks_filtered[0][self.data_idx])])
 
-        return self.tracked_distance_now
+        return self.tracked_distance
 
 
 if __name__ == "__main__":
