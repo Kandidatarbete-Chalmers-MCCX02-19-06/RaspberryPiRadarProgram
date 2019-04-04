@@ -56,6 +56,8 @@ def main():
         track = tracking.tracking(sweep, counter)
         peak = track
         counter += 1
+        if counter == num_points:
+            counter = 0
         # print(peak)
         amplitude_line.set_ydata(peak)
         # amplitude_line.set_ydata(amplitude)
@@ -137,9 +139,9 @@ class Tracking:
             # I = np.amin(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]) #amin and abs?
             I = np.amin(np.abs(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]))
             last_max = self.I_peaks[0][self.data_idx - 1]
-            print("locks: ", self.locks)
-            print("Index: ", I)
-            print("Last_max: ", last_max)
+            #print("locks: ", self.locks)
+            #print("Index: ", I)
+            #print("Last_max: ", last_max)
 
             List_of_largest_amp = [np.abs(self.data[int(I + last_max)]),  # if close to one end the last_max and I will go out of bounds
                                    np.abs(self.data[int(last_max-I)])]
@@ -147,6 +149,9 @@ class Tracking:
                 I = I + last_max
             else:
                 I = last_max - I
+
+            print("Index: ", I)
+            print("Distance to target: ", matlab_dist[I])
 
             if len(self.locks) == 0:
                 self.I_peaks[0][self.data_idx] = self.I_peaks[0][self.data_idx-1]
