@@ -33,7 +33,7 @@ def main():
 
     for ax in [amplitude_ax]:
         ax.set_xlabel("time (s)")
-        ax.set_xlim(0, num_points)
+        ax.set_xlim(0, num_points/config.sweep_rate)
 
     amplitude_ax.set_ylabel("Distance (m)")
     amplitude_ax.set_ylim(config.range_interval[0], config.range_interval[1])
@@ -70,7 +70,7 @@ def main():
 def config_setup():
     config = configs.IQServiceConfig()
     config.range_interval = [0.3, 0.7]
-    config.sweep_rate = 10
+    config.sweep_rate = 100
     config.gain = 1
     #config.session_profile = configs.EnvelopeServiceConfig.MAX_DEPTH_RESOLUTION
     # config.session_profile = configs.EnvelopeServiceConfig.MAX_SNR
@@ -106,6 +106,10 @@ class Tracking:
         matlab_dist = np.linspace(
             self.config_range_interval[0], self.config_range_interval[1], num=dist)
 
+        if self.data_idx == 0:
+            self.tracked_distance = np.zeros((1, self.num_points))
+            self.tracked_amplitude = np.zeros((1, self.num_points))
+            self.tracked_phase = np.zeros((1, self.num_points))
         if self.data_idx == 0 and counter == 0:      # things that only happens first time
             # chooses index closest to starting distance
             I = np.round(
