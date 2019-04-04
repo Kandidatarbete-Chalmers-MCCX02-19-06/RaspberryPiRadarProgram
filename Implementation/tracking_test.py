@@ -68,7 +68,7 @@ def main():
 def config_setup():
     config = configs.IQServiceConfig()
     config.range_interval = [0.3, 0.7]
-    config.sweep_rate = 10
+    config.sweep_rate = 100
     config.gain = 1
     #config.session_profile = configs.EnvelopeServiceConfig.MAX_DEPTH_RESOLUTION
     # config.session_profile = configs.EnvelopeServiceConfig.MAX_SNR
@@ -135,7 +135,7 @@ class Tracking:
         else:
             self.locks, _ = signal.find_peaks(np.abs(self.data))
             # I = np.amin(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]) #amin and abs?
-            I = np.amin(np.abs(self.locks - self.I_peaks[0][self.data_idx - 1]))
+            I = np.amin(np.abs(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]))
             last_max = self.I_peaks[0][self.data_idx - 1]
             print("locks: ", self.locks)
             print("Index: ", I)
