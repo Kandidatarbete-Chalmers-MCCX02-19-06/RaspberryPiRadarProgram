@@ -30,7 +30,6 @@ class RespiratoryRate (threading.Thread):
                     self.respiratory_rate_queue.put(data)
           pass
 
-
 ##### MAIN #########
 
 HR_filter_queue = queue.Queue()

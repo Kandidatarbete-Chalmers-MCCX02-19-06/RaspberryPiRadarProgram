@@ -45,12 +45,12 @@ def tracking(self):
             self.i_avg_start = self.data_idx - N_avg
             counter = 1
 
-        self.I_peaks_filtered[self.data_idx] = np.round(np.mean(self.I_peaks(self.i_avg_start: self.data_idx)))
+        self.I_peaks_filtered[self.data_idx] = np.round(np.mean(self.I_peaks(self.i_avg_start: self.data_idx))) #TODO:Syntaxfel
         self.tracked_distance[self.data_idx] = self.I_peaks_filtered[self.data_idx] / dist * interval
 
         self.tracked_amplitude[self.data_idx] = np.abs(
             self.data(self.I_peaks_filtered[self.data_idx]))
-        self.data(self.I_peaks_filtered[self.data_idx])
+        self.data(self.I_peaks_filtered[self.data_idx]) #TODO:Den här raden gör ingenting...?!
         self.tracked_phase[self.data_idx] = np.angle(
             self.data(self.I_peaks_filtered[self.data_idx]))
 
