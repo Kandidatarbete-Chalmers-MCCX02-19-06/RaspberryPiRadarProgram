@@ -34,13 +34,13 @@ def main():
     fig.canvas.set_window_title("filename")
 
     for ax in [amplitude_ax]:
-        ax.set_xlabel("Depth (m)")
+        ax.set_xlabel("time (s)")
         ax.set_xlim(config.range_interval)
 
-    amplitude_ax.set_ylabel("Distance")
+    amplitude_ax.set_ylabel("Distance (m)")
     amplitude_ax.set_ylim(config.range_interval[0], config.range_interval[1])
 
-    xs = np.linspace(*config.range_interval, num_points)
+    xs = np.linspace(0, num_points/config.sweep_rate, num=num_points)
     amplitude_line = amplitude_ax.plot(xs, np.zeros_like(xs))[0]
 
     fig.tight_layout()
@@ -56,8 +56,7 @@ def main():
         info, sweep = client.get_next()
         amplitude = np.abs(sweep)
         track = tracking.tracking(sweep, counter)
-        peak = track / num_points * \
-            (config.range_interval[1] - config.range_interval[0]) + config.range_interval[0]
+        peak = track
         counter += 1
         # print(peak)
         amplitude_line.set_ydata(peak)
