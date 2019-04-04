@@ -70,7 +70,7 @@ def main():
 def config_setup():
     config = configs.IQServiceConfig()
     config.range_interval = [0.3, 0.7]
-    config.sweep_rate = 100
+    config.sweep_rate = 10
     config.gain = 1
     #config.session_profile = configs.EnvelopeServiceConfig.MAX_DEPTH_RESOLUTION
     # config.session_profile = configs.EnvelopeServiceConfig.MAX_SNR
@@ -96,7 +96,7 @@ class Tracking:
         self.data = data
         self.data_idx = data_idx
         counter = 0  # Used only for if statement only for first iteration and not when data_idx goes back to zero
-        N_avg = 10  # Number of total peaks to average over
+        N_avg = 2  # Number of total peaks to average over
         self.start_distance = 0.37  # Initial guess for where
         # self.data_matrix[self.data_idx][:] = self.data
         dist = self.num_points     # number of datapoints in data # self.num_points
@@ -142,13 +142,15 @@ class Tracking:
             #print("locks: ", self.locks)
             #print("Index: ", I)
             #print("Last_max: ", last_max)
-
-            List_of_largest_amp = [np.abs(self.data[int(I + last_max)]),  # if close to one end the last_max and I will go out of bounds
-                                   np.abs(self.data[int(last_max-I)])]
-            if List_of_largest_amp[0] > List_of_largest_amp[1]:
-                I = I + last_max
+            if I + last_max >= dist or last_max - I < 0:
+                pass
             else:
-                I = last_max - I
+                List_of_largest_amp = [np.abs(self.data[int(I + last_max)]),  # if close to one end the last_max and I will go out of bounds
+                                       np.abs(self.data[int(last_max-I)])]
+                if List_of_largest_amp[0] > List_of_largest_amp[1]:
+                    I = I + last_max
+                else:
+                    I = last_max - I
 
             print("Index: ", I)
             print("Distance to target: ", matlab_dist[int(I)])
