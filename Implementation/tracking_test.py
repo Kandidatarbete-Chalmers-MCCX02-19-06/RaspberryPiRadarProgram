@@ -33,7 +33,7 @@ def main():
 
     for ax in [amplitude_ax]:
         ax.set_xlabel("time (s)")
-        ax.set_xlim(config.range_interval)
+        ax.set_xlim(0, num_points)
 
     amplitude_ax.set_ylabel("Distance (m)")
     amplitude_ax.set_ylim(config.range_interval[0], config.range_interval[1])
