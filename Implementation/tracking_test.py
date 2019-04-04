@@ -151,7 +151,7 @@ class Tracking:
                 I = last_max - I
 
             print("Index: ", I)
-            print("Distance to target: ", matlab_dist[I])
+            print("Distance to target: ", matlab_dist[int(I)])
 
             if len(self.locks) == 0:
                 self.I_peaks[0][self.data_idx] = self.I_peaks[0][self.data_idx-1]
