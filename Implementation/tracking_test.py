@@ -148,7 +148,7 @@ class Tracking:
             #last_max = self.I_peaks[0][self.data_idx - 1]
             #print("locks: ", self.locks)
             print("Index: ", I)
-            print("Last_max: ", last_max)
+            #print("Last_max: ", last_max)
             # if I + last_max >= dist or last_max - I < 0:
             #     pass
             # else:
