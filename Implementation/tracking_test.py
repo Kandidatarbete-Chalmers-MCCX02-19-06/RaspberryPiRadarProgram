@@ -59,7 +59,7 @@ def main():
         peak = track / num_points * \
             (config.range_interval[1] - config.range_interval[0]) + config.range_interval[0]
         counter += 1
-        print(peak)
+        # print(peak)
         amplitude_line.set_ydata(peak)
         # amplitude_line.set_ydata(amplitude)
         fig.canvas.flush_events()
@@ -171,6 +171,7 @@ class Tracking:
             #self.tracked_distance[0][self.data_idx] = self.I_peaks_filtered[0][self.data_idx] / dist * interval
             self.tracked_distance[0][self.data_idx] = matlab_dist[int(
                 self.I_peaks_filtered[0][self.data_idx])]
+            print(self.tracked_distance)
             self.tracked_amplitude[0][self.data_idx] = np.abs(
                 self.data[int(self.I_peaks_filtered[0][self.data_idx])])
             self.tracked_phase[0][self.data_idx] = np.angle(
