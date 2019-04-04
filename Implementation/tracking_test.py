@@ -137,6 +137,9 @@ class Tracking:
             # I = np.amin(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]) #amin and abs?
             I = np.amin(np.abs(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]))
             last_max = self.I_peaks[0][self.data_idx - 1]
+            print("locks: ", self.locks)
+            print("Index: "I)
+            print("Last_max: " last_max)
 
             if last_max - I < 0 or last_max + I >= dist:
                 List_of_largest_amp = [np.abs(self.data[int(I + last_max)]),  # if close to one end the last_max and I will go out of bounds
@@ -168,7 +171,7 @@ class Tracking:
             #self.tracked_distance[0][self.data_idx] = self.I_peaks_filtered[0][self.data_idx] / dist * interval
             self.tracked_distance[0][self.data_idx] = matlab_dist[int(
                 self.I_peaks_filtered[0][self.data_idx])]
-            print(self.tracked_distance)
+            # print(self.tracked_distance)
             self.tracked_amplitude[0][self.data_idx] = np.abs(
                 self.data[int(self.I_peaks_filtered[0][self.data_idx])])
             self.tracked_phase[0][self.data_idx] = np.angle(
