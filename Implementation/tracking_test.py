@@ -110,6 +110,7 @@ class Tracking:
             self.tracked_distance = np.zeros((1, self.num_points))
             self.tracked_amplitude = np.zeros((1, self.num_points))
             self.tracked_phase = np.zeros((1, self.num_points))
+
         if self.data_idx == 0 and counter == 0:      # things that only happens first time
             # chooses index closest to starting distance
             # I = np.round(
@@ -143,9 +144,9 @@ class Tracking:
             # I = np.amin(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]) #amin and abs?
             I = np.amin(np.abs(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]))
             last_max = self.I_peaks[0][self.data_idx - 1]
-            #print("locks: ", self.locks)
-            #print("Index: ", I)
-            #print("Last_max: ", last_max)
+            print("locks: ", self.locks)
+            print("Index: ", I)
+            print("Last_max: ", last_max)
             if I + last_max >= dist or last_max - I < 0:
                 pass
             else:
