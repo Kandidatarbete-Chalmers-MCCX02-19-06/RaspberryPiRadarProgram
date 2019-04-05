@@ -251,7 +251,7 @@ class Tracking:
             # print(self.I_peaks_filtered[0][data_idx])
             # self.tracked_distance[0][self.data_idx] = self.I_peaks_filtered[0][self.data_idx] / dist * interval
 
-            threshold = np.abs(self.data[int(self.I_peaks_filtered[0][self.data_idx])])/2         # determines the amplitude of the last tracked data for find_peaks function
+            threshold = np.abs(self.data[int(self.I_peaks_filtered[0][self.data_idx])])*0.75         # determines the amplitude of the last tracked data for find_peaks function
 
             self.tracked_distance[0][self.data_idx] = matlab_dist[int(
                 self.I_peaks_filtered[0][self.data_idx])]
