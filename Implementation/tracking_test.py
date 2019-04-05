@@ -194,8 +194,8 @@ class Tracking:
             # print(self.I_peaks_filtered)
             print("locks", self.locks)
             print("I_peaks_filt", self.I_peaks_filtered[0][self.data_idx - 1])
-            print("minus", self.locks -
-                  self.I_peaks_filtered[0][self.data_idx - 1])
+            print("minus", np.abs(self.locks -
+                                  self.I_peaks_filtered[0][self.data_idx - 1]))
             # print(np.abs(self.data[self.locks]))
 
             # print(Index_in_locks)
