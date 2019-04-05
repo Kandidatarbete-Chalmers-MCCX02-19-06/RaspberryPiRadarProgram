@@ -123,11 +123,11 @@ class Radar(threading.Thread):
     def tracking(self):
         if self.data_idx == 0 and self.counter == 0:      # things that only happens first time
             I = np.argmax(np.abs(self.data))
-            self.I_peaks[:] = I
-            self.I_peaks_filtered[0] = self.I_peaks[0]
-            self.tracked_distance[0] = self.real_dist[int(self.I_peaks_filtered[0])]
-            self.tracked_amplitude[0] = np.abs(self.data[int(self.I_peaks_filtered[0])])
-            self.tracked_phase[0] = np.angle(self.data[int(self.I_peaks_filtered[0])])
+            self.I_peaks[:] = int(I)
+            self.I_peaks_filtered[0] = int(self.I_peaks[0])
+            self.tracked_distance[0] = self.real_dist[self.I_peaks_filtered[0]]
+            self.tracked_amplitude[0] = np.abs(self.data[self.I_peaks_filtered[0]])
+            self.tracked_phase[0] = np.angle(self.data[self.I_peaks_filtered[0]])
 
         # After first seq continous tracking
         else:
