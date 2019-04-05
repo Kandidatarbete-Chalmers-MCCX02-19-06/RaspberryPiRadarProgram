@@ -125,9 +125,9 @@ class Radar(threading.Thread):
             I = np.argmax(np.abs(self.data))
             self.I_peaks[:] = int(I)
             self.I_peaks_filtered[0] = int(self.I_peaks[0])
-            self.tracked_distance[0] = self.real_dist[self.I_peaks_filtered[0]]
-            self.tracked_amplitude[0] = np.abs(self.data[self.I_peaks_filtered[0]])
-            self.tracked_phase[0] = np.angle(self.data[self.I_peaks_filtered[0]])
+            self.tracked_distance[0] = self.real_dist[int(self.I_peaks_filtered[0])]
+            self.tracked_amplitude[0] = np.abs(self.data[int(self.I_peaks_filtered[0])])
+            self.tracked_phase[0] = np.angle(self.data[int(self.I_peaks_filtered[0])])
 
         # After first seq continous tracking
         else:
