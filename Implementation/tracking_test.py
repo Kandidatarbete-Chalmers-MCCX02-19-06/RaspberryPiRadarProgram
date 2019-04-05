@@ -200,8 +200,8 @@ class Tracking:
 
             # print(Index_in_locks)
 
-            I = self.locks[int(Index_in_locks)]  # Shouldn't be called I
-            print(I, "\n")
+            I = self.locks[int(Index_in_locks)]
+            print(I)
             # last_max = self.I_peaks[0][self.data_idx - 1]
             # print("locks: ", self.locks)
             # print("Last_max: ", last_max)
@@ -217,10 +217,12 @@ class Tracking:
 
             # print("Distance to target: ", matlab_dist[int(I)])
 
-            if len(self.locks) == 0:
-                self.I_peaks[0][self.data_idx] = self.I_peaks[0][self.data_idx-1]
-            else:
-                self.I_peaks[0][self.data_idx] = I
+            # if len(self.locks) == 0:
+            #    self.I_peaks[0][self.data_idx] = self.I_peaks[0][self.data_idx-1]
+            # else:
+            self.I_peaks[0][self.data_idx] = I
+
+            print("I_peaks av index", self.I_peaks[0][self.data_idx], "\n")
 
             if counter == 0:  # Questions about this part.
                 self.i_avg_start = np.argmax([0, self.data_idx - N_avg])
