@@ -30,17 +30,17 @@ def main():
     radar = Radar.Radar(radar_queue, run_measurement, go)
     radar.start()
 
-    bvme = bluetooth_app.bluetooth_app(radar_queue, run_measurement, go)
-    bvme.app_data()
-    print('End of bluetooth_app')
-    # time.sleep(300)
+    # bvme = bluetooth_app.bluetooth_app(radar_queue, run_measurement, go)
+    # bvme.app_data()
+    # print('End of bluetooth_app')
+    time.sleep(300)
     # interrupt_queue.put(1)
 
     # go.append("True")
     radar.join()
     print("radar is closed")
-    bvme.connect_device_thread.join()
-    print("connect_device is closed")
+    # bvme.connect_device_thread.join()
+    # print("connect_device is closed")
 
     print('Shut down succeed')
     #subprocess.call(["sudo", "shutdown", "-r", "now"])
