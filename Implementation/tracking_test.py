@@ -78,7 +78,7 @@ def main():
         i += 1
         if i == 100:
             i = 0
-            list.clear()
+            list = np.zeros(100)
         if not plt.fignum_exists(1):  # Simple way to check if plot is closed
             break
         fig.canvas.flush_events()
