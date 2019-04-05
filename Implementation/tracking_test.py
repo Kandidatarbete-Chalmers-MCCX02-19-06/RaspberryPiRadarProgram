@@ -118,6 +118,7 @@ class Tracking:
         self.tracked_amplitude = np.zeros((1, self.num_points))
         self.tracked_phase = np.zeros((1, self.num_points))
         self.data_matrix = np.zeros((1, self.num_points))
+        self.threshold = 0  # variable for finding peaks above threshold
 
         # self.data_idx = configs["data_index"]
 
@@ -132,7 +133,6 @@ class Tracking:
         # maximum value
         interval = self.config_range_interval[1] - \
             self.config_range_interval[0]
-        threshold = 0       # variable for finding peaks above threshold
 
         matlab_dist = np.linspace(
             self.config_range_interval[0], self.config_range_interval[1], num=dist)
@@ -187,7 +187,7 @@ class Tracking:
 
         # After first seq continous tracking
         else:
-            self.locks, _ = signal.find_peaks(np.abs(self.data), threshold = threshold)
+            self.locks, _ = signal.find_peaks(np.abs(self.data), threshold = self.threshold)
             print("locks före", self.locks)
             lista = []
             for loc in self.locks:
@@ -197,7 +197,7 @@ class Tracking:
             i = 0
             for loc in self.locks:      # remove peak indexes with amplitude less than threshold
                 amplitude = np.abs(self.data[loc])
-                if amplitude < threshold:
+                if amplitude < self.threshold:
                     np.delete(self.locks, i)
                 i += 1
 
@@ -208,7 +208,7 @@ class Tracking:
 
             # print(self.I_peaks_filtered)
             print("locks efter", self.locks)
-            print("threshold: ", threshold)
+            print("threshold: ", self.threshold)
             print("I_peaks_filt", self.I_peaks_filtered[0][self.data_idx - 1])
             print("minus", np.abs(self.locks -
                                   self.I_peaks_filtered[0][self.data_idx - 1]))
