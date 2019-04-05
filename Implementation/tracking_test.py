@@ -223,10 +223,9 @@ class Tracking:
                 self.I_peaks[0][self.data_idx] = I
 
             if counter == 0:  # Questions about this part.
-                self.i_avg_start = np.argmax([0, self.data_idx - N_avg])
+                self.i_avg_start = np.amax([0, self.data_idx - N_avg])
                 if self.data_idx == dist:  # change dist to nmbr of sequences later
                     counter = 1
-
             else:
                 self.i_avg_start = self.data_idx - N_avg
 
