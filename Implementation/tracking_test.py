@@ -38,18 +38,18 @@ def main():
     fig.canvas.set_window_title(filename)
 
     for ax in [amplitude_ax]:
-        ax.set_xlabel("Depth (m)")
-        ax.set_xlim(config.range_interval)
-        ax.set_xticks(np.linspace(0.4, 0.8, num=5))
-        ax.set_xticks(np.concatenate([np.linspace(0.41, 0.49, num=9), np.linspace(
-            0.51, 0.59, num=9), np.linspace(0.61, 0.69, num=9), np.linspace(0.71, 0.79, num=9)]), minor=True)
-        ax.grid(True, which='major')
-        ax.grid(True, which='minor')
+        #ax.set_xlabel("Depth (m)")
+        # ax.set_xlim(config.range_interval)
+        ax.set_xlabel("Time (s)")
+        ax.set_xlim(0, 100)
 
-    amplitude_ax.set_ylabel("Amplitude")
-    amplitude_ax.set_ylim(0, 1.1 * amplitude_y_max)
+    # amplitude_ax.set_ylabel("Amplitude")
+    #amplitude_ax.set_ylim(0, 1.1 * amplitude_y_max)
 
-    xs = np.linspace(*config.range_interval, num_points)
+    amplitude_ax.set_ylabel("tracked distance (m)")
+    amplitude_ax.set_ylim(config.range_interval)
+
+    xs = np.linspace(0, 100, num=num_points)
     amplitude_line = amplitude_ax.plot(xs, np.zeros_like(xs))[0]
 
     fig.tight_layout()
@@ -70,25 +70,25 @@ def main():
         counter += 1
         if counter == num_points:
             counter = 0
-        ymax = amplitude.max()
-        xmax = config.range_interval[0] + (config.range_interval[1] - config.range_interval[0]) * \
-            (np.argmax(amplitude)/num_points)
-        matris[0][:] = [xmax, ymax]
-        matris = np.roll(matris, 1, axis=0)
+        # ymax = amplitude.max()
+        # xmax = config.range_interval[0] + (config.range_interval[1] - config.range_interval[0]) * \
+        #     (np.argmax(amplitude)/num_points)
+        # matris[0][:] = [xmax, ymax]
+        # matris = np.roll(matris, 1, axis=0)
 
-        text = "x={:.2f}, y={:.2f}".format(xmax, ymax)
-        bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
-        arrowprops = dict(arrowstyle="->", connectionstyle="angle,angleA=0,angleB=90")
-        kw = dict(xycoords='data', textcoords="axes fraction",
-                  arrowprops=arrowprops, bbox=bbox_props, ha="right", va="top")
-        annotate = ax.annotate(text, xy=(xmax, ymax), xytext=(0.96, 0.96), **kw)
+        # text = "x={:.2f}, y={:.2f}".format(xmax, ymax)
+        # bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
+        # arrowprops = dict(arrowstyle="->", connectionstyle="angle,angleA=0,angleB=90")
+        # kw = dict(xycoords='data', textcoords="axes fraction",
+        #           arrowprops=arrowprops, bbox=bbox_props, ha="right", va="top")
+        # annotate = ax.annotate(text, xy=(xmax, ymax), xytext=(0.96, 0.96), **kw)
 
-        amplitude_line.set_ydata(amplitude)
+        amplitude_line.set_ydata(track)
 
         if not plt.fignum_exists(1):  # Simple way to check if plot is closed
             break
         fig.canvas.flush_events()
-        annotate.remove()
+        # annotate.remove()
     # matris = np.mean(matris, axis=0)
     # np.savetxt(filename, matris, delimiter=",")
 
@@ -227,7 +227,7 @@ class Tracking:
                 self.data[int(self.I_peaks_filtered[0][self.data_idx])])
             self.tracked_phase[0][self.data_idx] = np.angle(
                 self.data[int(self.I_peaks_filtered[0][self.data_idx])])
-        return self.tracked_amplitude
+        return self.tracked_distance
 
 
 if __name__ == "__main__":
