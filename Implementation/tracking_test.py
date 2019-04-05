@@ -134,6 +134,8 @@ class Tracking:
             self.locks, _ = signal.find_peaks(np.abs(self.data))        # find local maximas in data
             self.locks = [x for x in self.locks if(np.abs(self.data[x]) > self.threshold)]      # removes local maxima if under threshhold
             difference = np.subtract(self.locks, self.I_peaks_filtered[self.data_idx])
+            print("locks: ", self.locks)
+            print("Last I_peaks_filtered: ", self.I_peaks_filtered[self.data_idx])
             print("difference: ", difference)
             abs = np.abs(difference)
             print("abs: ", abs)
@@ -150,7 +152,7 @@ class Tracking:
                 I = self.locks[int(Index_in_locks)]
                 self.I_peaks[self.data_idx] = I
 
-            print("Locks: ", self.locks)
+            #print("Locks: ", self.locks)
             print("I_peaks: ", self.I_peaks)
 
             # if self.counter == 0:  # Questions about this part.
