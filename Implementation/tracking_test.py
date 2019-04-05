@@ -222,6 +222,7 @@ class Tracking:
             else:
                 self.I_peaks[0][self.data_idx] = I
 
+            print("Hela I_peaks:", self.I_peaks)
             print("I_peaks av index", self.I_peaks[0][self.data_idx], "\n")
 
             if counter == 0:  # Questions about this part.
