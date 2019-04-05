@@ -208,6 +208,7 @@ class Tracking:
 
             # print(self.I_peaks_filtered)
             print("locks efter", self.locks)
+            print("threshold: ", threshold)
             print("I_peaks_filt", self.I_peaks_filtered[0][self.data_idx - 1])
             print("minus", np.abs(self.locks -
                                   self.I_peaks_filtered[0][self.data_idx - 1]))
