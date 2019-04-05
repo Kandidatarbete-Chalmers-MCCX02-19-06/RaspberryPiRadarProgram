@@ -153,6 +153,9 @@ class Tracking:
 
             #print("dist in idx: ", distance_in_index)
             I = np.argmax(self.data)
+            Itest = np.argmax(np.abs(self.data))
+            print(I)
+            print(Itest)
 
             #self.locks, _ = signal.find_peaks(np.abs(self.data))
             #Index_in_locks = np.argmin(np.abs(self.locks - distance_in_index))
@@ -188,10 +191,10 @@ class Tracking:
             Index_in_locks = np.argmin(
                 np.abs(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]))
 
-            print(self.I_peaks_filtered)
-            print(self.locks)
-            print(Index_in_locks)
-            print(self.I_peaks_filtered[0][self.data_idx - 1])
+            # print(self.I_peaks_filtered)
+            # print(self.locks)
+            # print(Index_in_locks)
+            #print(self.I_peaks_filtered[0][self.data_idx - 1])
 
             I = self.locks[Index_in_locks]
             # last_max = self.I_peaks[0][self.data_idx - 1]
@@ -226,6 +229,8 @@ class Tracking:
 
             self.I_peaks_filtered[0][self.data_idx] = np.round(
                 np.mean(self.I_peaks[0][self.i_avg_start:self.data_idx]))
+
+            self.I_peaks_filtered[0][self.data_idx] = argmax(np.abs(self.data))
 
             # print(self.I_peaks_filtered)
             # print(self.I_peaks_filtered)
