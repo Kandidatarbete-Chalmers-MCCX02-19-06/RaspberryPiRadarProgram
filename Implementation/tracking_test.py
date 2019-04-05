@@ -125,7 +125,7 @@ class Tracking:
             self.locks = [x for x in self.locks if(np.abs(self.data[x]) > self.threshold)]      # removes local maxima if under threshhold
             Index_in_locks = np.argmin(np.abs(self.locks - self.I_peaks_filtered[self.data_idx - 1]))       # difference between current peak index and last peak index
             print("locks: ", self.locks)
-            print("I_peaks_filtered: ", self.I_peaks_filtered[self.data_idx - 1])
+            print("I_peaks_filtered minus: ", self.I_peaks_filtered[self.data_idx - 1])
             print("Index_in_locks: ", Index_in_locks)
 
             if len(self.locks) == 0:        # if no peak is found
