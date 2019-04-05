@@ -66,7 +66,7 @@ def main():
         # for i in range(0, sekvenser):
         info, sweep = client.get_next()
         amplitude = np.abs(sweep)
-        track = tracking(sweep, counter)
+        track = tracking.tracking(sweep, counter)
         counter += 1
         if counter == num_points:
             counter = 0
