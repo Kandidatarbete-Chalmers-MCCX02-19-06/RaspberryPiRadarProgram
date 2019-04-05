@@ -151,7 +151,7 @@ class Tracking:
 
         self.data_idx += 1
         if self.data_idx == self.N_avg:
-            data_idx = 0
+            self.data_idx = 0
         return self.tracked_distance
 
 if __name__ == "__main__":
