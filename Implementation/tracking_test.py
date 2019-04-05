@@ -32,7 +32,7 @@ def main():
     num_points = info["data_length"]
 
     amplitude_y_max = 22000
-
+    tracking = Tracking(num_points, config.range_interval)
     fig, (amplitude_ax) = plt.subplots(1)
     fig.set_size_inches(12, 6)
     fig.canvas.set_window_title(filename)
@@ -61,11 +61,15 @@ def main():
 
     client.start_streaming()
     matris = np.zeros((sekvenser, 2))
-
+    counter = 0
     while not interrupt_handler.got_signal:
         # for i in range(0, sekvenser):
         info, sweep = client.get_next()
         amplitude = np.abs(sweep)
+        track = tracking(sweep, counter)
+        counter += 1
+        if counter == num_points:
+            counter = 0
         ymax = amplitude.max()
         xmax = config.range_interval[0] + (config.range_interval[1] - config.range_interval[0]) * \
             (np.argmax(amplitude)/num_points)
@@ -94,11 +98,12 @@ def main():
 
 
 def config_setup():
-    config = configs.EnvelopeServiceConfig()
+    #config = configs.EnvelopeServiceConfig()
+    config = configs.IQServiceConfig()
     config.range_interval = [0.4, 0.8]
     config.sweep_rate = 2
     config.gain = 1
-    config.session_profile = configs.EnvelopeServiceConfig.MAX_SNR
+    #config.session_profile = configs.EnvelopeServiceConfig.MAX_SNR
     return config
 
 
@@ -222,7 +227,6 @@ class Tracking:
                 self.data[int(self.I_peaks_filtered[0][self.data_idx])])
             self.tracked_phase[0][self.data_idx] = np.angle(
                 self.data[int(self.I_peaks_filtered[0][self.data_idx])])
-        print(self.tracked_amplitude)
         return self.tracked_amplitude
 
 
