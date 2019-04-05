@@ -96,7 +96,7 @@ def config_setup():
     config = configs.EnvelopeServiceConfig()
     # config = configs.IQServiceConfig()
     config.range_interval = [0.4, 0.8]
-    config.sweep_rate = 4
+    config.sweep_rate = 10
     config.gain = 1
     config.session_profile = configs.EnvelopeServiceConfig.MAX_SNR
     return config
@@ -123,7 +123,7 @@ class Tracking:
 
         if self.data_idx == 0 and self.counter == 0:      # things that only happens first time
             I = np.argmax(np.abs(self.data))
-            self.I_peaks[0:(self.N_avg)] = I
+            self.I_peaks[:] = I
             self.I_peaks_filtered[0] = self.I_peaks[0]
             self.tracked_distance[0] = self.real_dist[int(self.I_peaks_filtered[0])]
             self.tracked_amplitude[0] = np.abs(self.data[int(self.I_peaks_filtered[0])])
@@ -138,9 +138,7 @@ class Tracking:
             print("Last I_peaks_filtered: ", self.I_peaks_filtered[self.data_idx])
             print("difference: ", difference)
             abs = np.abs(difference)
-            print("abs: ", abs)
             argmin = np.argmin(abs)
-            print("argmin: ", argmin)
             Index_in_locks = argmin
 
             # Index_in_locks = np.argmin(np.abs(self.locks - self.I_peaks_filtered[self.data_idx - 1]))       # difference between current peak index and last peak index
@@ -152,7 +150,6 @@ class Tracking:
                 I = self.locks[int(Index_in_locks)]
                 self.I_peaks[self.data_idx] = I
 
-            #print("Locks: ", self.locks)
             print("I_peaks: ", self.I_peaks)
 
             # if self.counter == 0:  # Questions about this part.
