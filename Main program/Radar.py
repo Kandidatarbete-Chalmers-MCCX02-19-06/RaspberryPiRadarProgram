@@ -40,11 +40,12 @@ class Radar(threading.Thread):
 
         self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
         self.num_points = self.info["data_length"]  # Amount of data points per sampel
+        self.data = np.zeros(self.num_points)           # define array before used
 
         # Vector for radar values from tracked data
         self.seq = 1200     # number of sequences to save
         self.peak_vector = np.zeros((1, self.seq), dtype=np.csingle)
-        self.data_idx = 0  # Inedex for peak vector used for filtering
+        # self.data_idx = 0  # Inedex for peak vector used for filtering
         self.data_matrix = np.zeros((self.seq, self.num_points))      # matrix for old data values
         self.I_peak = np.zeros((self.seq, 1))       # indexes of peaks
 
@@ -62,7 +63,7 @@ class Radar(threading.Thread):
         self.tracked_phase = np.zeros(self.N_avg)
         self.threshold = 0  # variable for finding peaks above threshold
         self.data_idx = 0
-        self.real_dist = np.linspace(self.config.range_interval[0], self.config.range_interval[1], num=self.num_points)  # converts index to real length
+        self.real_dist = np.linspace(self.config.range_interval[0], self.config.range_interval[1], num=self.num_points)   # converts index to real length
         self.counter = 0  # Used only for if statement only for first iteration and not when data_idx goes back to zero
 
         super(Radar, self).__init__()  # Inherit threading vitals
@@ -84,7 +85,7 @@ class Radar(threading.Thread):
             #    print("Still getting data")
             self.HR_filter_queue.put(2)
             # if self.data_idx >= self.seq:  # Resets matrix index to zero for filtering.
-            #   self.data_idx = 0
+             #    self.data_idx = 0
 
         print("End of getting data from radar")
         self.client.disconnect()
