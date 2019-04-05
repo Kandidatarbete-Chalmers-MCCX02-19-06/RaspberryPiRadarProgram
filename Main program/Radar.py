@@ -98,8 +98,8 @@ class Radar(threading.Thread):
             print("Real radar data is taken")
         else:
             time.sleep(1)
-            self.data = np.zeros((1, self.num_points))
-            self.client.get_next()
+            # self.data = np.zeros((1, self.num_points))
+            self.data = self.client.get_next()
             print("No data available")
             # print(self.data)
 
