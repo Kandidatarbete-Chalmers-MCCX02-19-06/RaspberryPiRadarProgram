@@ -68,7 +68,7 @@ def main():
         amplitude = np.abs(sweep)
         track = tracking.tracking(sweep, counter)
         counter += 1
-        if counter == num_points: #change num_points to nmbr of sequences
+        if counter == num_points:  # change num_points to nmbr of sequences
             counter = 0
         # ymax = amplitude.max()
         # xmax = config.range_interval[0] + (config.range_interval[1] - config.range_interval[0]) * \
@@ -126,11 +126,12 @@ class Tracking:
         self.data_idx = data_idx
         counter = 0  # Used only for if statement only for first iteration and not when data_idx goes back to zero
         N_avg = 10  # Number of total peaks to average over
-        self.start_distance = 0.5  # Initial guess for where
+        self.start_distance = 0.6  # Initial guess for where
         # self.data_matrix[self.data_idx][:] = self.data
         dist = self.num_points     # number of datapoints in data # self.num_points
         # maximum value
-        interval = self.config_range_interval[1] - self.config_range_interval[0]
+        interval = self.config_range_interval[1] - \
+            self.config_range_interval[0]
 
         matlab_dist = np.linspace(
             self.config_range_interval[0], self.config_range_interval[1], num=dist)
@@ -174,8 +175,10 @@ class Tracking:
 
             # self.tracked_distance[0][0] = self.I_peaks_filtered[0][0] / dist * interval
             self.tracked_distance[0][0] = matlab_dist[int(I)]
-            self.tracked_amplitude[0][0] = np.abs(self.data[int(self.I_peaks_filtered[0][0])])
-            self.tracked_phase[0][0] = np.angle(self.data[int(self.I_peaks_filtered[0][0])])
+            self.tracked_amplitude[0][0] = np.abs(
+                self.data[int(self.I_peaks_filtered[0][0])])
+            self.tracked_phase[0][0] = np.angle(
+                self.data[int(self.I_peaks_filtered[0][0])])
 
         # After first seq continous tracking
         else:
@@ -207,7 +210,7 @@ class Tracking:
 
             if counter == 0:  # Questions about this part.
                 self.i_avg_start = np.argmax([0, self.data_idx - N_avg])
-                if self.data_idx == dist: #change dist to nmbr of sequences later
+                if self.data_idx == dist:  # change dist to nmbr of sequences later
                     counter = 1
 
             else:
