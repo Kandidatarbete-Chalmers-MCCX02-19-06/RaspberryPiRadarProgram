@@ -234,8 +234,10 @@ class Tracking:
 
             self.I_peaks_filtered[0][self.data_idx] = np.round(
                 np.mean(self.I_peaks[0][self.i_avg_start:self.data_idx]))
+            print("I_peaks med kolon",
+                  self.I_peaks[0][self.i_avg_start:self.data_idx])
 
-            self.I_peaks_filtered[0][self.data_idx] = np.argmax(  # new method: just taking
+            # self.I_peaks_filtered[0][self.data_idx] = np.argmax(  # new method: just taking
                 np.abs(self.data))
 
             # print(self.I_peaks_filtered)
@@ -244,12 +246,12 @@ class Tracking:
             # print(self.I_peaks_filtered[0][data_idx])
             # self.tracked_distance[0][self.data_idx] = self.I_peaks_filtered[0][self.data_idx] / dist * interval
 
-            self.tracked_distance[0][self.data_idx] = matlab_dist[int(
+            self.tracked_distance[0][self.data_idx]=matlab_dist[int(
                 self.I_peaks_filtered[0][self.data_idx])]
             # print(self.tracked_distance)
-            self.tracked_amplitude[0][self.data_idx] = np.abs(
+            self.tracked_amplitude[0][self.data_idx]=np.abs(
                 self.data[int(self.I_peaks_filtered[0][self.data_idx])])
-            self.tracked_phase[0][self.data_idx] = np.angle(
+            self.tracked_phase[0][self.data_idx]=np.angle(
                 self.data[int(self.I_peaks_filtered[0][self.data_idx])])
         return self.tracked_distance
 
