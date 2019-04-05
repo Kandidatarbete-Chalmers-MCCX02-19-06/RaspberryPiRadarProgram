@@ -35,6 +35,7 @@ def main():
     amplitude_y_max = 22000
     N_avg = 10
     tracking = Tracking(num_points, config.range_interval, N_avg)
+    print("numpoints: ", num_points)
     fig, (amplitude_ax) = plt.subplots(1)
     fig.set_size_inches(12, 6)
     fig.canvas.set_window_title(filename)
@@ -123,7 +124,6 @@ class Tracking:
         if self.data_idx == 0 and self.counter == 0:      # things that only happens first time
             I = np.argmax(np.abs(self.data))
             self.I_peaks[0:(self.N_avg)] = I
-            print("I_peaks first:", self.I_peaks)
             self.I_peaks_filtered[0] = self.I_peaks[0]
             self.tracked_distance[0] = self.real_dist[int(self.I_peaks_filtered[0])]
             self.tracked_amplitude[0] = np.abs(self.data[int(self.I_peaks_filtered[0])])
@@ -134,9 +134,9 @@ class Tracking:
             self.locks, _ = signal.find_peaks(np.abs(self.data))        # find local maximas in data
             self.locks = [x for x in self.locks if(np.abs(self.data[x]) > self.threshold)]      # removes local maxima if under threshhold
             Index_in_locks = np.argmin(np.abs(self.locks - self.I_peaks_filtered[self.data_idx - 1]))       # difference between current peak index and last peak index
-            print("locks: ", self.locks)
-            print("I_peaks_filtered minus: ", self.I_peaks_filtered[self.data_idx - 1])
-            print("Index_in_locks: ", Index_in_locks)
+            # print("locks: ", self.locks)
+            # print("I_peaks_filtered minus: ", self.I_peaks_filtered[self.data_idx - 1])
+            # print("Index_in_locks: ", Index_in_locks)
 
             if len(self.locks) == 0:        # if no peak is found
                 self.I_peaks[self.data_idx] = self.I_peaks[self.data_idx - 1]
