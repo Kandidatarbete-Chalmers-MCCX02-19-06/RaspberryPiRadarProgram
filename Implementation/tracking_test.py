@@ -41,7 +41,7 @@ def main():
     #amplitude_ax.set_ylim(config.range_interval[0], config.range_interval[1])
 
     amplitude_ax.set_ylabel("Amplitude")
-    amplitude_ax.set_ylim(0, 1)
+    amplitude_ax.set_ylim(0, 10000)
 
     #xs = np.linspace(0, num_points/config.sweep_rate, num=num_points)
     xs = np.linspace(*config.range_interval, num=num_points)
@@ -74,7 +74,7 @@ def main():
 
 
 def config_setup():
-    config = configs.IQServiceConfig()
+    config = configs.EnvelopeServiceConfig()
     config.range_interval = [0.3, 0.7]
     config.sweep_rate = 100
     config.gain = 1
