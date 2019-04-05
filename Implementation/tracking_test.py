@@ -60,7 +60,7 @@ def main():
         info, sweep = client.get_next()
         amplitude = np.abs(sweep)
         track = tracking.tracking(sweep, counter)
-        peak = track
+        peak = amplitude
         counter += 1
         if counter == num_points:
             counter = 0
