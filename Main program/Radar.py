@@ -99,7 +99,7 @@ class Radar(threading.Thread):
         else:
             time.sleep(1)
             # self.data = np.zeros((1, self.num_points))
-            self.data = self.client.get_next()
+            self.info, self.data = self.client.get_next()
             print("No data available")
             # print(self.data)
 
