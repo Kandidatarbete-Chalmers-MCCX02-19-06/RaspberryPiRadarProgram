@@ -192,7 +192,9 @@ class Tracking:
                 np.abs(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]))
 
             # print(self.I_peaks_filtered)
-            # print(self.locks)
+            print(self.locks)
+            print(np.abs(self.data[self.locks])
+
             # print(Index_in_locks)
             #print(self.I_peaks_filtered[0][self.data_idx - 1])
 
@@ -230,7 +232,7 @@ class Tracking:
             self.I_peaks_filtered[0][self.data_idx] = np.round(
                 np.mean(self.I_peaks[0][self.i_avg_start:self.data_idx]))
 
-            self.I_peaks_filtered[0][self.data_idx] = np.argmax(
+            self.I_peaks_filtered[0][self.data_idx] = np.argmax( #new method: just taking 
                 np.abs(self.data))
 
             # print(self.I_peaks_filtered)
@@ -238,6 +240,7 @@ class Tracking:
             # print(self.I_peaks_filtered[0][int(self.data_idx)])
             # print(self.I_peaks_filtered[0][data_idx])
             # self.tracked_distance[0][self.data_idx] = self.I_peaks_filtered[0][self.data_idx] / dist * interval
+
             self.tracked_distance[0][self.data_idx] = matlab_dist[int(
                 self.I_peaks_filtered[0][self.data_idx])]
             # print(self.tracked_distance)
