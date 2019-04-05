@@ -187,7 +187,7 @@ class Tracking:
 
         # After first seq continous tracking
         else:
-            self.locks, _ = signal.find_peaks(np.abs(self.data), threshold = self.threshold)
+            self.locks, _ = signal.find_peaks(np.abs(self.data))
             print("locks före", self.locks)
             lista = []
             for loc in self.locks:
@@ -197,6 +197,7 @@ class Tracking:
             i = 0
             for loc in self.locks:      # remove peak indexes with amplitude less than threshold
                 amplitude = np.abs(self.data[loc])
+                print("amplitude: ", amplitude)
                 if amplitude < self.threshold:
                     np.delete(self.locks, i)
                 i += 1
