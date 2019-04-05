@@ -113,7 +113,8 @@ class Tracking:
 
         if self.data_idx == 0 and self.counter == 0:      # things that only happens first time
             I = np.argmax(np.abs(self.data))
-            self.I_peaks[0] = I
+            self.I_peaks[0:(self.N_avg-1)] = I
+            print("I_peaks first:", self.I_peaks)
             self.I_peaks_filtered[0] = self.I_peaks[0]
             self.tracked_distance[0] = self.real_dist[int(self.I_peaks_filtered[0])]
             self.tracked_amplitude[0] = np.abs(self.data[int(self.I_peaks_filtered[0])])
@@ -141,7 +142,7 @@ class Tracking:
             else:
                 self.i_avg_start = self.data_idx - (self.N_avg - 1)
 
-            self.I_peaks_filtered[self.data_idx] = np.round(np.mean(self.I_peaks[self.i_avg_start:self.data_idx]))      # mean value of N_avg latest peaks
+            self.I_peaks_filtered[self.data_idx] = np.round(np.mean(self.I_peaks))      # mean value of N_avg latest peaks
             self.threshold = np.abs(self.data[int(self.I_peaks_filtered[self.data_idx])])*0.5       # determines threshold
             self.tracked_distance[self.data_idx] = self.real_dist[int(self.I_peaks_filtered[self.data_idx])]
             self.tracked_amplitude[self.data_idx] = np.abs(self.data[int(self.I_peaks_filtered[self.data_idx])])
