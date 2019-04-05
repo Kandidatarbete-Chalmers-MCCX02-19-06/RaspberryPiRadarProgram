@@ -101,7 +101,7 @@ def config_setup():
     config = configs.EnvelopeServiceConfig()
     # config = configs.IQServiceConfig()
     config.range_interval = [0.4, 0.8]
-    config.sweep_rate = 10
+    config.sweep_rate = 2
     config.gain = 1
     config.session_profile = configs.EnvelopeServiceConfig.MAX_SNR
     return config
