@@ -101,7 +101,7 @@ def config_setup():
     config = configs.EnvelopeServiceConfig()
     # config = configs.IQServiceConfig()
     config.range_interval = [0.4, 0.8]
-    config.sweep_rate = 2
+    config.sweep_rate = 20
     config.gain = 1
     config.session_profile = configs.EnvelopeServiceConfig.MAX_SNR
     return config
@@ -257,7 +257,8 @@ class Tracking:
             # print(self.I_peaks_filtered[0][data_idx])
             # self.tracked_distance[0][self.data_idx] = self.I_peaks_filtered[0][self.data_idx] / dist * interval
 
-            self.threshold = np.abs(self.data[int(self.I_peaks_filtered[0][self.data_idx])])*0.5         # determines the amplitude of the last tracked data for find_peaks function
+            # determines the amplitude of the last tracked data for find_peaks function
+            self.threshold = np.abs(self.data[int(self.I_peaks_filtered[0][self.data_idx])])*0.5
 
             self.tracked_distance[0][self.data_idx] = matlab_dist[int(
                 self.I_peaks_filtered[0][self.data_idx])]
