@@ -201,7 +201,7 @@ class Tracking:
             # print(Index_in_locks)
 
             I = self.locks[int(Index_in_locks)]  # Shouldn't be called I
-            print(I \n)
+            print(I, "\n")
             # last_max = self.I_peaks[0][self.data_idx - 1]
             # print("locks: ", self.locks)
             # print("Last_max: ", last_max)
