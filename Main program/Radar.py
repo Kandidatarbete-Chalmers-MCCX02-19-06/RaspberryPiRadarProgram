@@ -13,7 +13,7 @@ from acconeer_utils.mpl_process import PlotProcess, PlotProccessDiedException, F
 
 class Radar(threading.Thread):
 
-    def __init__(self, HR_filter_queue, run_measurement, go):  # Lägg till RR_filter_queue som inputargument
+    def __init__(self, HR_filter_queue, go):  # Lägg till RR_filter_queue som inputargument
         self.go = go
         # Setup for collecting data from radar
         self.args = example_utils.ExampleArgumentParser().parse_args()
@@ -25,14 +25,13 @@ class Radar(threading.Thread):
         else:
             port = self.args.serial_port or example_utils.autodetect_serial_port()
             self.client = RegClient(port)
-        # List to only send real data when devices want data and send zeros when no device needs data.
-        self.run_measurement = run_measurement
+
         self.client.squeeze = False
         self.config = configs.IQServiceConfig()
         self.config.sensor = self.args.sensors
 
         self.config.range_interval = [0.2, 0.6]  # Measurement interval
-        self.config.sweep_rate = 1  # Frequency for collecting data
+        self.config.sweep_rate = 100  # Frequency for collecting data
         self.config.gain = 1  # Gain between 0 and 1.
         self.time = 1  # Duration for a set amount of sequences
         self.seq = self.config.sweep_rate * self.time  # Amount of sequences during a set time and sweep freq
@@ -57,34 +56,26 @@ class Radar(threading.Thread):
 
         self.client.start_streaming()  # Starts Acconeers streaming server
         # static variable impported from bluetooth_app class (In final version)
-        while self.go:
+        while not self.go:
             # for i in range(self.seq*2):
             self.get_data()
             self.tracker()
             self.filter_HeartRate()
             self.filter_RespRate()
             self.data_idx += 1
-            # if self.data_idx % self.config.sweep_rate == 0:
-            #    print("Still getting data")
-            self.HR_filter_queue.put(2)
+            if self.data_idx % self.config.sweep_rate == 0:
+                print("Still getting data")
+                self.HR_filter_queue.put(2)
             if self.data_idx >= self.seq:  # Resets matrix index to zero for filtering.
                 self.data_idx = 0
-
         print("End of getting data from radar")
+
         self.client.disconnect()
 
     # Method to collect data from the streaming server
     def get_data(self):
         # self.data should be accessable from all other methods
-        if self.run_measurement:
-            self.info, self.data = self.client.get_next()
-            print("Real radar data is taken")
-        else:
-            time.sleep(1)
-            self.data = np.zeros((1, self.num_points))
-            self.client.get_next()
-            print("No data available")
-            # print(self.data)
+        self.info, self.data = self.client.get_next()
 
     # Filter for heart rate using the last X sampels according to data_idx. Saves data to queue
     def filter_HeartRate(self):
