@@ -193,7 +193,14 @@ class Tracking:
             for loc in self.locks:
                 lista.append(np.abs(self.data[loc]))
             print("Amplitudes in locks: ", lista)
-            self.locks = [x for x in self.locks if(np.abs(self.data[x]) > threshold)]      # remove peak indexes with amplitude less than threshold
+
+            i = 0
+            for loc in self.locks:      # remove peak indexes with amplitude less than threshold
+                amplitude = np.abs(self.data[loc])
+                if amplitude < threshold:
+                    np.delete(self.locks, i)
+                i += 1
+
 
             # I = np.amin(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]) #amin and abs?
             Index_in_locks = np.argmin(
