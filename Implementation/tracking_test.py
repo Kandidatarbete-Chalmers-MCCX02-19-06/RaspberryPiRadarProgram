@@ -126,7 +126,7 @@ class Tracking:
         self.data_idx = data_idx
         counter = 0  # Used only for if statement only for first iteration and not when data_idx goes back to zero
         N_avg = 10  # Number of total peaks to average over
-        self.start_distance = 0.6  # Initial guess for where
+        self.start_distance = 0.45  # Initial guess for where
         # self.data_matrix[self.data_idx][:] = self.data
         dist = self.num_points     # number of datapoints in data # self.num_points
         # maximum value
