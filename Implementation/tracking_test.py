@@ -120,13 +120,13 @@ class Tracking:
 
             distance_in_index = (self.start_distance -
                                 self.config_range_interval[0]) / interval * dist
-
-            # I = np.argmax(self.data)
+            print("dist in idx: ", distance_in_index)
+            I = np.argmax(self.data)
 
             self.locks, _ = signal.find_peaks(np.abs(self.data))
-            Index_in_locks = np.argmin(
-                np.abs(self.locks - distance_in_index)
-            I=self.locks[Index_in_locks]
+            Index_in_locks = np.argmin(np.abs(self.locks - distance_in_index)
+
+            # I=self.locks[Index_in_locks]
 
             # print(I)
             # print(I_idx)
