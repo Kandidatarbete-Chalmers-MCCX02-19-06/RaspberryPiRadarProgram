@@ -217,9 +217,9 @@ class Tracking:
 
             # print("Distance to target: ", matlab_dist[int(I)])
 
-            # if len(self.locks) == 0:
-            #    self.I_peaks[0][self.data_idx] = self.I_peaks[0][self.data_idx-1]
-            # else:
+            if len(self.locks) == 0:
+                self.I_peaks[0][self.data_idx] = self.I_peaks[0][self.data_idx-1]
+            else:
             self.I_peaks[0][self.data_idx] = I
 
             print("I_peaks av index", self.I_peaks[0][self.data_idx], "\n")
