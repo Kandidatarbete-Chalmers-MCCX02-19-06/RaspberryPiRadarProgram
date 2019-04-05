@@ -38,13 +38,13 @@ def main():
     fig.canvas.set_window_title(filename)
 
     for ax in [amplitude_ax]:
-        #ax.set_xlabel("Depth (m)")
+        # ax.set_xlabel("Depth (m)")
         # ax.set_xlim(config.range_interval)
         ax.set_xlabel("Time (s)")
         ax.set_xlim(0, 100)
 
     # amplitude_ax.set_ylabel("Amplitude")
-    #amplitude_ax.set_ylim(0, 1.1 * amplitude_y_max)
+    # amplitude_ax.set_ylim(0, 1.1 * amplitude_y_max)
 
     amplitude_ax.set_ylabel("tracked distance (m)")
     amplitude_ax.set_ylim(config.range_interval)
@@ -99,7 +99,7 @@ def main():
 
 def config_setup():
     config = configs.EnvelopeServiceConfig()
-    #config = configs.IQServiceConfig()
+    # config = configs.IQServiceConfig()
     config.range_interval = [0.4, 0.8]
     config.sweep_rate = 2
     config.gain = 1
@@ -151,16 +151,16 @@ class Tracking:
             distance_in_index = int(round((self.start_distance -
                                            self.config_range_interval[0]) / interval * dist))
 
-            #print("dist in idx: ", distance_in_index)
+            # print("dist in idx: ", distance_in_index)
             I = np.argmax(self.data)
             Itest = np.argmax(np.abs(self.data))
             print(I)
             print(Itest)
 
-            #self.locks, _ = signal.find_peaks(np.abs(self.data))
-            #Index_in_locks = np.argmin(np.abs(self.locks - distance_in_index))
+            # self.locks, _ = signal.find_peaks(np.abs(self.data))
+            # Index_in_locks = np.argmin(np.abs(self.locks - distance_in_index))
 
-            #I = self.locks[int(Index_in_locks)]
+            # I = self.locks[int(Index_in_locks)]
 
             # print(I)
             # print(I_idx)
@@ -200,7 +200,8 @@ class Tracking:
 
             # print(Index_in_locks)
 
-            I = self.locks[int(Index_in_locks)]
+            I = self.locks[int(Index_in_locks)]  # Shouldn't be called I
+            print(I \n)
             # last_max = self.I_peaks[0][self.data_idx - 1]
             # print("locks: ", self.locks)
             # print("Last_max: ", last_max)
