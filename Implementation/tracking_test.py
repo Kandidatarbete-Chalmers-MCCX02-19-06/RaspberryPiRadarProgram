@@ -101,7 +101,7 @@ def config_setup():
     config = configs.EnvelopeServiceConfig()
     # config = configs.IQServiceConfig()
     config.range_interval = [0.4, 0.8]
-    config.sweep_rate = 2
+    config.sweep_rate = 20
     config.gain = 1
     config.session_profile = configs.EnvelopeServiceConfig.MAX_SNR
     return config
@@ -155,8 +155,8 @@ class Tracking:
             # print("dist in idx: ", distance_in_index)
             I = np.argmax(self.data)
             Itest = np.argmax(np.abs(self.data))
-            print(I)
-            print(Itest)
+            # print(I)
+            # print(Itest)
 
             # self.locks, _ = signal.find_peaks(np.abs(self.data))
             # Index_in_locks = np.argmin(np.abs(self.locks - distance_in_index))
@@ -188,11 +188,11 @@ class Tracking:
         # After first seq continous tracking
         else:
             self.locks, _ = signal.find_peaks(np.abs(self.data))
-            print("locks före", self.locks)
+            # print("locks före", self.locks)
             lista = []
             for loc in self.locks:
                 lista.append(np.abs(self.data[loc]))
-            print("Amplitudes in locks: ", lista)
+            # print("Amplitudes in locks: ", lista)
 
             self.locks = [x for x in self.locks if(np.abs(self.data[x]) > self.threshold)]
 
@@ -201,17 +201,17 @@ class Tracking:
                 np.abs(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]))
 
             # print(self.I_peaks_filtered)
-            print("locks efter", self.locks)
-            print("threshold: ", self.threshold)
-            print("I_peaks_filt", self.I_peaks_filtered[0][self.data_idx - 1])
-            print("minus", np.abs(self.locks -
-                                  self.I_peaks_filtered[0][self.data_idx - 1]))
+           # print("locks efter", self.locks)
+            # print("threshold: ", self.threshold)
+            # print("I_peaks_filt", self.I_peaks_filtered[0][self.data_idx - 1])
+            # print("minus", np.abs(self.locks -
+                                  # self.I_peaks_filtered[0][self.data_idx - 1]))
             # print(np.abs(self.data[self.locks]))
 
             # print(Index_in_locks)
 
             I = self.locks[int(Index_in_locks)]
-            print(I)
+            # print(I)
             # last_max = self.I_peaks[0][self.data_idx - 1]
             # print("locks: ", self.locks)
             # print("Last_max: ", last_max)
@@ -239,14 +239,14 @@ class Tracking:
             else:
                 self.i_avg_start = self.data_idx - N_avg
 
-            print("i_avg", self.i_avg_start)
+            # print("i_avg", self.i_avg_start)
             # I_avg_start to data_idx
 
             self.I_peaks_filtered[0][self.data_idx] = np.round(
                 np.mean(self.I_peaks[0][self.i_avg_start:self.data_idx]))
-            print("I_peaks med kolon",
+            # print("I_peaks med kolon",
                   self.I_peaks[0][self.i_avg_start:self.data_idx])
-            print("numpoints", dist)
+            # print("numpoints", dist)
 
             # self.I_peaks_filtered[0][self.data_idx] = np.argmax(  # new method: just taking
             #    np.abs(self.data))
@@ -258,12 +258,12 @@ class Tracking:
             # self.tracked_distance[0][self.data_idx] = self.I_peaks_filtered[0][self.data_idx] / dist * interval
 
             # determines the amplitude of the last tracked data for find_peaks function
-            self.threshold = np.abs(self.data[int(self.I_peaks_filtered[0][self.data_idx])])*0.5
+            self.threshold=np.abs(self.data[int(self.I_peaks_filtered[0][self.data_idx])])*0.5
 
-            self.tracked_distance[0][self.data_idx] = matlab_dist[int(
+            self.tracked_distance[0][self.data_idx]=matlab_dist[int(
                 self.I_peaks_filtered[0][self.data_idx])]
             # print(self.tracked_distance)
-            self.tracked_amplitude[0][self.data_idx] = np.abs(
+            self.tracked_amplitude[0][self.data_idx]=np.abs(
                 self.data[int(self.I_peaks_filtered[0][self.data_idx])])
             self.tracked_phase[0][self.data_idx] = np.angle(
                 self.data[int(self.I_peaks_filtered[0][self.data_idx])])
