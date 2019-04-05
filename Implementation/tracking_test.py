@@ -132,6 +132,7 @@ class Tracking:
         # maximum value
         interval = self.config_range_interval[1] - \
             self.config_range_interval[0]
+        threshold = 0       # variable for finding peaks above threshold
 
         matlab_dist = np.linspace(
             self.config_range_interval[0], self.config_range_interval[1], num=dist)
@@ -186,7 +187,7 @@ class Tracking:
 
         # After first seq continous tracking
         else:
-            self.locks, _ = signal.find_peaks(np.abs(self.data))
+            self.locks, _ = signal.find_peaks(np.abs(self.data), threshold = threshold)
             # I = np.amin(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]) #amin and abs?
             Index_in_locks = np.argmin(
                 np.abs(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]))
@@ -246,6 +247,8 @@ class Tracking:
             # print(self.I_peaks_filtered[0][int(self.data_idx)])
             # print(self.I_peaks_filtered[0][data_idx])
             # self.tracked_distance[0][self.data_idx] = self.I_peaks_filtered[0][self.data_idx] / dist * interval
+
+            threshold = np.abs(self.data[self.I_peaks_filtered[0][self.data_idx]])/2         # determines the amplitude of the last tracked data for find_peaks function
 
             self.tracked_distance[0][self.data_idx] = matlab_dist[int(
                 self.I_peaks_filtered[0][self.data_idx])]
