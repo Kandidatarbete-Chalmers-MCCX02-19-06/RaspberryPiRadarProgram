@@ -230,7 +230,8 @@ class Tracking:
             self.I_peaks_filtered[0][self.data_idx] = np.round(
                 np.mean(self.I_peaks[0][self.i_avg_start:self.data_idx]))
 
-            self.I_peaks_filtered[0][self.data_idx] = argmax(np.abs(self.data))
+            self.I_peaks_filtered[0][self.data_idx] = np.argmax(
+                np.abs(self.data))
 
             # print(self.I_peaks_filtered)
             # print(self.I_peaks_filtered)
