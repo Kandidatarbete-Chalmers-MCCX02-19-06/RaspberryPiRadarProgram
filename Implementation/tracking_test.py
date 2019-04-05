@@ -187,9 +187,10 @@ class Tracking:
 
         # After first seq continous tracking
         else:
-            self.locks, _ = signal.find_peaks(np.abs(self.data), threshold = threshold)
+            self.locks, _ = signal.find_peaks(np.abs(self.data), threshold=threshold)
             print("locks före", self.locks)
-            self.locks = [x for x in self.locks if(np.abs(self.data[x]) > threshold)]      # remove peak indexes with amplitude less than threshold
+            # remove peak indexes with amplitude less than threshold
+            self.locks = [x for x in self.locks if(np.abs(self.data[x]) > threshold)]
 
             # I = np.amin(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]) #amin and abs?
             Index_in_locks = np.argmin(
@@ -251,7 +252,8 @@ class Tracking:
             # print(self.I_peaks_filtered[0][data_idx])
             # self.tracked_distance[0][self.data_idx] = self.I_peaks_filtered[0][self.data_idx] / dist * interval
 
-            threshold = np.abs(self.data[self.I_peaks_filtered[0][self.data_idx]])/2         # determines the amplitude of the last tracked data for find_peaks function
+            # determines the amplitude of the last tracked data for find_peaks function
+            threshold = np.abs(self.data[int(self.I_peaks_filtered[0][self.data_idx])])/2
 
             self.tracked_distance[0][self.data_idx] = matlab_dist[int(
                 self.I_peaks_filtered[0][self.data_idx])]
