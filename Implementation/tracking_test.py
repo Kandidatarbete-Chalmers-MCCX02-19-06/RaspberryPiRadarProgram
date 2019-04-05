@@ -32,13 +32,19 @@ def main():
     fig.canvas.set_window_title("filename")
 
     for ax in [amplitude_ax]:
-        ax.set_xlabel("time (s)")
-        ax.set_xlim(0, num_points/config.sweep_rate)
+        #ax.set_xlabel("time (s)")
+        #ax.set_xlim(0, num_points/config.sweep_rate)
+        ax.set_xlim(*config.range_interval)
+        ax.set_xlabel("distance (m)")
 
-    amplitude_ax.set_ylabel("Distance (m)")
-    amplitude_ax.set_ylim(config.range_interval[0], config.range_interval[1])
+    #amplitude_ax.set_ylabel("Distance (m)")
+    #amplitude_ax.set_ylim(config.range_interval[0], config.range_interval[1])
 
-    xs = np.linspace(0, num_points/config.sweep_rate, num=num_points)
+    amplitude_ax.set_ylabel("Amplitude")
+    amplitude_ax.set_ylim(0, 20000)
+
+    #xs = np.linspace(0, num_points/config.sweep_rate, num=num_points)
+    xs = np.linspace(*config.range_interval, num=num_points)
     amplitude_line = amplitude_ax.plot(xs, np.zeros_like(xs))[0]
 
     fig.tight_layout()
@@ -54,7 +60,7 @@ def main():
         info, sweep = client.get_next()
         amplitude = np.abs(sweep)
         track = tracking.tracking(sweep, counter)
-        peak = amplitude
+        peak = track
         counter += 1
         if counter == num_points:
             counter = 0
@@ -199,7 +205,7 @@ class Tracking:
             self.tracked_phase[0][self.data_idx] = np.angle(
                 self.data[int(self.I_peaks_filtered[0][self.data_idx])])
 
-        return self.tracked_distance
+        return self.tracked_amplitude
 
 
 if __name__ == "__main__":
