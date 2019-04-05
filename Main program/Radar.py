@@ -40,7 +40,7 @@ class Radar(threading.Thread):
 
         self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
         self.num_points = self.info["data_length"]  # Amount of data points per sampel
-        self.data = np.zeros(self.num_points)           # define array before used
+        # self.data = np.zeros(self.num_points)           # define array before used
 
         # Vector for radar values from tracked data
         self.seq = 1200     # number of sequences to save
