@@ -113,7 +113,7 @@ class Tracking:
 
         if self.data_idx == 0 and self.counter == 0:      # things that only happens first time
             I = np.argmax(np.abs(self.data))
-            self.I_peaks[0:(self.N_avg-1)] = I
+            self.I_peaks[0:(self.N_avg)] = I
             print("I_peaks first:", self.I_peaks)
             self.I_peaks_filtered[0] = self.I_peaks[0]
             self.tracked_distance[0] = self.real_dist[int(self.I_peaks_filtered[0])]
