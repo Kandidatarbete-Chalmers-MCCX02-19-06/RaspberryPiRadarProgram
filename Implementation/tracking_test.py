@@ -8,7 +8,6 @@ from acconeer_utils.clients.reg.client import RegClient
 from acconeer_utils.clients.json.client import JSONClient
 from acconeer_utils.clients import configs
 from acconeer_utils import example_utils
-from acconeer_utils.mpl_process import PlotProcess, PlotProccessDiedException, FigureUpdater
 
 
 def main():
@@ -44,9 +43,6 @@ def main():
         ax.set_xlabel("Time (s)")
         ax.set_xlim(0, 20)
 
-    # amplitude_ax.set_ylabel("Amplitude")
-    # amplitude_ax.set_ylim(0, 1.1 * amplitude_y_max)
-
     amplitude_ax.set_ylabel("tracked distance (m)")
     amplitude_ax.set_ylim(config.range_interval)
 
@@ -64,35 +60,17 @@ def main():
     matris = np.zeros((sekvenser, 2))
     counter = 0
     while not interrupt_handler.got_signal:
-        # for i in range(0, sekvenser):
         info, sweep = client.get_next()
         amplitude = np.abs(sweep)
         track = tracking.tracking(sweep, counter)
         counter += 1
         if counter == num_points:  # change num_points to nmbr of sequences
             counter = 0
-        # ymax = amplitude.max()
-        # xmax = config.range_interval[0] + (config.range_interval[1] - config.range_interval[0]) * \
-        #     (np.argmax(amplitude)/num_points)
-        # matris[0][:] = [xmax, ymax]
-        # matris = np.roll(matris, 1, axis=0)
-
-        # text = "x={:.2f}, y={:.2f}".format(xmax, ymax)
-        # bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
-        # arrowprops = dict(arrowstyle="->", connectionstyle="angle,angleA=0,angleB=90")
-        # kw = dict(xycoords='data', textcoords="axes fraction",
-        #           arrowprops=arrowprops, bbox=bbox_props, ha="right", va="top")
-        # annotate = ax.annotate(text, xy=(xmax, ymax), xytext=(0.96, 0.96), **kw)
-
         amplitude_line.set_ydata(track)
 
         if not plt.fignum_exists(1):  # Simple way to check if plot is closed
             break
         fig.canvas.flush_events()
-        # annotate.remove()
-    # matris = np.mean(matris, axis=0)
-    # np.savetxt(filename, matris, delimiter=",")
-
     print("Disconnecting...")
     plt.close()
     client.disconnect()
@@ -146,40 +124,15 @@ class Tracking:
 
         if self.data_idx == 0 and counter == 0:      # things that only happens first time
             # chooses index closest to starting distance
-            # I = np.round(
-            #    ((self.start_distance - self.config_range_interval[0]) / interval) * dist)
-
-            # I = np.abs(self.data).index(signal.find_peaks(np.abs(self.data)))
 
             distance_in_index=int(round((self.start_distance - self.config_range_interval[0]) / interval * dist))
 
             # print("dist in idx: ", distance_in_index)
             # I = np.argmax(self.data)
             I=np.argmax(np.abs(self.data))
-            # print(I)
-            # print(Itest)
 
-            # self.locks, _ = signal.find_peaks(np.abs(self.data))
-            # Index_in_locks = np.argmin(np.abs(self.locks - distance_in_index))
-
-            # I = self.locks[int(Index_in_locks)]
-
-            # print(I)
-            # print(I_idx)
-            # print(dist)
-            # self.locks, _ = signal.find_peaks(np.abs(self.data))
-            # print(self.locks)
-            # print(I)
-            # print(self.locks)  # Check what happends during the first cycle.
-            # I = np.amin(np.abs(self.locks - self.I_peaks[0][0]))
-            # print(self.I_peaks)
-            # print(I, int(I))
             self.I_peaks[0]=I
-            # print(self.I_peaks[0][0])
-            # print(type(I), type(int(I)))
             self.I_peaks_filtered[0] = self.I_peaks[0]
-
-            # self.tracked_distance[0][0] = self.I_peaks_filtered[0][0] / dist * interval
             self.tracked_distance[0]=matlab_dist[int(I)]
             self.tracked_amplitude[0]=np.abs(
                 self.data[int(self.I_peaks_filtered[0])])
@@ -189,43 +142,15 @@ class Tracking:
         # After first seq continous tracking
         else:
             self.locks, _ = signal.find_peaks(np.abs(self.data))
-            # print("locks före", self.locks)
             lista=[]
             for loc in self.locks:
                 lista.append(np.abs(self.data[loc]))
-            # print("Amplitudes in locks: ", lista)
 
             self.locks=[x for x in self.locks if(np.abs(self.data[x]) > self.threshold)]
 
-            # I = np.amin(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]) #amin and abs?
             Index_in_locks=np.argmin(np.abs(self.locks - self.I_peaks_filtered[self.data_idx - 1]))
 
-            # print(self.I_peaks_filtered)
-           # print("locks efter", self.locks)
-            # print("threshold: ", self.threshold)
-            # print("I_peaks_filt", self.I_peaks_filtered[0][self.data_idx - 1])
-            # print("minus", np.abs(self.locks -
-                                  # self.I_peaks_filtered[0][self.data_idx - 1]))
-            # print(np.abs(self.data[self.locks]))
-
-            # print(Index_in_locks)
-
             I=self.locks[int(Index_in_locks)]
-            # print(I)
-            # last_max = self.I_peaks[0][self.data_idx - 1]
-            # print("locks: ", self.locks)
-            # print("Last_max: ", last_max)
-            # if I + last_max >= dist or last_max - I < 0:
-            #     pass
-            # else:
-            #     List_of_largest_amp = [np.abs(self.data[int(I + last_max)]),  # if close to one end the last_max and I will go out of bounds
-            #                            np.abs(self.data[int(last_max-I)])]
-            #     if List_of_largest_amp[0] > List_of_largest_amp[1]:
-            #         I = I + last_max
-            #     else:
-            #         I = last_max - I
-
-            # print("Distance to target: ", matlab_dist[int(I)])
 
             if len(self.locks) == 0:
                 self.I_peaks[self.data_idx]=self.I_peaks[self.data_idx-1]
@@ -239,27 +164,11 @@ class Tracking:
             else:
                 self.i_avg_start=self.data_idx - N_avg
 
-            # print("i_avg", self.i_avg_start)
-            # I_avg_start to data_idx
-
             self.I_peaks_filtered[self.data_idx]=np.round(np.mean(self.I_peaks[self.i_avg_start:self.data_idx]))
-            # print("I_peaks med kolon",
-                  # self.I_peaks[0][self.i_avg_start:self.data_idx])
-            # print("numpoints", dist)
-
-            # self.I_peaks_filtered[0][self.data_idx] = np.argmax(  # new method: just taking
-            #    np.abs(self.data))
-
-            # print(self.I_peaks_filtered)
-            # print(self.I_peaks_filtered)
-            # print(self.I_peaks_filtered[0][int(self.data_idx)])
-            # print(self.I_peaks_filtered[0][data_idx])
-            # self.tracked_distance[0][self.data_idx] = self.I_peaks_filtered[0][self.data_idx] / dist * interval
 
             # determines the amplitude of the last tracked data for find_peaks function
             self.threshold=np.abs(self.data[int(self.I_peaks_filtered[self.data_idx])])*0.5
             self.tracked_distance[self.data_idx]=matlab_dist[int(self.I_peaks_filtered[self.data_idx])]
-            # print(self.tracked_distance)
             self.tracked_amplitude[self.data_idx]=np.abs(self.data[int(self.I_peaks_filtered[self.data_idx])])
             self.tracked_phase[self.data_idx]=np.angle(self.data[int(self.I_peaks_filtered[self.data_idx])])
         return self.tracked_distance
