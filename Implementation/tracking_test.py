@@ -13,74 +13,92 @@ from acconeer_utils.mpl_process import PlotProcess, PlotProccessDiedException, F
 
 def main():
     args = example_utils.ExampleArgumentParser(num_sens=1).parse_args()
-    example_utils.config_logging(args)
+      example_utils.config_logging(args)
 
-    if args.socket_addr:
-        client = JSONClient(args.socket_addr)
-    else:
-        port = args.serial_port or example_utils.autodetect_serial_port()
-        client = RegClient(port)
+       if args.socket_addr:
+            client = JSONClient(args.socket_addr)
+        else:
+            port = args.serial_port or example_utils.autodetect_serial_port()
+            client = RegClient(port)
 
-    config = config_setup()
-    config.sensor = args.sensors
-    info = client.setup_session(config)
-    num_points = info["data_length"]
-    tracking = Tracking(num_points, config.range_interval)
+        config = config_setup()
+        config.sensor = args.sensors
 
-    fig, (amplitude_ax) = plt.subplots(1)
-    fig.set_size_inches(12, 6)
-    fig.canvas.set_window_title("filename")
+        tid = 10
+        sekvenser = tid * config.sweep_rate
+        filename = "Reflektor_2.csv"
 
-    for ax in [amplitude_ax]:
-        #ax.set_xlabel("time (s)")
-        #ax.set_xlim(0, num_points/config.sweep_rate)
-        ax.set_xlim(*config.range_interval)
-        ax.set_xlabel("distance (m)")
+        info = client.setup_session(config)
+        num_points = info["data_length"]
 
-    #amplitude_ax.set_ylabel("Distance (m)")
-    #amplitude_ax.set_ylim(config.range_interval[0], config.range_interval[1])
+        amplitude_y_max = 22000
 
-    amplitude_ax.set_ylabel("Amplitude")
-    amplitude_ax.set_ylim(0, 10000)
+        fig, (amplitude_ax) = plt.subplots(1)
+        fig.set_size_inches(12, 6)
+        fig.canvas.set_window_title(filename)
 
-    #xs = np.linspace(0, num_points/config.sweep_rate, num=num_points)
-    xs = np.linspace(*config.range_interval, num=num_points)
-    amplitude_line = amplitude_ax.plot(xs, np.zeros_like(xs))[0]
+        for ax in [amplitude_ax]:
+            ax.set_xlabel("Depth (m)")
+            ax.set_xlim(config.range_interval)
+            ax.set_xticks(np.linspace(0.4, 0.8, num=5))
+            ax.set_xticks(np.concatenate([np.linspace(0.41, 0.49, num=9), np.linspace(
+                0.51, 0.59, num=9), np.linspace(0.61, 0.69, num=9), np.linspace(0.71, 0.79, num=9)]), minor=True)
+            ax.grid(True, which='major')
+            ax.grid(True, which='minor')
 
-    fig.tight_layout()
-    plt.ion()
-    plt.show()
+        amplitude_ax.set_ylabel("Amplitude")
+        amplitude_ax.set_ylim(0, 1.1 * amplitude_y_max)
 
-    interrupt_handler = example_utils.ExampleInterruptHandler()
-    print("Press Ctrl-C to end session")
+        xs = np.linspace(*config.range_interval, num_points)
+        amplitude_line = amplitude_ax.plot(xs, np.zeros_like(xs))[0]
 
-    client.start_streaming()
-    counter = 0
-    while not interrupt_handler.got_signal:
-        info, sweep = client.get_next()
-        amplitude = np.abs(sweep)
-        track = tracking.tracking(sweep, counter)
-        peak = amplitude
-        counter += 1
-        if counter == num_points:
-            counter = 0
-        # print(peak)
-        amplitude_line.set_ydata(peak)
-        # amplitude_line.set_ydata(amplitude)
-        fig.canvas.flush_events()
+        fig.tight_layout()
+        plt.ion()
+        plt.show()
 
-    print("Disconnecting...")
-    client.disconnect()
+        interrupt_handler = example_utils.ExampleInterruptHandler()
+        print("Press Ctrl-C to end session")
+
+        client.start_streaming()
+        matris = np.zeros((sekvenser, 2))
+
+        while not interrupt_handler.got_signal:
+            # for i in range(0, sekvenser):
+            info, sweep = client.get_next()
+            amplitude = np.abs(sweep)
+            ymax = amplitude.max()
+            xmax = config.range_interval[0] + (config.range_interval[1] - config.range_interval[0]) * \
+                (np.argmax(amplitude)/num_points)
+            matris[0][:] = [xmax, ymax]
+            matris = np.roll(matris, 1, axis=0)
+
+            text = "x={:.2f}, y={:.2f}".format(xmax, ymax)
+            bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
+            arrowprops = dict(arrowstyle="->", connectionstyle="angle,angleA=0,angleB=90")
+            kw = dict(xycoords='data', textcoords="axes fraction",
+                      arrowprops=arrowprops, bbox=bbox_props, ha="right", va="top")
+            annotate = ax.annotate(text, xy=(xmax, ymax), xytext=(0.96, 0.96), **kw)
+
+            amplitude_line.set_ydata(amplitude)
+
+            if not plt.fignum_exists(1):  # Simple way to check if plot is closed
+                break
+            fig.canvas.flush_events()
+            annotate.remove()
+        # matris = np.mean(matris, axis=0)
+        # np.savetxt(filename, matris, delimiter=",")
+
+        print("Disconnecting...")
+        plt.close()
+        client.disconnect()
 
 
 def config_setup():
     config = configs.EnvelopeServiceConfig()
-    config.range_interval = [0.3, 0.7]
-    config.sweep_rate = 100
+    config.range_interval = [0.4, 0.8]
+    config.sweep_rate = 2
     config.gain = 1
-    # config.session_profile = configs.EnvelopeServiceConfig.MAX_DEPTH_RESOLUTION
-    # config.session_profile = configs.EnvelopeServiceConfig.MAX_SNR
-    print(config.gain)
+    config.session_profile = configs.EnvelopeServiceConfig.MAX_SNR
     return config
 
 
