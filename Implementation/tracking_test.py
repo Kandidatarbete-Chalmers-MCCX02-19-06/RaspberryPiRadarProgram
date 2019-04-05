@@ -41,7 +41,7 @@ def main():
     #amplitude_ax.set_ylim(config.range_interval[0], config.range_interval[1])
 
     amplitude_ax.set_ylabel("Amplitude")
-    amplitude_ax.set_ylim(0, 20000)
+    amplitude_ax.set_ylim(0, 1)
 
     #xs = np.linspace(0, num_points/config.sweep_rate, num=num_points)
     xs = np.linspace(*config.range_interval, num=num_points)
