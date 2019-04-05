@@ -141,7 +141,7 @@ class Tracking:
             if self.counter == 0:  # Questions about this part.
                 self.i_avg_start = 0        # this will be 0 as long as counter == 0
                 if self.data_idx == self.N_avg - 1:  # change dist to nmbr of sequences later
-                    counter = 1
+                    self.counter = 1
             else:
                 self.i_avg_start = self.data_idx - (self.N_avg - 1)
 
