@@ -96,7 +96,7 @@ def config_setup():
     config = configs.EnvelopeServiceConfig()
     # config = configs.IQServiceConfig()
     config.range_interval = [0.4, 0.8]
-    config.sweep_rate = 2
+    config.sweep_rate = 4
     config.gain = 1
     config.session_profile = configs.EnvelopeServiceConfig.MAX_SNR
     return config
@@ -144,20 +144,24 @@ class Tracking:
                 I = self.locks[int(Index_in_locks)]
                 self.I_peaks[self.data_idx] = I
 
-            if self.counter == 0:  # Questions about this part.
-                self.i_avg_start = 0        # this will be 0 as long as counter == 0
-                if self.data_idx == self.N_avg - 1:  # change dist to nmbr of sequences later
-                    self.counter = 1
-            else:
-                self.i_avg_start = self.data_idx - (self.N_avg - 1)
+            print("Locks: ", self.locks)
+            print("I_peaks: ", self.I_peaks)
+
+            # if self.counter == 0:  # Questions about this part.
+            #     self.i_avg_start = 0        # this will be 0 as long as counter == 0
+            #     if self.data_idx == self.N_avg - 1:  # change dist to nmbr of sequences later
+            #         self.counter = 1
+            # else:
+            # self.i_avg_start = self.data_idx - (self.N_avg - 1)
 
             self.I_peaks_filtered[self.data_idx] = np.round(np.mean(self.I_peaks))      # mean value of N_avg latest peaks
+
             self.threshold = np.abs(self.data[int(self.I_peaks_filtered[self.data_idx])])*0.5       # determines threshold
             self.tracked_distance[self.data_idx] = self.real_dist[int(self.I_peaks_filtered[self.data_idx])]
             self.tracked_amplitude[self.data_idx] = np.abs(self.data[int(self.I_peaks_filtered[self.data_idx])])
             self.tracked_phase[self.data_idx] = np.angle(self.data[int(self.I_peaks_filtered[self.data_idx])])
 
-        print("I_peaks_filtered: ", self.I_peaks_filtered)
+        # print("I_peaks_filtered: ", self.I_peaks_filtered)
 
         self.data_idx += 1
         if self.data_idx == self.N_avg:
