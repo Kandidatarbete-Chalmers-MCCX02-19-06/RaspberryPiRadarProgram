@@ -78,7 +78,7 @@ def main():
         i += 1
         if i == 100:
             i = 0
-            list = []
+            list.clear()
         if not plt.fignum_exists(1):  # Simple way to check if plot is closed
             break
         fig.canvas.flush_events()
@@ -95,7 +95,7 @@ def config_setup():
     config = configs.EnvelopeServiceConfig()
     # config = configs.IQServiceConfig()
     config.range_interval = [0.4, 0.8]
-    config.sweep_rate = 2
+    config.sweep_rate = 10
     config.gain = 1
     config.session_profile = configs.EnvelopeServiceConfig.MAX_SNR
     return config
