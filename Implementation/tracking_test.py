@@ -222,9 +222,6 @@ class Tracking:
             else:
                 self.I_peaks[0][self.data_idx] = I
 
-            print("Hela I_peaks:", self.I_peaks)
-            print("I_peaks av index", self.I_peaks[0][self.data_idx], "\n")
-
             if counter == 0:  # Questions about this part.
                 self.i_avg_start = np.argmax([0, self.data_idx - N_avg])
                 if self.data_idx == dist:  # change dist to nmbr of sequences later
@@ -233,6 +230,7 @@ class Tracking:
             else:
                 self.i_avg_start = self.data_idx - N_avg
 
+            print("i_avg", self.i_avg_start)
             # I_avg_start to data_idx
 
             self.I_peaks_filtered[0][self.data_idx] = np.round(
