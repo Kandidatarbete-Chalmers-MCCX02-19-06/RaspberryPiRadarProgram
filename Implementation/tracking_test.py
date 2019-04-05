@@ -133,13 +133,19 @@ class Tracking:
         else:
             self.locks, _ = signal.find_peaks(np.abs(self.data))        # find local maximas in data
             self.locks = [x for x in self.locks if(np.abs(self.data[x]) > self.threshold)]      # removes local maxima if under threshhold
-            Index_in_locks = np.argmin(np.abs(self.locks - self.I_peaks_filtered[self.data_idx - 1]))       # difference between current peak index and last peak index
-            # print("locks: ", self.locks)
-            # print("I_peaks_filtered minus: ", self.I_peaks_filtered[self.data_idx - 1])
-            # print("Index_in_locks: ", Index_in_locks)
+            difference = np.subtract(self.locks, self.I_peaks_filtered[self.data_idx])
+            print("difference: ", difference)
+            abs = np.abs(difference)
+            print("abs: ", abs)
+            argmin = np.argmin(abs)
+            print("argmin: ", argmin)
+            Index_in_locks = argmin
+
+            # Index_in_locks = np.argmin(np.abs(self.locks - self.I_peaks_filtered[self.data_idx - 1]))       # difference between current peak index and last peak index
 
             if len(self.locks) == 0:        # if no peak is found
                 self.I_peaks[self.data_idx] = self.I_peaks[self.data_idx - 1]
+                print("Last value. Not updated.")
             else:
                 I = self.locks[int(Index_in_locks)]
                 self.I_peaks[self.data_idx] = I
