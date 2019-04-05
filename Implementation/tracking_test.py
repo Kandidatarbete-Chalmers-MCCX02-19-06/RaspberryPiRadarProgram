@@ -42,7 +42,7 @@ def main():
         # ax.set_xlabel("Depth (m)")
         # ax.set_xlim(config.range_interval)
         ax.set_xlabel("Time (s)")
-        ax.set_xlim(0, 20)
+        ax.set_xlim(0, 100)
 
     # amplitude_ax.set_ylabel("Amplitude")
     # amplitude_ax.set_ylim(0, 1.1 * amplitude_y_max)
@@ -50,13 +50,14 @@ def main():
     amplitude_ax.set_ylabel("tracked distance (m)")
     amplitude_ax.set_ylim(config.range_interval)
 
-    xs = np.linspace(0, 20 * config.sweep_rate, num=N_avg)
+    xs = np.linspace(0, 20 * config.sweep_rate, num=N_avg*10)
     amplitude_line = amplitude_ax.plot(xs, np.zeros_like(xs))[0]
 
     fig.tight_layout()
     plt.ion()
     plt.show()
-
+    list = np.zeros(100)
+    i = 0
     interrupt_handler = example_utils.ExampleInterruptHandler()
     print("Press Ctrl-C to end session")
 
@@ -67,9 +68,11 @@ def main():
         # for i in range(0, sekvenser):
         info, sweep = client.get_next()
         track = tracking.tracking(sweep)
-
-        amplitude_line.set_ydata(track)
-
+        list[i] = track
+        amplitude_line.set_ydata(list)
+        i += 1
+        if i == 100:
+            i = 0
         if not plt.fignum_exists(1):  # Simple way to check if plot is closed
             break
         fig.canvas.flush_events()
@@ -153,7 +156,7 @@ class Tracking:
         self.data_idx += 1
         if self.data_idx == self.N_avg:
             self.data_idx = 0
-        return self.tracked_distance
+        return self.tracked_distance[self.data_idx - 1]
 
 if __name__ == "__main__":
     main()
