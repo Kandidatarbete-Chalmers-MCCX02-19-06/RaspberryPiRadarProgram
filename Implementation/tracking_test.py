@@ -187,8 +187,10 @@ class Tracking:
             # I = np.amin(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]) #amin and abs?
             Index_in_locks = np.argmin(
                 np.abs(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]))
-            print(self.I_peaks_filtered)
 
+            print(self.I_peaks_filtered)
+            print(self.locks)
+            print(Index_in_locks)
             print(self.I_peaks_filtered[0][self.data_idx - 1])
 
             I = self.locks[Index_in_locks]
