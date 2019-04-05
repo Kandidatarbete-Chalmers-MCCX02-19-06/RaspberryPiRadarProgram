@@ -193,12 +193,12 @@ class Tracking:
 
             # print(self.I_peaks_filtered)
             print(self.locks)
-            print(np.abs(self.data[self.locks])
+            print(np.abs(self.data[self.locks]))
 
             # print(Index_in_locks)
             #print(self.I_peaks_filtered[0][self.data_idx - 1])
 
-            I = self.locks[Index_in_locks]
+            I = self.locks[int(Index_in_locks)]
             # last_max = self.I_peaks[0][self.data_idx - 1]
             # print("locks: ", self.locks)
             # print("Last_max: ", last_max)
@@ -232,7 +232,7 @@ class Tracking:
             self.I_peaks_filtered[0][self.data_idx] = np.round(
                 np.mean(self.I_peaks[0][self.i_avg_start:self.data_idx]))
 
-            self.I_peaks_filtered[0][self.data_idx] = np.argmax( #new method: just taking 
+            self.I_peaks_filtered[0][self.data_idx] = np.argmax(  # new method: just taking
                 np.abs(self.data))
 
             # print(self.I_peaks_filtered)
