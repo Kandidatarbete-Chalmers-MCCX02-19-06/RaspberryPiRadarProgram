@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 # import scipy as sp
 from scipy import signal
+import time
 
 from acconeer_utils.clients.reg.client import RegClient
 from acconeer_utils.clients.json.client import JSONClient
@@ -50,7 +51,7 @@ def main():
     amplitude_ax.set_ylabel("tracked distance (m)")
     amplitude_ax.set_ylim(config.range_interval)
 
-    xs = np.linspace(0, 20 * config.sweep_rate, num=N_avg*10)
+    xs = np.linspace(0, 100, num=100)
     amplitude_line = amplitude_ax.plot(xs, np.zeros_like(xs))[0]
 
     fig.tight_layout()
@@ -67,12 +68,17 @@ def main():
     while not interrupt_handler.got_signal:
         # for i in range(0, sekvenser):
         info, sweep = client.get_next()
+        start = round(time.time()*1000)/1000
         track = tracking.tracking(sweep)
+        end = round(time.time()*1000)/1000
+        print("Time for tracking loop {}".format(end-start))
         list[i] = track
         amplitude_line.set_ydata(list)
+
         i += 1
         if i == 100:
             i = 0
+            list = []
         if not plt.fignum_exists(1):  # Simple way to check if plot is closed
             break
         fig.canvas.flush_events()
