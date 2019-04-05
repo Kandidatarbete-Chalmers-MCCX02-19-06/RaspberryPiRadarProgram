@@ -119,12 +119,12 @@ class Tracking:
             # I = np.abs(self.data).index(signal.find_peaks(np.abs(self.data)))
 
             distance_in_index = (self.start_distance -
-                                self.config_range_interval[0]) / interval * dist
+                                 self.config_range_interval[0]) / interval * dist
             print("dist in idx: ", distance_in_index)
             I = np.argmax(self.data)
 
-            self.locks, _ = signal.find_peaks(np.abs(self.data))
-            Index_in_locks = np.argmin(np.abs(self.locks - distance_in_index)
+            #self.locks, _ = signal.find_peaks(np.abs(self.data))
+            # Index_in_locks = np.argmin(np.abs(self.locks - distance_in_index)
 
             # I=self.locks[Index_in_locks]
 
@@ -138,25 +138,24 @@ class Tracking:
             # I = np.amin(np.abs(self.locks - self.I_peaks[0][0]))
             # print(self.I_peaks)
             # print(I, int(I))
-            self.I_peaks[0][0]=I
+            self.I_peaks[0][0] = I
             # print(self.I_peaks[0][0])
             # print(type(I), type(int(I)))
-            self.I_peaks_filtered[0][0]=self.I_peaks[0][0]
+            self.I_peaks_filtered[0][0] = self.I_peaks[0][0]
 
             # self.tracked_distance[0][0] = self.I_peaks_filtered[0][0] / dist * interval
-            self.tracked_distance[0][0]=matlab_dist[int(I)]
-            self.tracked_amplitude[0][0]=np.abs(self.data[int(self.I_peaks_filtered[0][0])])
-            self.tracked_phase[0][0]=np.angle(self.data[int(self.I_peaks_filtered[0][0])])
+            self.tracked_distance[0][0] = matlab_dist[int(I)]
+            self.tracked_amplitude[0][0] = np.abs(self.data[int(self.I_peaks_filtered[0][0])])
+            self.tracked_phase[0][0] = np.angle(self.data[int(self.I_peaks_filtered[0][0])])
 
         # After first seq continous tracking
         else:
-            self.locks, _=signal.find_peaks(np.abs(self.data))
+            self.locks, _ = signal.find_peaks(np.abs(self.data))
             # I = np.amin(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]) #amin and abs?
-            Index_in_locks=np.argmin(
+            Index_in_locks = np.argmin(
                 np.abs(self.locks - self.I_peaks_filtered[0][self.data_idx - 1]))
 
-
-            I=self.locks[Index_in_locks]
+            I = self.locks[Index_in_locks]
             # last_max = self.I_peaks[0][self.data_idx - 1]
             # print("locks: ", self.locks)
             # print("Last_max: ", last_max)
@@ -173,18 +172,18 @@ class Tracking:
             # print("Distance to target: ", matlab_dist[int(I)])
 
             if len(self.locks) == 0:
-                self.I_peaks[0][self.data_idx]=self.I_peaks[0][self.data_idx-1]
+                self.I_peaks[0][self.data_idx] = self.I_peaks[0][self.data_idx-1]
             else:
-                self.I_peaks[0][self.data_idx]=I
+                self.I_peaks[0][self.data_idx] = I
 
             if counter == 0:  # Questions about this part.
-                self.i_avg_start=np.argmax([0, self.data_idx - N_avg])
+                self.i_avg_start = np.argmax([0, self.data_idx - N_avg])
             else:
-                self.i_avg_start=self.data_idx - N_avg
-                counter=1
+                self.i_avg_start = self.data_idx - N_avg
+                counter = 1
             # I_avg_start to data_idx
 
-            self.I_peaks_filtered[0][self.data_idx]=np.round(
+            self.I_peaks_filtered[0][self.data_idx] = np.round(
                 np.mean(self.I_peaks[0][self.i_avg_start:self.data_idx]))
 
             # print(self.I_peaks_filtered)
@@ -192,12 +191,12 @@ class Tracking:
             # print(self.I_peaks_filtered[0][int(self.data_idx)])
             # print(self.I_peaks_filtered[0][data_idx])
             # self.tracked_distance[0][self.data_idx] = self.I_peaks_filtered[0][self.data_idx] / dist * interval
-            self.tracked_distance[0][self.data_idx]=matlab_dist[int(
+            self.tracked_distance[0][self.data_idx] = matlab_dist[int(
                 self.I_peaks_filtered[0][self.data_idx])]
             # print(self.tracked_distance)
-            self.tracked_amplitude[0][self.data_idx]=np.abs(
+            self.tracked_amplitude[0][self.data_idx] = np.abs(
                 self.data[int(self.I_peaks_filtered[0][self.data_idx])])
-            self.tracked_phase[0][self.data_idx]=np.angle(
+            self.tracked_phase[0][self.data_idx] = np.angle(
                 self.data[int(self.I_peaks_filtered[0][self.data_idx])])
 
         return self.tracked_distance
