@@ -68,7 +68,7 @@ def main():
         amplitude = np.abs(sweep)
         track = tracking.tracking(sweep, counter)
         counter += 1
-        if counter == num_points:
+        if counter == num_points: #change num_points to nmbr of sequences
             counter = 0
         # ymax = amplitude.max()
         # xmax = config.range_interval[0] + (config.range_interval[1] - config.range_interval[0]) * \
@@ -207,9 +207,12 @@ class Tracking:
 
             if counter == 0:  # Questions about this part.
                 self.i_avg_start = np.argmax([0, self.data_idx - N_avg])
+                if self.data_idx == dist: #change dist to nmbr of sequences later
+                    counter = 1
+
             else:
                 self.i_avg_start = self.data_idx - N_avg
-                counter = 1
+
             # I_avg_start to data_idx
 
             self.I_peaks_filtered[0][self.data_idx] = np.round(
