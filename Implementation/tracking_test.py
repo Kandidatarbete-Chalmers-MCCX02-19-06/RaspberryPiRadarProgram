@@ -108,7 +108,7 @@ class Tracking:
         self.num_points = num_points
         self.config_range_interval = range_interval
         self.I_peaks = np.zeros(self.N_avg)
-        self.locks = np.zeros(self.N_avg)
+        self.locs = np.zeros(self.N_avg)
         self.I_peaks_filtered = np.zeros(self.N_avg)
         self.tracked_distance = np.zeros(self.N_avg)
         self.tracked_amplitude = np.zeros(self.N_avg)
@@ -131,23 +131,23 @@ class Tracking:
 
         # After first seq continous tracking
         else:
-            self.locks, _ = signal.find_peaks(np.abs(self.data))        # find local maximas in data
-            self.locks = [x for x in self.locks if(np.abs(self.data[x]) > self.threshold)]      # removes local maxima if under threshhold
-            difference = np.subtract(self.locks, self.I_peaks_filtered[self.data_idx])
-            print("locks: ", self.locks)
+            self.locs, _ = signal.find_peaks(np.abs(self.data))        # find local maximas in data
+            self.locs = [x for x in self.locs if(np.abs(self.data[x]) > self.threshold)]      # removes local maxima if under threshhold
+            difference = np.subtract(self.locs, self.I_peaks_filtered[self.data_idx])
+            print("locks: ", self.locs)
             print("Last I_peaks_filtered: ", self.I_peaks_filtered[self.data_idx])
             print("difference: ", difference)
             abs = np.abs(difference)
             argmin = np.argmin(abs)
-            Index_in_locks = argmin
+            Index_in_locks = argmin     # index of closest peak in locs
 
             # Index_in_locks = np.argmin(np.abs(self.locks - self.I_peaks_filtered[self.data_idx - 1]))       # difference between current peak index and last peak index
 
-            if len(self.locks) == 0:        # if no peak is found
+            if len(self.locs) == 0:        # if no peak is found
                 self.I_peaks[self.data_idx] = self.I_peaks[self.data_idx - 1]
                 print("Last value. Not updated.")
             else:
-                I = self.locks[int(Index_in_locks)]
+                I = self.locs[int(Index_in_locks)]
                 self.I_peaks[self.data_idx] = I
 
             print("I_peaks: ", self.I_peaks)
