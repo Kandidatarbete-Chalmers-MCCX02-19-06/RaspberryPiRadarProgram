@@ -110,6 +110,7 @@ class Radar(threading.Thread):
     # Tracks the maximum peak from collected data which is filtered for further signal processing
     def tracking(self, data):
         # self.data = data      # Removed because using local data variable. Easier to understand how data travells in class
+        print("Length of data input ", str(len(data)))
         if self.data_idx == 0 and self.counter == 0:      # things that only happens first time
             I = np.argmax(np.abs(data))
             self.I_peaks[:] = I
