@@ -58,7 +58,7 @@ class DataAcquisition(threading.Thread):
         # pg_updater = PGUpdater(self.config)
         # pg_process = PGProcess(pg_updater)
         # pg_process.start()
-        while True:
+        while self.go:
             data = self.get_data()  # This data is an 1D array in terminal print
             plot_data = self.tracking(data)
             # if plot_data is not None:
@@ -80,7 +80,7 @@ class DataAcquisition(threading.Thread):
     def tracking(self, sweep):
         sweep = np.transpose(sweep)
         n = len(sweep)
-        # print(self.sweep_index)
+        print(self.sweep_index)
         ampl = np.abs(sweep)
         power = ampl*ampl
         if np.sum(power) > 1e-6:
