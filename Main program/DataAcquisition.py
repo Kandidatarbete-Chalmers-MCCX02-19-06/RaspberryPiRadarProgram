@@ -36,6 +36,8 @@ class DataAcquisition(threading.Thread):
         self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
         self.num_points = self.info["data_length"]  # Length of data per sampel
 
+        super(DataAcquisition, self).__init__()  # Inherit threading vitals
+
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
         i = 0
