@@ -45,9 +45,8 @@ class DataAcquisition(threading.Thread):
         self.averages = 3  # antalet medelvärdesbildningar
         self.average_com = []  # array med avstånd
         self.data_index = 0
-        self.com_x = None
-        self.real_dist = np.linspace(
-            self.config.range_interval[0], self.config.range_interval[1], num=self.num_points)
+        # self.real_dist = np.linspace(
+        #    self.config.range_interval[0], self.config.range_interval[1], num=self.num_points)
         self.tracked_distance = None
         self.tracked_amplitude = None
         self.tracked_phase = None
@@ -89,9 +88,11 @@ class DataAcquisition(threading.Thread):
             a = self.alpha(0.25, self.dt)
             self.lp_com = a*com + (1-a)*self.lp_com
             com_idx = int(self.lp_com * n)
-            self.tracked_data = 1
-            self.tracked_distance = self.real_dist[com_idx]
-            self.com_x = (1-self.lp_com) * \
+            # Here begins our own code
+            # First row is taken from acconeer plot for how to convert lp_com to m
+            # Tracked amplitude is absolute value of data for the tracked index
+            # Tracked phase is the angle between I and Q in data for tracked index
+            self.tracked_distance = (1-self.lp_com) * \
                 self.config.range_interval[0] + self.lp_com*self.config.range_interval[1]
             print("Tracked Distance {} and com idx {}".format(self.com_x, com_idx))
             self.tracked_amplitude = np.abs(data[com_idx])
