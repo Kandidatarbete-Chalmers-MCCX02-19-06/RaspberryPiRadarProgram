@@ -30,7 +30,7 @@ class DataAcquisition(threading.Thread):
         self.config.sensor = self.args.sensors
         # Settings for radar setup
         self.config.range_interval = [0.2, 0.6]  # Measurement interval
-        self.config.sweep_rate = 20  # Frequency for collecting data
+        self.config.sweep_rate = 1  # Frequency for collecting data
         self.config.gain = 1  # Gain between 0 and 1.
 
         self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
@@ -40,11 +40,9 @@ class DataAcquisition(threading.Thread):
 
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
-        i = 0
         while self.go:
             data = self.get_data()
-            print("Data is working:", i)
-            i += 1
+            print("Data is working:", data)
 
         self.client.disconnect()
 
