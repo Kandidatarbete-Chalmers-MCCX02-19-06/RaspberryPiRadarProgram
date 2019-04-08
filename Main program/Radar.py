@@ -49,6 +49,7 @@ class Radar(threading.Thread):
         self.HR_filter_queue = HR_filter_queue
         #self.a = a
         #self.RR_filter_queue = RR_filter_queue
+        # Initiation for tracking method
         super(Radar, self).__init__()  # Inherit threading vitals
 
     # Loop which collects data from the radar, tracks the maximum peak and filters it for further signal processing. The final filtered data is put into a queue.
@@ -95,6 +96,3 @@ class Radar(threading.Thread):
 
     # Tracks the maximum peak from collected data which is filtered for further signal processing
     def tracker(self):
-        self.amplitude = np.abs(self.data)
-        self.peak = np.argmax(self.amplitude)
-        self.peak_vector[0][self.data_idx] = self.data[0][self.peak]
