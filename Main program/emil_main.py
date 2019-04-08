@@ -7,6 +7,7 @@ import queue
 
 import Radar
 import bluetooth_app        # import bluetooth class
+import DataAcquisition      # Import class which collects and filters relevant data.
 
 # Bluetooth imports
 import bluetooth
@@ -22,28 +23,29 @@ def main():
 
     radar_queue = queue.Queue()
     #send_to_app_queue = queue.Queue()
-    go = []
+    go = ["True"]
     run_measurement = []
     # heart_rate_queue = queue.Queue()
     # resp_rate_queue = queue.Queue()
 
-    radar = Radar.Radar(radar_queue, go)
-    radar.start()
+    # radar = Radar.Radar(radar_queue, go)
+    # radar.start()
+    radar_data = DataAcquisition.DataAcquisition(go)
 
-    bvme = bluetooth_app.bluetooth_app(radar_queue, run_measurement, go)
-    bvme.app_data()
-    print('End of bluetooth_app')
-    # time.sleep(300)
+    # bvme = bluetooth_app.bluetooth_app(radar_queue, run_measurement, go)
+    # bvme.app_data()
+    # print('End of bluetooth_app')
+    time.sleep(10)
     # interrupt_queue.put(1)
-
-    # go.append("True")
-    radar.join()
+    go.pop(0)
+    # radar.join()
+    radar_data.join()
     print("radar is closed")
-    bvme.connect_device_thread.join()
+    # bvme.connect_device_thread.join()
     print("connect_device is closed")
 
     print('Shut down succeed')
-    subprocess.call(["sudo", "shutdown", "-r", "now"])
+    #subprocess.call(["sudo", "shutdown", "-r", "now"])
 
 
 if __name__ == "__main__":

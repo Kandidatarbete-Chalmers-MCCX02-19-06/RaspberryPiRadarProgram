@@ -13,7 +13,6 @@ from acconeer_utils.mpl_process import PlotProcess, PlotProccessDiedException, F
 
 
 class Radar(threading.Thread):
-
     def __init__(self, HR_filter_queue, go):  # Lägg till RR_filter_queue som inputargument
         self.go = go
         # Setup for collecting data from radar
