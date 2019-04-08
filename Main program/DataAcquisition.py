@@ -33,7 +33,7 @@ class DataAcquisition(threading.Thread):
         self.config.sensor = self.args.sensors
         # Settings for radar setup
         self.config.range_interval = [0.2, 0.6]  # Measurement interval
-        self.config.sweep_rate = 25  # Frequency for collecting data
+        self.config.sweep_rate = 24  # Frequency for collecting data
         self.config.gain = 1  # Gain between 0 and 1.
 
         self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
@@ -42,7 +42,7 @@ class DataAcquisition(threading.Thread):
         # Inputs for tracking
         self.f = self.config.sweep_rate
         self.dt = 1 / self.f
-        self.averages = 10  # antalet medelvärdesbildningar
+        self.averages = 3  # antalet medelvärdesbildningar
         self.average_com = []  # array med avstånd
         self.data_index = 0
 
