@@ -35,7 +35,7 @@ class DataAcquisition(threading.Thread):
 
         self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
         self.num_points = self.info["data_length"]  # Length of data per sampel
-
+        print("num_points {}".format(self.num_points))
         super(DataAcquisition, self).__init__()  # Inherit threading vitals
 
     def run(self):
