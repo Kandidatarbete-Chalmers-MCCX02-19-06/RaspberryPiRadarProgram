@@ -47,6 +47,7 @@ class DataAcquisition(threading.Thread):
 
     def get_data(self):
         info, data = self.client.get_next()
+        print(data)
         print("length of data {}".format(len(data)))
         print("info {}".format(info))
         return data
