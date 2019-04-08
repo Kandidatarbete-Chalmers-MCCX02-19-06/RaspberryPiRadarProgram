@@ -31,6 +31,7 @@ def main():
     # radar = Radar.Radar(radar_queue, go)
     # radar.start()
     radar_data = DataAcquisition.DataAcquisition(go)
+    radar_data.start()
 
     # bvme = bluetooth_app.bluetooth_app(radar_queue, run_measurement, go)
     # bvme.app_data()
