@@ -88,8 +88,8 @@ class Radar(threading.Thread):
     def get_data(self):
         # self.data should be accessable from all other methods
         info, data = self.client.get_next()
-        print("How long the data is ", data)
-        return data
+        #print("How long the data is ", data)
+        return np.array(data)
 
     # Filter for heart rate using the last X sampels according to data_idx. Saves data to queue
     # def filter_HeartRate(self):
@@ -111,7 +111,7 @@ class Radar(threading.Thread):
     # Tracks the maximum peak from collected data which is filtered for further signal processing
     def tracking(self, data):
         # self.data = data      # Removed because using local data variable. Easier to understand how data travells in class
-        # print("Length of data input ", str(len(data)))
+        print("Length of data input ", str(len(data)))
         if self.data_idx == 0 and self.counter == 0:      # things that only happens first time
             I = np.argmax(np.abs(data))
             self.I_peaks[:] = I
