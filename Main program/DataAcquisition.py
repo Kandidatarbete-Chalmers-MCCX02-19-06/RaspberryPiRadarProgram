@@ -79,8 +79,8 @@ class DataAcquisition(threading.Thread):
 
     def tracking(self, sweep):
         sweep = np.transpose(sweep)
-        #n = len(sweep)
-        print(self.sweep_index)
+        n = len(sweep)
+        # print(self.sweep_index)
         ampl = np.abs(sweep)
         power = ampl*ampl
         if np.sum(power) > 1e-6:
