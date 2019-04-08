@@ -78,7 +78,8 @@ class DataAcquisition(threading.Thread):
         return data
 
     def tracking(self, sweep):
-        n = len(sweep[0])
+        sweep = np.transpose(sweep)
+        n = len(sweep)
 
         ampl = np.abs(sweep)
         power = ampl*ampl
@@ -103,7 +104,7 @@ class DataAcquisition(threading.Thread):
             self.lp_com = a*com + (1-a)*self.lp_com
 
             com_idx = int(self.lp_com * n)
-            delta_angle = np.angle(sweep[0][com_idx] * np.conj(self.last_sweep[0][com_idx]))
+            delta_angle = np.angle(sweep[com_idx] * np.conj(self.last_sweep[com_idx]))
             vel = self.f * 2.5 * delta_angle / (2*np.pi)
 
             a = self.alpha(0.1, self.dt)
@@ -120,7 +121,7 @@ class DataAcquisition(threading.Thread):
             plot_hist_pos = self.hist_pos - self.hist_pos.mean()
             plot_hist_pos_zoom = self.hist_pos[hist_len//2:] - self.hist_pos[hist_len//2:].mean()
 
-            #iq_val = np.exp(1j*np.angle(sweep[0][com_idx])) * self.lp_ampl[0][com_idx]
+            iq_val = np.exp(1j*np.angle(sweep[com_idx])) * self.lp_ampl[com_idx]
 
             plot_data = {
                 "abs": self.lp_ampl,
@@ -128,7 +129,7 @@ class DataAcquisition(threading.Thread):
                 "com": self.lp_com,
                 "hist_pos": plot_hist_pos,
                 "hist_pos_zoom": plot_hist_pos_zoom,
-                "iq_val": 0,
+                "iq_val": iq_val,
             }
         self.last_sweep = sweep
         self.sweep_index += 1
