@@ -10,6 +10,7 @@ F_low_2 = F_low;
 
 F_high_1 = F_high;
 F_high_2 = F_high*(1+BWrel_transband);
+L_seq = length(S_i);%data length in number of samples
 
 
 %Kaiser filter test start
@@ -28,6 +29,19 @@ HpFilt = designfilt('highpassfir', ...
                     'StopbandAttenuation',Atten_stopband, ...
                     'SampleRate',Fs, ...
                     'DesignMethod','kaiserwin');
+            
+%Delay removal
+delay_LP = grpdelay(LpFilt,L_seq,Fs);%number of lags in samples
+delay_HP = grpdelay(HpFilt,L_seq,Fs);%Number of lags in samples
+delay_filter_total = round(mean(delay_LP + delay_HP)) %number of lags in samples
+S_i = [S_i zeros(1,delay_filter_total)];%Pads with zeros to extend data
+
+%use filters to form bandpass filter
 S_o = filter(LpFilt,S_i);
-S_o = filter(HpFilt,S_i);
+S_o = filter(HpFilt,S_o);
+
+
+%Delay removal
+S_o = S_o(delay_filter_total+1:end);
+
 

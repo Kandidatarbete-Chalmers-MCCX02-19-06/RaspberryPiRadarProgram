@@ -104,15 +104,16 @@ function [dist,amp_out, phase_out,t,gain, L_start, L_end, L_data, L_seq, Fs] = I
      dist = distance_vector;
     
     t = (0:L_seq-1)/Fs;
-    
-    [T,D] = meshgrid(t,distance_vector);%2D plane, segment number and distances
-    
-    for i = 1:L_seq
-        A(i,:) = amp_out(i,:);%amp
-        P(i,:) = phase_out(i,:);%phase
-    end
-    A = A';
-    P = P';
+    %Placed 3D mesh generation in external function, to have opt-out for
+    %speed
+%     [T,D] = meshgrid(t,distance_vector);%2D plane, segment number and distances
+%     
+%     for i = 1:L_seq
+%         A(i,:) = amp_out(i,:);%amp
+%         P(i,:) = phase_out(i,:);%phase
+%     end
+%     A = A';
+%     P = P';
     
     
     
