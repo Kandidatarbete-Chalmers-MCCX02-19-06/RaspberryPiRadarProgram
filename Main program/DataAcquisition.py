@@ -47,9 +47,9 @@ class DataAcquisition(threading.Thread):
 
     def get_data(self):
         info, data = self.client.get_next()
+        print("length of data {}".format(len(data)))
         return data
 
     def tracking(self, data):
         n = len(data)
-        print("length of data {}".format(len(data)))
         return n
