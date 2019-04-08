@@ -107,6 +107,7 @@ class Tracking:
         self.N_avg = N_avg
         self.num_points = num_points
         self.config_range_interval = range_interval
+
         self.I_peaks = np.zeros(self.N_avg)
         self.locs = np.zeros(self.N_avg)
         self.I_peaks_filtered = np.zeros(self.N_avg)
@@ -148,7 +149,7 @@ class Tracking:
 
             if len(self.locs) == 0:        # if no peak is found
                 self.I_peaks[self.data_idx] = self.I_peaks[self.data_idx - 1]
-                print("Last value. Not updated.")
+                print("Last peak value. Not updated.")
             else:
                 I = self.locs[int(Index_in_locks)]
                 self.I_peaks[self.data_idx] = I
