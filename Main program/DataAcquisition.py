@@ -45,7 +45,7 @@ class DataAcquisition(threading.Thread):
         self.averages = 3  # antalet medelvärdesbildningar
         self.average_com = []  # array med avstånd
         self.data_index = 0
-
+        self.com_x = None
         self.real_dist = np.linspace(
             self.config.range_interval[0], self.config.range_interval[1], num=self.num_points)
         self.tracked_distance = None
@@ -91,10 +91,11 @@ class DataAcquisition(threading.Thread):
             com_idx = int(self.lp_com * n)
             self.tracked_data = 1
             self.tracked_distance = self.real_dist[com_idx]
-            print("Tracked Distance {} and com idx {}".format(self.tracked_distance, com_idx))
-            self.tracked_amplitude = np.abs(data[com_idx])
-            self.tracked_phase = np.angle(data[com_idx])
-            self.tracked_data = {"tracked distance": self.tracked_distance,
+            self.com_x = (1-self.lp_com*self.config.range_interval[0] + self.lp_com*self.config.range_interval[1]
+            print("Tracked Distance {} and com idx {}".format(self.com_x, com_idx))
+            self.tracked_amplitude=np.abs(data[com_idx])
+            self.tracked_phase=np.angle(data[com_idx])
+            self.tracked_data={"tracked distance": self.tracked_distance,
                                  "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase, }
 
         return self.tracked_data
@@ -107,67 +108,67 @@ class DataAcquisition(threading.Thread):
 
 class PGUpdater:
     def __init__(self, config):
-        self.config = config
-        self.interval = config.range_interval
+        self.config=config
+        self.interval=config.range_interval
 
     def setup(self, win):
         win.resize(800, 600)
         win.setWindowTitle("Acconeer phase tracking example")
 
-        self.abs_plot = win.addPlot(row=0, col=0)
+        self.abs_plot=win.addPlot(row=0, col=0)
         self.abs_plot.showGrid(x=True, y=True)
         self.abs_plot.setLabel("left", "Amplitude")
         self.abs_plot.setLabel("bottom", "Depth (m)")
-        self.abs_curve = self.abs_plot.plot(pen=example_utils.pg_pen_cycler(0))
-        pen = example_utils.pg_pen_cycler(1)
+        self.abs_curve=self.abs_plot.plot(pen=example_utils.pg_pen_cycler(0))
+        pen=example_utils.pg_pen_cycler(1)
         pen.setStyle(QtCore.Qt.DashLine)
-        self.abs_inf_line = pg.InfiniteLine(pen=pen)
+        self.abs_inf_line=pg.InfiniteLine(pen=pen)
         self.abs_plot.addItem(self.abs_inf_line)
 
-        self.arg_plot = win.addPlot(row=1, col=0)
+        self.arg_plot=win.addPlot(row=1, col=0)
         self.arg_plot.showGrid(x=True, y=True)
         self.arg_plot.setLabel("bottom", "Depth (m)")
         self.arg_plot.setLabel("left", "Phase")
         self.arg_plot.setYRange(-np.pi, np.pi)
         self.arg_plot.getAxis("left").setTicks(example_utils.pg_phase_ticks)
-        self.arg_curve = self.arg_plot.plot(pen=example_utils.pg_pen_cycler(0))
-        self.arg_inf_line = pg.InfiniteLine(pen=pen)
+        self.arg_curve=self.arg_plot.plot(pen=example_utils.pg_pen_cycler(0))
+        self.arg_inf_line=pg.InfiniteLine(pen=pen)
         self.arg_plot.addItem(self.arg_inf_line)
 
-        self.iq_plot = win.addPlot(row=1, col=1, title="IQ at line")
+        self.iq_plot=win.addPlot(row=1, col=1, title="IQ at line")
         example_utils.pg_setup_polar_plot(self.iq_plot, 0.5)
-        self.iq_curve = self.iq_plot.plot(pen=example_utils.pg_pen_cycler())
-        self.iq_scatter = pg.ScatterPlotItem(
+        self.iq_curve=self.iq_plot.plot(pen=example_utils.pg_pen_cycler())
+        self.iq_scatter=pg.ScatterPlotItem(
             brush=pg.mkBrush(example_utils.color_cycler()),
             size=15,
         )
         self.iq_plot.addItem(self.iq_scatter)
 
-        self.hist_plot = win.addPlot(row=0, col=1, colspan=2)
+        self.hist_plot=win.addPlot(row=0, col=1, colspan=2)
         self.hist_plot.showGrid(x=True, y=True)
         self.hist_plot.setLabel("bottom", "Time (s)")
         self.hist_plot.setLabel("left", "Tracking (mm)")
-        self.hist_curve = self.hist_plot.plot(pen=example_utils.pg_pen_cycler())
+        self.hist_curve=self.hist_plot.plot(pen=example_utils.pg_pen_cycler())
         self.hist_plot.setYRange(-5, 5)
 
-        self.hist_zoom_plot = win.addPlot(row=1, col=2)
+        self.hist_zoom_plot=win.addPlot(row=1, col=2)
         self.hist_zoom_plot.showGrid(x=True, y=True)
         self.hist_zoom_plot.setLabel("bottom", "Time (s)")
         self.hist_zoom_plot.setLabel("left", "Tracking (mm)")
-        self.hist_zoom_curve = self.hist_zoom_plot.plot(pen=example_utils.pg_pen_cycler())
+        self.hist_zoom_curve=self.hist_zoom_plot.plot(pen=example_utils.pg_pen_cycler())
         self.hist_zoom_plot.setYRange(-0.5, 0.5)
 
-        self.smooth_max = example_utils.SmoothMax(self.config.sweep_rate)
-        self.first = True
+        self.smooth_max=example_utils.SmoothMax(self.config.sweep_rate)
+        self.first=True
 
     def update(self, data):
         if self.first:
-            self.xs = np.linspace(*self.interval, len(data["abs"]))
-            self.ts = np.linspace(-3, 0, len(data["hist_pos"]))
-            self.ts_zoom = np.linspace(-1.5, 0, len(data["hist_pos_zoom"]))
-            self.first = False
+            self.xs=np.linspace(*self.interval, len(data["abs"]))
+            self.ts=np.linspace(-3, 0, len(data["hist_pos"]))
+            self.ts_zoom=np.linspace(-1.5, 0, len(data["hist_pos_zoom"]))
+            self.first=False
 
-        com_x = (1-data["com"])*self.interval[0] + data["com"]*self.interval[1]
+        com_x=(1-data["com"])*self.interval[0] + data["com"]*self.interval[1]
 
         self.abs_curve.setData(self.xs, data["abs"])
         self.abs_plot.setYRange(0, self.smooth_max.update(np.amax(data["abs"])))
