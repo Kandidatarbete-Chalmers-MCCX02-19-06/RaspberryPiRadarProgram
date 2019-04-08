@@ -42,7 +42,7 @@ class DataAcquisition(threading.Thread):
         # Inputs for tracking
         self.f = self.config.sweep_rate
         self.dt = 1 / self.f
-        self.averages = 2  # antalet medelvärdesbildningar
+        self.averages = 10  # antalet medelvärdesbildningar
         self.average_com = []  # array med avstånd
         self.data_index = 0
 
@@ -92,10 +92,10 @@ class DataAcquisition(threading.Thread):
             self.tracked_data = 1
             self.tracked_distance = self.real_dist[com_idx]
             print("Tracked Distance {} and com idx {}".format(self.tracked_distance, com_idx))
-            # self.tracked_amplitude = np.abs(data(com_idx))
-            # self.tracked_phase = np.angle(data(com_idx))
-            # self.tracked_data = {"tracked distance": self.tracked_distance,
-            #                      "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase, }
+            self.tracked_amplitude = np.abs(data[com_idx])
+            self.tracked_phase = np.angle(data[com_idx])
+            self.tracked_data = {"tracked distance": self.tracked_distance,
+                                 "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase, }
 
         return self.tracked_data
 
