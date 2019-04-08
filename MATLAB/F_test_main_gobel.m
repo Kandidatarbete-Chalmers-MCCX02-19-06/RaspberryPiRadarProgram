@@ -3,26 +3,32 @@
 clc
 clear all
 format shorteng
-Fs = 25
-T_sample = 240% seconds of sampled data
+Fs = 20
+T_sample = 300% seconds of sampled data
 L_seq = round(T_sample*Fs)%number of samples
 
-SNR_dB = 20%dB
-SNR = 10^(SNR_dB/10)
-
+SNR = -10%dB
+%time base
 t = 1/Fs * (0:L_seq-1);
-f0 = 1.1
+
+%frequency function
+f0_start = 1.1
+f0_end = 2.2
+K = (f0_end-f0_start)/T_sample
+
+f0 = @(t) f0_start + t*K
+%f0 = @(t) f0_start - (f0_end-f0_start)/T_sample*2.*t.*(1-heaviside(t - T_sample/2))
 
 f2 = 1.3
 f3 = 0.9
 f4 = 2.3
-target_delta_distance = 5e-6*cos(2*pi*f0*t);%base
-target_delta_distance = target_delta_distance + 4e-6*cos(2*pi*2*f0*t);% 2nd harmonic
-target_delta_distance = target_delta_distance + 3e-6*cos(2*pi*3*f0*t);% 3rd harmonic
 
-S_o = target_delta_distance;
+target_delta_distance = 5e-6*sin(2*pi.*(f0_start.*t + K/2.*t.^2));%base
 
-target_delta_distance = awgn(target_delta_distance,SNR);%noise
+%target_delta_distance = target_delta_distance + 4e-6*cos(2*pi*2*f0(t).*t);% 2nd harmonic
+%target_delta_distance = target_delta_distance + 3e-6*cos(2*pi*3*f0(t).*t);% 3rd harmonic
+
+target_delta_distance = awgn(target_delta_distance,SNR,'measured');%noise
 %target_delta_distance = target_delta_distance + 7e-6*cos(2*pi*f2*t);%Random tone
 %target_delta_distance = target_delta_distance + 3e-6*cos(2*pi*f3*t);%Random tone
 %target_delta_distance = target_delta_distance + 8e-6*cos(2*pi*f4*t);%Random tone
@@ -60,24 +66,14 @@ HpFilt = designfilt('highpassfir', ...
                     'SampleRate',Fs, ...
                     'DesignMethod','kaiserwin');
                 %fvtool(HpFilt)
-target_delta_distance = filter(LpFilt,target_delta_distance);
-target_delta_distance = filter(HpFilt,target_delta_distance);
-
-%Windowing
-W = window(@flattopwin,1,L_seq)';
-target_delta_distance = target_delta_distance .* W;
+%target_delta_distance = filter(LpFilt,target_delta_distance);
+%target_delta_distance = filter(HpFilt,target_delta_distance);
 
 
-%Padded FFT
+
 FFT_resolution = 0.001%[Hz resolution]
-L_fft = max(Fs/FFT_resolution,L_seq)%needed length of FFT, or orignial.
-f = Fs*(0:(L_fft/2))/L_fft;
-
-Y = fft(target_delta_distance,L_fft);
-P2 = abs(Y/L_fft);
-P1 = P2(1:L_fft/2+1);
-P1(2:end-1) = 2*P1(2:end-1);
-target_delta_distance_fft = P1;%FFT for delta distance from phase of target
+beta = 0.1
+[f,target_delta_distance_fft] = smartFFT_abs(target_delta_distance,Fs,FFT_resolution,beta);
 
 
 figure(1)
@@ -85,49 +81,11 @@ plot(f,target_delta_distance_fft)
 xlabel('Frequency [Hz]')
 ylabel('Amplitude [m]')
 
-disp('tone finding')
-%Finding dominant tone
-BW = 0.1% [Hz] bandwidth of peak finding
-i_BW_ss = round(L_fft/Fs*BW/2)%bandwidth in number of frequency samples.
-
-%F resolution
-F_resolution = Fs/L_fft
-%First harmoinc frequency span
-Fmin = 0.9
-Fmax = 2
-
-%index version
-i_Fmin = Fmin*L_fft/Fs
-i_Fmax = Fmax*L_fft/Fs
-
-N_f = round( (i_Fmax - i_Fmin)/i_BW_ss/2 )
-f_search = linspace(Fmin,Fmax,N_f);
-%i_f_search = linspace(i_Fmin,i_Fmax,N_f);
-i_f_search = i_Fmin + (0:(N_f-1))*i_BW_ss*2;
-
-
-for i = 1:length(i_f_search)
-    P_sum_3(i) = mean( target_delta_distance_fft(i_f_search(i)-i_BW_ss: i_f_search(i)+i_BW_ss ) );
-    P_sum_3(i) = P_sum_3(i) + mean( 2*target_delta_distance_fft(i_f_search(i)-i_BW_ss: 2*i_f_search(i)+i_BW_ss ) );
-    P_sum_3(i) = P_sum_3(i) + mean( 3*target_delta_distance_fft(i_f_search(i)-i_BW_ss: 3*i_f_search(i)+i_BW_ss ) );
-
-end
-
-
-[maxval,i_crude] = max(P_sum_3)%Finds index of crude measurement of frequency.
-f_crude = f_search(i_crude)%Crude frequency measurement
-
-%Find peak in FFT for fine reading
-[PKS,LOCS]= findpeaks(target_delta_distance_fft);
-%Finds peak with f closest to crude frequency measurement
-[minval,i_fine] = min( abs( f(LOCS) - f_crude ) )
-%Sets f_fine to be fine measuremed value
-f_fine = f(LOCS(i_fine))
 
 disp('test of f')
 Fscan_min = 0.9
 Fscan_max = 2
-BW_comb = 0.005
+BW_comb = 1/60
 N_harm = 3
 [f_search,P_sum_N,f_fine] = basetone_finder(f,target_delta_distance_fft,Fs,Fscan_min,Fscan_max,BW_comb,N_harm,true);
 
@@ -135,15 +93,24 @@ f_fine = f_fine
 
 
 %Test of pspectrum
-figure(3)
-T_resolution = 30 % Time resolution[s]
-%F_resolution = 1/60*10
-overlap = 99% overlap of slidiing frames [%]
-S_leakage = 1 % Leakge from tones 
+T_resolution = 20 % Time resolution[s]
+overlap = 90% overlap of slidiing frames [%]
+S_leakage = 0.6 % Leakge from tones 
 
 
-pspectrum(target_delta_distance,Fs,'spectrogram', ...
-     'TimeResolution',T_resolution,'Overlap',overlap,'Leakage',S_leakage)
+%[P,F,T] = pspectrum(target_delta_distance,Fs,'spectrogram', ...
+%     'TimeResolution',T_resolution,'Overlap',overlap,'Leakage',S_leakage);
+[P,F,T] = windowedFFT(target_delta_distance,Fs,T_resolution,overlap,S_leakage);
+
+figure(2)
+pcolor(T,F,P);
+colorbar
+xlabel('Time [s]')
+ylabel('Frequency [Hz]')
+hold on
+plot(T,f0(T),'r','LineWidth',1)
+
+
 
 %%
 figure(2)

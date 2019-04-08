@@ -46,8 +46,8 @@ Emf = sum(abs(MF).^2);
 
 
 %Detektering och följning utav mål
-start_distance = 0.4%m
-N_avg = 10;
+start_distance = 0.47%m
+N_avg = 100;
 [t,target_amplitude, target_phase, target_distance] = target_tracker_2(t,dist,amp,phase,start_distance,N_avg);
 
 
@@ -97,16 +97,17 @@ Fs = Fs/r%New sample rate in time domain
 %Delta distance of tracked target
 target_delta_distance = wavelength/2/pi/2*target_phase;
 
+
 %filer data into two bandwidths
 F_low_BR = 0.2
 F_high_BR = 0.7
 
-F_low_HR = 0.75
+F_low_HR = 0.85
 F_high_HR = 6
 BWrel_transband_BR = 0.5
 BWrel_transband_HR = 0.1
 Atten_stopband = 20 %(!)
-%Atten_stopband = 60
+
 [delta_distance_BR] = bandpassfilter(target_delta_distance,Fs,F_low_BR,F_high_BR,BWrel_transband_BR,Atten_stopband);
 [delta_distance_HR] = bandpassfilter(target_delta_distance,Fs,F_low_HR,F_high_HR,BWrel_transband_HR,Atten_stopband);
 
@@ -120,11 +121,11 @@ beta = 0.2
 %delta_distance_HR_FFT = movmean(delta_distance_HR_FFT,25);
 
 %Frequency finding
-BW_comb = 2/60 %[Hz] Tightness of tone scanning
+BW_comb = 1/60 %[Hz] Tightness of tone scanning
 N_harmonics = 2%number of harmonics to look at, incl fundamental
 
 %Scan span for heartrate
-Fscan_lower_HR = 50/60
+Fscan_lower_HR = 60/60
 Fscan_upper_HR = 180/60
 %f_detected_BR = basetone_finder(f_BR,delta_distance_BR_FFT,Fs,F_low_BR,F_high_BR,BW_comb)
 [f_search,P_sum_N,f_fine] = basetone_finder(f_HR,delta_distance_HR_FFT,Fs,Fscan_lower_HR,Fscan_upper_HR,BW_comb,N_harmonics,true);
@@ -161,19 +162,17 @@ xlabel('Time [s]')
 %Waterfall FFT plot of HR
 
 figure(6)
-T_resolution = 20 % Time resolution[s]
-%F_resolution = 1/60*1.5
-overlap = 95% overlap of slidiing frames [%]
-S_leakage = 0.5 % Leakage from tones 
+T_resolution = 30 % Time resolution[s]
+overlap = 90% overlap of slidiing frames [%]
+S_leakage = 0.7 % Leakage from tones 
 
-% [P,F,T] = pspectrum(delta_distance_HR,Fs,'spectrogram', ...
-%     'FrequencyResolution',F_resolution,'Overlap',overlap,'Leakage',S_leakage);
 
-[P,F,T] = pspectrum(delta_distance_HR,Fs,'spectrogram', ...
-     'TimeResolution',T_resolution,'Overlap',overlap,'Leakage',S_leakage);
+
+%[P,F,T] = pspectrum(delta_distance_HR,Fs,'spectrogram', ...
+%     'TimeResolution',T_resolution,'Overlap',overlap,'Leakage',S_leakage);
 
 %test of custom function
-%[P,F,T] = windowedFFT(delta_distance_HR,Fs,T_resolution,overlap,S_leakage);
+[P,F,T] = windowedFFT(delta_distance_HR,Fs,T_resolution,overlap,S_leakage);
 
 
 pcolor(T,F,log10(abs(P)));
@@ -183,13 +182,13 @@ xlabel('Time [s]')
 ylabel('Frequency [Hz]')
 ylim([0 6])
 F_resolution = F_resolution
-T_resolution = T(2)-T(1)
+T_resolution = T(2)-T(1) 
 BW_comb = F_resolution;
 
 %test with overtone finder
-Fscan_lower_HR = 90/60
-Fscan_upper_HR = 180/60
-BW_comb = 1/60
+Fscan_lower_HR = 70/60
+Fscan_upper_HR = 160/60
+BW_comb =1/60
 N_harmonics = 2
 %ADD sliding window data
 [f_search,P_sum_N,f_fine] = basetone_finder(F,P(:,1),Fs,Fscan_lower_HR,Fscan_upper_HR,BW_comb,N_harmonics,false);
@@ -207,7 +206,7 @@ end
 
 
 figure(8)
-pcolor(T,BPM_search,P_N');
+pcolor(T,BPM_search,log10(P_N'));
 %pcolor(P)
 colorbar
 xlabel('Time [s]')
@@ -261,6 +260,9 @@ subplot(2,2,4)
 plot(t,5e-3/2/pi/2*(target_phase - mean(target_phase)))
 xlabel('t [s]')
 ylabel('Delta distance of tracked target [m]')
+
+
+
 
 
 

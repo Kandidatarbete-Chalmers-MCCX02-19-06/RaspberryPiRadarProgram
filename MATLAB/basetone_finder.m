@@ -73,8 +73,13 @@ end
 %Sets f_fine to be fine measuremed value
 %f_fine = f(LOCS(i_fine));
 
-%test again
-f_fine = f_crude;
+%better estimation
+%f_fine = HR_estimator(f_search,P_sum_N);
+
+%test to avoid half tone detection instead of directly estimating the
+%frequency
+f_fine = trueToneFinder(f_search,P_sum_N);
+
 
 if plot_selection
     %Plots function if chosen

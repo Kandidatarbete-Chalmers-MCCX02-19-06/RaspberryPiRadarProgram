@@ -47,8 +47,8 @@ function [t,target_amplitude, target_phase, target_distance] = target_tracker_2(
         %end of test
         
         %Filter the index
-        i_avg_start = max(0,i-N_avg);%Protects against index out of range
-        i_peaks_filtered(i) = round( mean(i_peaks(i-i_avg_start:i)) );%Filtered index
+        i_avg_start = max(1,i-N_avg);%Protects against index out of range
+        i_peaks_filtered(i) = round( mean(i_peaks(i_avg_start:i)) );%Filtered index
         
         target_amplitude(i) = amplitude(i,i_peaks_filtered(i));
         target_phase(i) = phase(i,i_peaks_filtered(i));
