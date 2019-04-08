@@ -38,7 +38,7 @@ def main():
     while not interrupt_handler.got_signal:
         info, sweep = client.get_next()
         plot_data = processor.process(sweep)
-
+        print(len(sweep))
         if plot_data is not None:
             try:
                 pg_process.put_data(plot_data)
@@ -72,8 +72,8 @@ class PhaseTrackingProcessor:
         self.sweep_index = 0
 
         # TEST
-        self.averages = 10 # antalet medelvärdesbildningar
-        self.average_com = [] # array med avstånd
+        self.averages = 10  # antalet medelvärdesbildningar
+        self.average_com = []  # array med avstånd
 
     def process(self, sweep):
         n = len(sweep)
@@ -81,14 +81,14 @@ class PhaseTrackingProcessor:
         ampl = np.abs(sweep)
         power = ampl*ampl
         if np.sum(power) > 1e-6:
-            #com = np.sum(np.arange(n)/n * power) / np.sum(power)  # center of mass
+            # com = np.sum(np.arange(n)/n * power) / np.sum(power)  # center of mass
 
             # TEST
-            com = np.argmax(power) / n # globalt maximum
+            com = np.argmax(power) / n  # globalt maximum
             self.average_com.append(com)
-            if len(self.average_com) > self.averages: # tar bort älsta värdet
+            if len(self.average_com) > self.averages:  # tar bort älsta värdet
                 self.average_com.pop(0)
-            com = np.average(self.average_com) # medelvärdet av tidigare avstånd
+            com = np.average(self.average_com)  # medelvärdet av tidigare avstånd
 
         else:
             com = 0
@@ -173,9 +173,9 @@ class PGUpdater:
         example_utils.pg_setup_polar_plot(self.iq_plot, 0.5)
         self.iq_curve = self.iq_plot.plot(pen=example_utils.pg_pen_cycler())
         self.iq_scatter = pg.ScatterPlotItem(
-                brush=pg.mkBrush(example_utils.color_cycler()),
-                size=15,
-                )
+            brush=pg.mkBrush(example_utils.color_cycler()),
+            size=15,
+        )
         self.iq_plot.addItem(self.iq_scatter)
 
         self.hist_plot = win.addPlot(row=0, col=1, colspan=2)
