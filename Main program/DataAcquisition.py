@@ -55,32 +55,32 @@ class DataAcquisition(threading.Thread):
 
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
-        pg_updater = PGUpdater(self.config)
-        pg_process = PGProcess(pg_updater)
-        pg_process.start()
+        # pg_updater = PGUpdater(self.config)
+        # pg_process = PGProcess(pg_updater)
+        # pg_process.start()
         while True:
             data = self.get_data()  # This data is an 1D array in terminal print
             plot_data = self.tracking(data)
-            if plot_data is not None:
-                try:
-                    pg_process.put_data(plot_data)
-                except PGProccessDiedException:
-                    break
+            # if plot_data is not None:
+            #     try:
+            #         pg_process.put_data(plot_data)
+            #     except PGProccessDiedException:
+            #         break
 
-        pg_process.close()
+        # pg_process.close()
         self.client.disconnect()
 
     def get_data(self):
         info, data = self.client.get_next()
         # print(data)
-        print("length of data {}".format(len(data[0])))
-        print("info {}".format(info))
+        #print("length of data {}".format(len(data[0])))
+        #print("info {}".format(info))
         return data
 
     def tracking(self, sweep):
         sweep = np.transpose(sweep)
-        n = len(sweep)
-
+        #n = len(sweep)
+        print(self.sweep_index)
         ampl = np.abs(sweep)
         power = ampl*ampl
         if np.sum(power) > 1e-6:
