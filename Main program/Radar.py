@@ -88,7 +88,7 @@ class Radar(threading.Thread):
     def get_data(self):
         # self.data should be accessable from all other methods
         info, data = self.client.get_next()
-        print("How long the data is ", len(data))
+        print("How long the data is ", data)
         return data
 
     # Filter for heart rate using the last X sampels according to data_idx. Saves data to queue
