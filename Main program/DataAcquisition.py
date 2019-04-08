@@ -90,7 +90,7 @@ class DataAcquisition(threading.Thread):
             self.lp_com = a*com + (1-a)*self.lp_com
             com_idx = int(self.lp_com * n)
             self.tracked_data = 1
-            self.tracked_distance = self.real_dist(com_idx)
+            self.tracked_distance = self.real_dist[com_idx]
             print("Tracked Distance {}".format(self.tracked_distance))
             # self.tracked_amplitude = np.abs(data(com_idx))
             # self.tracked_phase = np.angle(data(com_idx))
