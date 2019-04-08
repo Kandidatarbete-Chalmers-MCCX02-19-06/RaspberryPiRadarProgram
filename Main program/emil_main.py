@@ -23,13 +23,14 @@ def main():
     radar_queue = queue.Queue()
     #send_to_app_queue = queue.Queue()
     go = []
+    run_measurement = []
     # heart_rate_queue = queue.Queue()
     # resp_rate_queue = queue.Queue()
 
     radar = Radar.Radar(radar_queue, go)
     radar.start()
 
-    bvme = bluetooth_app.bluetooth_app(radar_queue, go)
+    bvme = bluetooth_app.bluetooth_app(radar_queue, run_measurement, go)
     bvme.app_data()
     print('End of bluetooth_app')
     # time.sleep(300)
