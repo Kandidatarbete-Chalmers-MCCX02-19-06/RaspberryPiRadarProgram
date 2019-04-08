@@ -120,7 +120,7 @@ class DataAcquisition(threading.Thread):
             plot_hist_pos = self.hist_pos - self.hist_pos.mean()
             plot_hist_pos_zoom = self.hist_pos[hist_len//2:] - self.hist_pos[hist_len//2:].mean()
 
-            iq_val = np.exp(1j*np.angle(sweep[0][com_idx])) * self.lp_ampl[0][com_idx]
+            #iq_val = np.exp(1j*np.angle(sweep[0][com_idx])) * self.lp_ampl[0][com_idx]
 
             plot_data = {
                 "abs": self.lp_ampl,
@@ -128,7 +128,7 @@ class DataAcquisition(threading.Thread):
                 "com": self.lp_com,
                 "hist_pos": plot_hist_pos,
                 "hist_pos_zoom": plot_hist_pos_zoom,
-                "iq_val": iq_val,
+                "iq_val": 0,
             }
         self.last_sweep = sweep
         self.sweep_index += 1
