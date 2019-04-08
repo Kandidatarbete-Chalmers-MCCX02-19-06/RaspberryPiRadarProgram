@@ -44,14 +44,13 @@ class DataAcquisition(threading.Thread):
         self.dt = 1 / self.f
         self.averages = 10  # antalet medelvärdesbildningar
         self.average_com = []  # array med avstånd
-
-        # Test with plot in thread
-        num_hist_points = self.f * 3
-        self.lp_vel = 0
-        self.hist_vel = np.zeros(num_hist_points)
-        self.hist_pos = np.zeros(num_hist_points)
         self.data_index = 0
-        self.tracked_data = None
+
+        self.real_dist = np.linspace(
+            self.config.range_interval[0], self.config.range_interval[0], num=self.num_points)
+        self.tracked_distance = None
+        self.tracked_amplitude = None
+        self.tracked_phase = None
 
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
@@ -85,22 +84,20 @@ class DataAcquisition(threading.Thread):
         if self.data_index == 0:
             self.lp_com = com
             self.tracked_data = 0
+            self.data_index = 1
         else:
             a = self.alpha(0.25, self.dt)
             self.lp_com = a*com + (1-a)*self.lp_com
             com_idx = int(self.lp_com * n)
-            print("com_idx {}".format(com_idx))
             self.tracked_data = 1
-            #self.tracked_distance = data[com_idx]
 
-        # self.tracked_distance[self.data_idx] = self.real_dist[int(
-        #         self.I_peaks_filtered[self.data_idx])]
-        # self.tracked_amplitude[self.data_idx] = np.abs(
-        #     data[int(self.I_peaks_filtered[self.data_idx])])
-        # self.tracked_phase[self.data_idx] = np.angle(
-        #     data[int(self.I_peaks_filtered[self.data_idx])])
+        self.tracked_distance = self.real_dist(com_idx)
+        print("Tracked Distance {}".format(self.tracked_distance))
+        self.tracked_amplitude = np.abs(data(com_idx))
+        self.tracked_phase = np.angle(data(com_idx))
+        self.tracked_data = {"tracked distance": self.tracked_distance,
+                             "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase, }
 
-        self.data_index += 1
         return self.tracked_data
 
     def alpha(self, tau, dt):

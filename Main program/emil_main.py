@@ -36,7 +36,7 @@ def main():
     # bvme = bluetooth_app.bluetooth_app(radar_queue, run_measurement, go)
     # bvme.app_data()
     # print('End of bluetooth_app')
-    time.sleep(10)
+    time.sleep(30)
     # interrupt_queue.put(1)
     go.pop(0)
     # radar.join()
