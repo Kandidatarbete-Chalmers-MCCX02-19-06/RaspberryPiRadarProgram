@@ -42,7 +42,7 @@ class DataAcquisition(threading.Thread):
         self.client.start_streaming()  # Starts Acconeers streaming server
         while self.go:
             data = self.get_data()  # This data is an 1D array in terminal print
-            tracked_data = self.tracking(data)
+            tracked_data = self.tracking(data)  # s
         self.client.disconnect()
 
     def get_data(self):
