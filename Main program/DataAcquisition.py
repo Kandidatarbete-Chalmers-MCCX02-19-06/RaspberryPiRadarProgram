@@ -91,7 +91,7 @@ class DataAcquisition(threading.Thread):
             com_idx = int(self.lp_com * n)
             self.tracked_data = 1
             self.tracked_distance = self.real_dist[com_idx]
-            print("Tracked Distance {}".format(self.tracked_distance))
+            print("Tracked Distance {} and com idx {}".format(self.tracked_distance, com_idx))
             # self.tracked_amplitude = np.abs(data(com_idx))
             # self.tracked_phase = np.angle(data(com_idx))
             # self.tracked_data = {"tracked distance": self.tracked_distance,
