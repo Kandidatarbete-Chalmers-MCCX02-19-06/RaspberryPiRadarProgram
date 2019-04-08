@@ -156,6 +156,7 @@ class Radar(threading.Thread):
 
             # determines threshold
             self.threshold = np.abs(data[int(self.I_peaks_filtered[self.data_idx])])*0.5
+
             self.tracked_distance[self.data_idx] = self.real_dist[int(
                 self.I_peaks_filtered[self.data_idx])]
             self.tracked_amplitude[self.data_idx] = np.abs(

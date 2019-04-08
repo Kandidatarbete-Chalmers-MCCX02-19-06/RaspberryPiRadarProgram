@@ -33,7 +33,7 @@ class DataAcquisition(threading.Thread):
         self.config.sensor = self.args.sensors
         # Settings for radar setup
         self.config.range_interval = [0.2, 0.6]  # Measurement interval
-        self.config.sweep_rate = 20  # Frequency for collecting data
+        self.config.sweep_rate = 2  # Frequency for collecting data
         self.config.gain = 1  # Gain between 0 and 1.
 
         self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
@@ -44,96 +44,62 @@ class DataAcquisition(threading.Thread):
         self.dt = 1 / self.f
         self.averages = 10  # antalet medelvärdesbildningar
         self.average_com = []  # array med avstånd
+
         # Test with plot in thread
         num_hist_points = self.f * 3
-
         self.lp_vel = 0
-        self.last_sweep = None
         self.hist_vel = np.zeros(num_hist_points)
         self.hist_pos = np.zeros(num_hist_points)
-        self.sweep_index = 0
+        self.data_index = 0
 
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
-        # pg_updater = PGUpdater(self.config)
-        # pg_process = PGProcess(pg_updater)
-        # pg_process.start()
         while self.go:
-            data = self.get_data()  # This data is an 1D array in terminal print
-            plot_data = self.tracking(data)
-            # if plot_data is not None:
-            #     try:
-            #         pg_process.put_data(plot_data)
-            #     except PGProccessDiedException:
-            #         break
-
-        # pg_process.close()
+            # This data is an 1D array in terminal print, not in Python script however....
+            data = self.get_data()
+            tracked_data = self.tracking(data)
         self.client.disconnect()
 
     def get_data(self):
         info, data = self.client.get_next()
         # print(data)
-        #print("length of data {}".format(len(data[0])))
-        #print("info {}".format(info))
+        # print("length of data {}".format(len(data[0])))
+        # print("info {}".format(info))
         return data
 
-    def tracking(self, sweep):
-        sweep = np.transpose(sweep)
-        n = len(sweep)
-        print(self.sweep_index)
-        ampl = np.abs(sweep)
+    def tracking(self, data):
+        data = np.transpose(data)
+        n = len(data)
+        ampl = np.abs(data)
         power = ampl*ampl
         if np.sum(power) > 1e-6:
-            com = np.argmax(power) / n  # globalt maximum
+            com = np.argmax(power) / n  # globalt maximum #How does this work elementwise or not?
             self.average_com.append(com)
             if len(self.average_com) > self.averages:  # tar bort älsta värdet
                 self.average_com.pop(0)
             com = np.average(self.average_com)  # medelvärdet av tidigare avstånd
-
         else:
             com = 0
 
-        if self.sweep_index == 0:
-            self.lp_ampl = ampl
+        if self.data_index == 0:
             self.lp_com = com
-            plot_data = None
+            tracked_data = None
         else:
-            a = self.alpha(0.1, self.dt)
-            self.lp_ampl = a*ampl + (1 - a)*self.lp_ampl
             a = self.alpha(0.25, self.dt)
             self.lp_com = a*com + (1-a)*self.lp_com
-
             com_idx = int(self.lp_com * n)
-            delta_angle = np.angle(sweep[com_idx] * np.conj(self.last_sweep[com_idx]))
-            vel = self.f * 2.5 * delta_angle / (2*np.pi)
+            print("com_idx {}".format(com_idx))
+            #self.tracked_distance = data[com_idx]
 
-            a = self.alpha(0.1, self.dt)
-            self.lp_vel = a*vel + (1 - a)*self.lp_vel
+        # self.tracked_distance[self.data_idx] = self.real_dist[int(
+        #         self.I_peaks_filtered[self.data_idx])]
+        # self.tracked_amplitude[self.data_idx] = np.abs(
+        #     data[int(self.I_peaks_filtered[self.data_idx])])
+        # self.tracked_phase[self.data_idx] = np.angle(
+        #     data[int(self.I_peaks_filtered[self.data_idx])])
 
-            self.hist_vel = np.roll(self.hist_vel, -1)
-            self.hist_vel[-1] = self.lp_vel
-
-            dp = self.lp_vel / self.f
-            self.hist_pos = np.roll(self.hist_pos, -1)
-            self.hist_pos[-1] = self.hist_pos[-2] + dp
-
-            hist_len = len(self.hist_pos)
-            plot_hist_pos = self.hist_pos - self.hist_pos.mean()
-            plot_hist_pos_zoom = self.hist_pos[hist_len//2:] - self.hist_pos[hist_len//2:].mean()
-
-            iq_val = np.exp(1j*np.angle(sweep[com_idx])) * self.lp_ampl[com_idx]
-
-            plot_data = {
-                "abs": self.lp_ampl,
-                "arg": np.angle(sweep),
-                "com": self.lp_com,
-                "hist_pos": plot_hist_pos,
-                "hist_pos_zoom": plot_hist_pos_zoom,
-                "iq_val": iq_val,
-            }
-        self.last_sweep = sweep
-        self.sweep_index += 1
-        return plot_data
+        self.data_index += 1
+        return tracked_data
 
     def alpha(self, tau, dt):
         return 1 - np.exp(-dt/tau)
