@@ -35,7 +35,7 @@ function [t,target_amplitude, target_phase, target_distance] = target_tracker_2(
         [minimum,I] = min( abs(locs-i_peaks_filtered(i-1)) );
         %i_peaks(i) = round (locs(I) + w(I)/2 );
         %i_peaks(i) = max( min( L_data,i_peaks(i) ) , 1 );
-        
+
         %Test without width of peak being used
         if (size(locs) == [1 0]) | (size(locs) == [0 1])
             %No peaks to be found, data is totally blank

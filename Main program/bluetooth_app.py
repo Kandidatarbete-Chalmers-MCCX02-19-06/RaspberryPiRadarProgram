@@ -12,12 +12,12 @@ import os
 class bluetooth_app:
     run = True  # Argument for shuting down all loops at the same time with input from one device.
 
-    def __init__(self, from_radar_queue, go):
+    def __init__(self, from_radar_queue, run_measurement, go):
         self.go = go  # Argument for shutting down all threads and loops at the same time.
         # Bluetooth variables
         self.client_list = []         # list for each connected device, sockets
         self.address_list = []        # list for mac-adresses from each connected device
-        self.read_thread_list = []     # list for threads to recieve from each device
+        # self.read_thread_list = []     # list for threads to recieve from each device
         self.host = ""
         self.port = 1
         self.client = None
@@ -25,7 +25,8 @@ class bluetooth_app:
         self.server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
         self.server.setblocking(0)  # Makes server.accept() non-blocking, used for "poweroff"
         # TEMP: Data from radar used to make sure data can be accepted between threads
-        self.from_radar_queue = from_radar_queue
+        self.from_radar_queue = from_radar_queue  # Queue from radar class to test if queue communication work
+        self.run_measurement = run_measurement
         print('Bluetooth Socket Created')
         try:
             self.server.bind((self.host, self.port))
@@ -40,7 +41,7 @@ class bluetooth_app:
 
     def app_data(self):  # The main loop which takes data from processing and sends data to all clients
         while self.run:
-            # time.sleep(1)
+            time.sleep(1)
             while len(self.client_list) == 0:
                 continue
             try:
@@ -53,7 +54,7 @@ class bluetooth_app:
             self.write_data_to_app(data_breath, 'breath rate')  # Sends heart rate to app
 
     def connect_device(self):  # Does not work properly
-        # os.system("echo 'power on\nquit' | bluetoothctl")  # Startup for bluetooth on rpi
+        os.system("echo 'power on\nquit' | bluetoothctl")  # Startup for bluetooth on rpi
         thread_list = []  # List which adds devices
         self.server.listen(7)  # Amount of devices that can simultaniously recive data.
         while self.run:
@@ -98,7 +99,7 @@ class bluetooth_app:
                     print("Shutdown starting")
                     try:
                         self.run = False
-                        self.go = self.go.append("True")
+                        self.go = self.go.pop(0)
                         print("run= " + str(self.run))
                         for client in self.client_list:
                             print('try to remove client ' +
@@ -108,14 +109,25 @@ class bluetooth_app:
                                   str(self.address_list[self.client_list.index(client)]))
                         self.server.close()
                         print("server is now closed")
-                        #os.system("echo 'power off\nquit' | bluetoothctl")
+                        os.system("echo 'power off\nquit' | bluetoothctl")
                     except Exception as error:
                         print("exception in for-loop in read_device: " + str(error))
+
+                elif data == 'startMeasure':
+                    self.run_measurement.append(c)
+                    print("Device added")
+
+                elif data == 'stopMeasure':
+                    if c in self.run_measurement:
+                        self.run_measurement.remove(c)
+                        print("Device removed")
 
         except Exception as error:
             print("last exception read_device: " + str(error))
             c.close()
             print('remove client: ' + str(self.address_list[self.client_list.index(c)]))
+            if c in self.run_measurement:
+                self.run_measurement.remove(c)
             self.client_list.remove(c)
 
     def write_data_to_app(self, data, data_type):
