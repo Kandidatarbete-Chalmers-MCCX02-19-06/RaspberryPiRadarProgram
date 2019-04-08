@@ -41,11 +41,14 @@ class DataAcquisition(threading.Thread):
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
         while self.go:
-            data = self.get_data()
-            print("Data is working:", data)
-
+            data = self.get_data()  # This data is an 1D array in terminal print
+            tracked_data = self.tracking(data)
         self.client.disconnect()
 
     def get_data(self):
         info, data = self.client.get_next()
         return data
+
+    def tracking(self, data):
+        n = len(data)
+        print("length of data {}".format(len(data)))
