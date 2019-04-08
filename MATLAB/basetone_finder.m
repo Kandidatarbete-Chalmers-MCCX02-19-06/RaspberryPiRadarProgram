@@ -45,6 +45,9 @@ for i = 1:length(i_f_search)
 
 end
 
+%Abs val incase of complex FFT used
+P_sum_N = abs(P_sum_N);
+
 %normalize
 P_sum_N = P_sum_N./mean(P_sum_N);
 
@@ -58,17 +61,25 @@ height = 0;
 [PKS,LOCS]= findpeaks(P_sum_N,'MinPeakProminence',height);
 [maxval,i_crude] = max(PKS);
 f_crude = f_search(LOCS(i_crude));
-
+%If no peaks, set to 0
+if size(f_crude) == [0 1]
+    f_crude = 0
+end
 
 %Find peak in FFT for fine reading
-[PKS,LOCS]= findpeaks(FFT_SS);
+%[PKS,LOCS]= findpeaks(FFT_SS);
 %Finds peak with f closest to crude frequency measurement
-[minval,i_fine] = min( abs( f(LOCS) - f_crude ) );
+%[minval,i_fine] = min( abs( f(LOCS) - f_crude ) );
 %Sets f_fine to be fine measuremed value
-f_fine = f(LOCS(i_fine));
+%f_fine = f(LOCS(i_fine));
 
-%test again
-f_fine = f_crude;
+%better estimation
+%f_fine = HR_estimator(f_search,P_sum_N);
+
+%test to avoid half tone detection instead of directly estimating the
+%frequency
+f_fine = trueToneFinder(f_search,P_sum_N);
+
 
 if plot_selection
     %Plots function if chosen
