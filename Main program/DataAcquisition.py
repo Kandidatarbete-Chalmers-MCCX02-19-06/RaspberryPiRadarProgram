@@ -47,7 +47,7 @@ class DataAcquisition(threading.Thread):
         self.data_index = 0
 
         self.real_dist = np.linspace(
-            self.config.range_interval[0], self.config.range_interval[0], num=self.num_points)
+            self.config.range_interval[0], self.config.range_interval[1], num=self.num_points)
         self.tracked_distance = None
         self.tracked_amplitude = None
         self.tracked_phase = None
