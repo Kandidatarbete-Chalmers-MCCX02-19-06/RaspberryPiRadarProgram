@@ -51,6 +51,7 @@ class DataAcquisition(threading.Thread):
         self.hist_vel = np.zeros(num_hist_points)
         self.hist_pos = np.zeros(num_hist_points)
         self.data_index = 0
+        self.tracked_data = None
 
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
@@ -83,12 +84,13 @@ class DataAcquisition(threading.Thread):
 
         if self.data_index == 0:
             self.lp_com = com
-            tracked_data = None
+            self.tracked_data = 0
         else:
             a = self.alpha(0.25, self.dt)
             self.lp_com = a*com + (1-a)*self.lp_com
             com_idx = int(self.lp_com * n)
             print("com_idx {}".format(com_idx))
+            self.tracked_data = 1
             #self.tracked_distance = data[com_idx]
 
         # self.tracked_distance[self.data_idx] = self.real_dist[int(
@@ -99,7 +101,7 @@ class DataAcquisition(threading.Thread):
         #     data[int(self.I_peaks_filtered[self.data_idx])])
 
         self.data_index += 1
-        return tracked_data
+        return self.tracked_data
 
     def alpha(self, tau, dt):
         return 1 - np.exp(-dt/tau)
