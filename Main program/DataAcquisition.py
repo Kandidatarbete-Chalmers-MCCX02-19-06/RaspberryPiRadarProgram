@@ -123,9 +123,9 @@ class DataAcquisition(threading.Thread):
                     # self.local_peaks_index[:] = max_peak # reset the array and take the new global max as
                     self.threshold = 0.5 * max_peak
 
-            self.local_peaks_avarage_index = np.round(np.average(self.track_peak_index))
-            print("local_peaks_avarage_index: ", self.local_peaks_avarage_index)
-            # print(type(self.local_peaks_avarage_index))
+            self.local_peaks_average_index = np.round(np.average(self.track_peak_index))
+            print("local_peaks_avarage_index: ", self.local_peaks_average_index)
+            # print(type(self.local_peaks_average_index))
             self.threshold = np.abs(data[int(self.local_peaks_average_index)]) * 0.5 # threshold for
             print("Threshold: ", self.threshold)
 
@@ -134,7 +134,7 @@ class DataAcquisition(threading.Thread):
             # if len(self.average_com) > self.averages:  # tar bort älsta värdet
             #     self.average_com.pop(0)
             # com = np.average(self.average_com)  # medelvärdet av tidigare avstånd
-            com = self.local_peaks_avarage_index/len(data)
+            com = self.local_peaks_average_index/len(data)
 
         else:
             com = 0
@@ -198,7 +198,7 @@ class DataAcquisition(threading.Thread):
             # för plott
             self.lp_ampl = a * ampl + (1 - a) * self.lp_ampl
 
-            tracked_distance = (1 - self.local_peaks_avarage_index/len(data)) * self.config.range_interval[0] + self.local_peaks_avarage_index/len(data) * self.config.range_interval[1]
+            tracked_distance = (1 - self.local_peaks_average_index/len(data)) * self.config.range_interval[0] + self.local_peaks_average_index/len(data) * self.config.range_interval[1]
 
             # self.tracked_data = {"tracked distance": self.tracked_distance,
             #                      "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase, "com": self.lp_com, "abs": self.lp_ampl}
