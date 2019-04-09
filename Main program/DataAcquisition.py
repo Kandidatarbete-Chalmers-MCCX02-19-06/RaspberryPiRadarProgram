@@ -124,7 +124,7 @@ class DataAcquisition(threading.Thread):
                 peak_difference_index = np.subtract(self.local_peaks_index, self.local_peaks_average_index)
                 print("difference abs: ",np.abs(peak_difference_index))
                 print("argmin: ",np.argmin(np.abs(peak_difference_index)))
-                self.track_peak_index.append(np.argmin(np.abs(peak_difference_index))) # min difference of index
+                self.track_peak_index.append(self.local_peaks_index[np.argmin(np.abs(peak_difference_index))]) # min difference of index
                 if len(self.local_peaks_index) == 0:
                     print("No local peak found")
                     self.track_peak_index[-1] = self.track_peak_index[-2]
