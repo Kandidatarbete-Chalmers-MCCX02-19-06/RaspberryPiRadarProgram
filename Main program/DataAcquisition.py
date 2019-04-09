@@ -48,7 +48,7 @@ class DataAcquisition(threading.Thread):
         # Inputs for tracking
         self.f = self.config.sweep_rate
         self.dt = 1 / self.f
-        self.number_of_averages = 3  # antalet medelvärdesbildningar
+        self.number_of_averages = 10  # antalet medelvärdesbildningar
         self.average_com = []  # array med avstånd
         self.local_peaks_index = [] # index of local peaks
         self.track_peak_index = [] # index of last tracked peaks
@@ -123,13 +123,16 @@ class DataAcquisition(threading.Thread):
                     self.track_peak_index[-1] = self.track_peak_index[-2]
                 if len(self.track_peak_index) > self.number_of_averages:  # removes oldest value
                     self.track_peak_index.pop(0)
-                if self.track_peak_index[-1] < 0.1 * max_peak:
+                if data[self.track_peak_index[-1]] < 0.1 * data[max_peak]:
                     self.track_peak_index.clear() # reset the array
                     self.track_peak_index.append(max_peak)  # new peak as global max
                     # self.local_peaks_index[:] = max_peak # reset the array and take the new global max as
                     self.threshold = 0.5 * max_peak
 
-            self.local_peaks_average_index = np.round(np.average(self.track_peak_index))
+            a = self.alpha(0.25, self.dt)
+            self.local_peaks_average_index = a * np.round(np.average(self.track_peak_index)) + (
+                        1 - a) * self.local_peaks_average_index
+            ## self.local_peaks_average_index = np.round(np.average(self.track_peak_index))
             #print("local_peaks_avarage_index: ", self.local_peaks_average_index)
             # print(type(self.local_peaks_average_index))
             self.threshold = np.abs(data[int(self.local_peaks_average_index)]) * 0.5 # threshold for
