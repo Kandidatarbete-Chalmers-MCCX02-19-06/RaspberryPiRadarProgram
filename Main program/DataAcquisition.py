@@ -103,19 +103,12 @@ class DataAcquisition(threading.Thread):
                 # print("Threshold: ",self.threshold)
             else:
                 self.local_peaks_index, _ = signal.find_peaks(power)  # find local maximas in data TODO improve to linear algebra
-                #print(type(self.local_peaks_index))
-                ##self.local_peaks_index = self.local_peaks_index.flatten()
-                #print(type(self.local_peaks_index))
-                #print(self.local_peaks_index)
-                #self.local_peaks_index = self.local_peaks_index[0, :]
 
-                #print(self.local_peaks_index)
                 index = 0
                 index_list = []
                 # print("Threshold: ",self.threshold)
                 for peak in self.local_peaks_index:
                     if np.abs(power[peak]) < self.threshold:
-                        # np.delete(self.local_peaks_index, index)
                         index_list.append(index)
                         index += 1
                 np.delete(self.local_peaks_index, index_list)       # deletes all indexes with amplitude < threshold
@@ -134,8 +127,6 @@ class DataAcquisition(threading.Thread):
                     print("old peak to low: ",power[self.track_peak_index[-1]]," max: ",power[max_peak_index])
                     self.track_peak_index.clear() # reset the array
                     self.track_peak_index.append(max_peak_index)  # new peak as global max
-                    # self.local_peaks_index[:] = max_peak # reset the array and take the new global max as
-                    #self.threshold = 0.5 * max_peak
                 self.track_peaks_average_index = int(np.round(self.a * (np.average(self.track_peak_index)) + (
                         1 - self.a) * self.track_peaks_average_index))
 
@@ -145,7 +136,7 @@ class DataAcquisition(threading.Thread):
             # self.track_peaks_average_index = int(np.round(np.average(self.track_peak_index)))
             #print("local_peaks_avarage_index: ", self.local_peaks_average_index)
             # print(type(self.local_peaks_average_index))
-            self.threshold = np.abs(power[int(self.track_peaks_average_index)]) * 0.8 # threshold for
+            self.threshold = np.abs(power[self.track_peaks_average_index]) * 0.8 # threshold for
             #print("Threshold: ", self.threshold)
 
             # com = np.argmax(power) / n  # globalt maximum #How does this work elementwise or not?
@@ -164,43 +155,6 @@ class DataAcquisition(threading.Thread):
             self.data_index = 1
             self.lp_ampl = ampl
         else:
-            # a = self.alpha(0.1, self.dt)
-            # self.lp_ampl = a * ampl + (1 - a) * self.lp_ampl
-            # a = self.alpha(0.25, self.dt)
-            # self.lp_com = a * com + (1 - a) * self.lp_com
-            #
-            # com_idx = int(self.lp_com * n)
-            # delta_angle = np.angle(data[com_idx] * np.conj(self.last_sweep[com_idx]))
-            # vel = self.f * 2.5 * delta_angle / (2 * np.pi)
-            #
-            # a = self.alpha(0.1, self.dt)
-            # self.lp_vel = a * vel + (1 - a) * self.lp_vel
-            #
-            # self.hist_vel = np.roll(self.hist_vel, -1)
-            # self.hist_vel[-1] = self.lp_vel
-            #
-            # dp = self.lp_vel / self.f
-            # self.hist_pos = np.roll(self.hist_pos, -1)
-            # self.hist_pos[-1] = self.hist_pos[-2] + dp
-            #
-            # hist_len = len(self.hist_pos)
-            # plot_hist_pos = self.hist_pos - self.hist_pos.mean()
-            # plot_hist_pos_zoom = self.hist_pos[hist_len // 2:] - self.hist_pos[hist_len // 2:].mean()
-            #
-            # iq_val = np.exp(1j * np.angle(data[com_idx])) * self.lp_ampl[com_idx]
-            #
-            # plot_data = {
-            #     "abs": self.lp_ampl,
-            #     "arg": np.angle(data),
-            #     "com": self.lp_com,
-            #     "hist_pos": plot_hist_pos,
-            #     "hist_pos_zoom": plot_hist_pos_zoom,
-            #     "iq_val": iq_val,
-            # }
-            #
-            # self.last_sweep = data
-            # self.data_index += 1
-            ################ ################ egen kod nedan ################# ###############
             a = self.alpha(0.25, self.dt)
             self.lp_com = a*com + (1-a)*self.lp_com
             com_idx = int(self.lp_com * n)
