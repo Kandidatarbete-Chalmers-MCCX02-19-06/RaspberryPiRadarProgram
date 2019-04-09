@@ -87,7 +87,7 @@ class DataAcquisition(threading.Thread):
 
     def tracking(self, data):
         data = np.transpose(data)
-        data = np.array(data).flatten()
+        # data = np.array(data).flatten()
         n = len(data)
         ampl = np.abs(data)
         power = ampl*ampl
@@ -96,7 +96,7 @@ class DataAcquisition(threading.Thread):
             max_peak = np.argmax(power)
             if self.data_index == 0: # first time
                 self.track_peak_index.append(max_peak)
-                #print("track_peak_index: ",self.track_peak_index)
+                print("track_peak_index: ",self.track_peak_index)
                 # self.threshold = 0.5 * max_peak
                 # print("Threshold: ",self.threshold)
             else:
