@@ -48,7 +48,7 @@ class DataAcquisition(threading.Thread):
         # Inputs for tracking
         self.f = self.config.sweep_rate
         self.dt = 1 / self.f
-        self.averages = 3  # antalet medelvärdesbildningar
+        self.number_of_averages = 3  # antalet medelvärdesbildningar
         self.average_com = []  # array med avstånd
         self.track_peak_index = [] # index of last tracked peaks
         self.local_peaks_average_index = None # average of last tracked peaks
@@ -101,7 +101,7 @@ class DataAcquisition(threading.Thread):
                 if len(self.local_peaks_index) == 0:
                     print("No local peak found")
                     self.track_peak_index[-1] = self.track_peak_index[-2]
-                if len(self.track_peak_index) > self.averages:  # removes oldest value
+                if len(self.track_peak_index) > self.number_of_averages:  # removes oldest value
                     self.track_peak_index.pop(0)
             if self.track_peak_index[-1] < 0.1 * max_peak:
                 self.local_peaks_index[:] = max_peak # reset the array and take the new global max as
@@ -113,6 +113,7 @@ class DataAcquisition(threading.Thread):
             # if len(self.average_com) > self.averages:  # tar bort älsta värdet
             #     self.average_com.pop(0)
             # com = np.average(self.average_com)  # medelvärdet av tidigare avstånd
+            com = self.local_peaks_avarage_index/len(data)
 
         else:
             com = 0
@@ -265,11 +266,11 @@ class PGUpdater:
             # self.ts_zoom = np.linspace(-1.5, 0, len(data["hist_pos_zoom"]))
             self.first = False
 
-        com_x = (1-data["com"])*self.interval[0] + data["com"]*self.interval[1]
+        # com_x = (1-data["com"])*self.interval[0] + data["com"]*self.interval[1]
 
         self.distance_curve.setData(self.xs, np.array(data["abs"]).flatten())
         self.distance_plot.setYRange(0, self.smooth_max.update(np.amax(data["abs"])))
-        self.distance_inf_line.setValue(com_x)
+        self.distance_inf_line.setValue(data["tracked distance"])
         # self.arg_curve.setData(self.xs, data["arg"])
         # self.arg_inf_line.setValue(com_x)
         # self.hist_curve.setData(self.ts, data["hist_pos"])
