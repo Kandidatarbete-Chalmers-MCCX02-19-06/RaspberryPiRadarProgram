@@ -129,6 +129,9 @@ class DataAcquisition(threading.Thread):
                 #     # self.local_peaks_index[:] = max_peak # reset the array and take the new global max as
                 #     self.threshold = 0.5 * max_peak
 
+
+                print("track_peak_index: ",self.track_peak_index)
+
             a = self.alpha(0.25, self.dt)
             #self.local_peaks_average_index = a * np.round(np.average(self.track_peak_index)) + (
             #            1 - a) * self.local_peaks_average_index
