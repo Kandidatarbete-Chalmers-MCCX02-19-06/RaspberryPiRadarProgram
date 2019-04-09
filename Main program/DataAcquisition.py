@@ -33,7 +33,7 @@ class DataAcquisition(threading.Thread):
         self.config.sensor = self.args.sensors
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.5]  # Measurement interval
-        self.config.sweep_rate = 15  # Frequency for collecting data
+        self.config.sweep_rate = 80  # Frequency for collecting data
         self.config.gain = 0.9  # Gain between 0 and 1.
 
         # self.sweep_index = 0 # för plotten
@@ -48,7 +48,7 @@ class DataAcquisition(threading.Thread):
         # Inputs for tracking
         self.f = self.config.sweep_rate
         self.dt = 1 / self.f
-        self.number_of_averages = 10  # antalet medelvärdesbildningar
+        self.number_of_averages = 5  # antalet medelvärdesbildningar
         self.average_com = []  # array med avstånd
         self.local_peaks_index = [] # index of local peaks
         self.track_peak_index = [] # index of last tracked peaks
@@ -134,7 +134,7 @@ class DataAcquisition(threading.Thread):
                     # self.local_peaks_index[:] = max_peak # reset the array and take the new global max as
                     #self.threshold = 0.5 * max_peak
 
-            print("tracked peak: ",self.track_peaks_average_index)
+            #print("tracked peak: ",self.track_peaks_average_index)
             a = self.alpha(0.25, self.dt)
             #self.local_peaks_average_index = a * np.round(np.average(self.track_peak_index)) + (
             #            1 - a) * self.local_peaks_average_index
