@@ -57,7 +57,7 @@ class DataAcquisition(threading.Thread):
             # This data is an 1D array in terminal print, not in Python script however....
             data = self.get_data()
             tracked_data = self.tracking(data)
-            print("Tracked data: ", tracked_data["tracked distance"])
+            print("Tracked data: ", tracked_data.get("tracked distance"))
         self.client.disconnect()
 
     def get_data(self):
