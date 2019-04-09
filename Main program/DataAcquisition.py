@@ -96,13 +96,13 @@ class DataAcquisition(threading.Thread):
             max_peak = np.argmax(power)
             if self.data_index == 0: # first time
                 self.track_peak_index.append(max_peak)
-                print("track_peak_index: ",self.track_peak_index)
+                #print("track_peak_index: ",self.track_peak_index)
                 # self.threshold = 0.5 * max_peak
                 # print("Threshold: ",self.threshold)
             else:
                 self.local_peaks_index, _ = signal.find_peaks(np.abs(data))  # find local maximas in data TODO improve to linear algebra
                 #print(type(self.local_peaks_index))
-                self.local_peaks_index = self.local_peaks_index.flatten()
+                ##self.local_peaks_index = self.local_peaks_index.flatten()
                 #print(type(self.local_peaks_index))
                 #print(self.local_peaks_index)
                 #self.local_peaks_index = self.local_peaks_index[0, :]
@@ -124,16 +124,16 @@ class DataAcquisition(threading.Thread):
                 if len(self.track_peak_index) > self.number_of_averages:  # removes oldest value
                     self.track_peak_index.pop(0)
                 if self.track_peak_index[-1] < 0.1 * max_peak:
-                    self.local_peaks_index.clear()  # reset the array
-                    self.local_peaks_index.append(max_peak)  # new peak as global max
+                    self.track_peak_index.clear() # reset the array
+                    self.track_peak_index.append(max_peak)  # new peak as global max
                     # self.local_peaks_index[:] = max_peak # reset the array and take the new global max as
                     self.threshold = 0.5 * max_peak
 
             self.local_peaks_average_index = np.round(np.average(self.track_peak_index))
-            print("local_peaks_avarage_index: ", self.local_peaks_average_index)
+            #print("local_peaks_avarage_index: ", self.local_peaks_average_index)
             # print(type(self.local_peaks_average_index))
             self.threshold = np.abs(data[int(self.local_peaks_average_index)]) * 0.5 # threshold for
-            print("Threshold: ", self.threshold)
+            #print("Threshold: ", self.threshold)
 
             # com = np.argmax(power) / n  # globalt maximum #How does this work elementwise or not?
             # self.average_com.append(com)
