@@ -97,11 +97,12 @@ class DataAcquisition(threading.Thread):
             if self.data_index == 0: # first time
                 self.local_peaks_index.append(max_peak)
                 self.threshold = 0.5 * max_peak
+                print("Threshold: ",self.threshold)
             else:
                 self.local_peaks_index, _ = signal.find_peaks(np.abs(data))  # find local maximas in data TODO improve to linear algebra
                 # self.local_peaks_index = np.array(self.local_peaks_index).flatten()
                 index = 0
-                print(self.threshold)
+                print("Threshold: ",self.threshold)
                 for peak in self.local_peaks_index:
                     if np.abs(data[peak]) < self.threshold:
                         np.delete(self.local_peaks_index, index)
