@@ -110,12 +110,12 @@ class DataAcquisition(threading.Thread):
                 #print(self.local_peaks_index)
                 index = 0
                 # print("Threshold: ",self.threshold)
-                for peak in self.local_peaks_index:
-                    if np.abs(data[peak]) < self.threshold:
-                        np.delete(self.local_peaks_index, index)
-                        index += 1
+                # for peak in self.local_peaks_index:
+                #     if np.abs(data[peak]) < self.threshold:
+                #         np.delete(self.local_peaks_index, index)
+                #         index += 1
                 #self.local_peaks_index = self.local_peaks_index[(np.abs(data[:]) > self.threshold)]
-                # self.local_peaks_index = [x for x in self.local_peaks_index if (np.abs(data[x]) > self.threshold)]
+                self.local_peaks_index = [x for x in self.local_peaks_index if (np.abs(data[x]) > self.threshold)]
                 peak_difference_index = np.subtract(self.local_peaks_index, self.local_peaks_average_index)
                 self.track_peak_index.append(np.argmin(np.abs(peak_difference_index))) # min difference of index
                 if len(self.local_peaks_index) == 0:
