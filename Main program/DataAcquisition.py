@@ -18,7 +18,6 @@ class DataAcquisition(threading.Thread):
     def __init__(self, go):
         super(DataAcquisition, self).__init__()  # Inherit threading vitals
         self.go = go
-        #self.sweep_index = 0 # för plotten
         # Setup for collecting data from acconeers radar files.
         self.args = example_utils.ExampleArgumentParser().parse_args()
         example_utils.config_logging(self.args)
@@ -36,6 +35,12 @@ class DataAcquisition(threading.Thread):
         self.config.range_interval = [0.2, 0.6]  # Measurement interval
         self.config.sweep_rate = 24  # Frequency for collecting data
         self.config.gain = 1  # Gain between 0 and 1.
+
+        # self.sweep_index = 0 # för plotten
+        # för plotten
+        self.pg_updater = PGUpdater(self.config)
+        self.pg_process = PGProcess(self.pg_updater)
+        self.pg_process.start()
 
         self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
         self.num_points = self.info["data_length"]  # Length of data per sampel
@@ -61,7 +66,7 @@ class DataAcquisition(threading.Thread):
             tracked_data = self.tracking(data)
             if tracked_data is not None:
                 try:
-                    pg_process.put_data(tracked_data)
+                    self.pg_process.put_data(tracked_data)
                     print("Tracked data: ", tracked_data["tracked distance"])
                 except PGProccessDiedException:
                     break
