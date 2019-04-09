@@ -32,9 +32,9 @@ class DataAcquisition(threading.Thread):
         self.config = configs.IQServiceConfig()
         self.config.sensor = self.args.sensors
         # Settings for radar setup
-        self.config.range_interval = [0.2, 0.6]  # Measurement interval
+        self.config.range_interval = [0.2, 1]  # Measurement interval
         self.config.sweep_rate = 24  # Frequency for collecting data
-        self.config.gain = 1  # Gain between 0 and 1.
+        self.config.gain = 0.7  # Gain between 0 and 1.
 
         # self.sweep_index = 0 # för plotten
         # för plotten
