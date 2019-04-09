@@ -136,8 +136,8 @@ class DataAcquisition(threading.Thread):
 
             #print("tracked peak: ",self.track_peaks_average_index)
             a = self.alpha(0.25, self.dt)
-            self.local_peaks_average_index = int(np.round(a * (np.average(self.track_peak_index)) + (
-                        1 - a) * self.local_peaks_average_index))
+            self.track_peaks_average_index = int(np.round(a * (np.average(self.track_peak_index)) + (
+                        1 - a) * self.track_peaks_average_index))
             self.track_peaks_average_index = int(np.round(np.average(self.track_peak_index)))
             #print("local_peaks_avarage_index: ", self.local_peaks_average_index)
             # print(type(self.local_peaks_average_index))
