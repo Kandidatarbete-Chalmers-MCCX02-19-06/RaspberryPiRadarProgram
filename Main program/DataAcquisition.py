@@ -62,6 +62,8 @@ class DataAcquisition(threading.Thread):
         self.tracked_phase = None
         self.last_sweep = None # för plotten
 
+        self.a = self.alpha(0.25, self.dt) # integration?
+
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
         while self.go:
@@ -96,6 +98,7 @@ class DataAcquisition(threading.Thread):
             max_peak_index = np.argmax(power)
             if self.data_index == 0: # first time
                 self.track_peak_index.append(max_peak_index)
+                self.track_peaks_average_index = self.track_peak_index
                 # self.threshold = 0.5 * max_peak
                 # print("Threshold: ",self.threshold)
             else:
@@ -133,12 +136,13 @@ class DataAcquisition(threading.Thread):
                     self.track_peak_index.append(max_peak_index)  # new peak as global max
                     # self.local_peaks_index[:] = max_peak # reset the array and take the new global max as
                     #self.threshold = 0.5 * max_peak
+                self.track_peaks_average_index = int(np.round(self.a * (np.average(self.track_peak_index)) + (
+                        1 - self.a) * self.track_peaks_average_index))
 
             #print("tracked peak: ",self.track_peaks_average_index)
-            a = self.alpha(0.25, self.dt)
-            self.track_peaks_average_index = int(np.round(a * (np.average(self.track_peak_index)) + (
-                        1 - a) * self.track_peaks_average_index))
-            self.track_peaks_average_index = int(np.round(np.average(self.track_peak_index)))
+
+
+            # self.track_peaks_average_index = int(np.round(np.average(self.track_peak_index)))
             #print("local_peaks_avarage_index: ", self.local_peaks_average_index)
             # print(type(self.local_peaks_average_index))
             self.threshold = np.abs(power[int(self.track_peaks_average_index)]) * 0.8 # threshold for
