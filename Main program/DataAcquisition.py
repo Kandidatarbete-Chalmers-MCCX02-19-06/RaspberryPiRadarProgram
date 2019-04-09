@@ -114,7 +114,8 @@ class DataAcquisition(threading.Thread):
                     self.threshold = 0.5 * max_peak
 
             self.local_peaks_avarage_index = np.round(np.average(self.track_peak_index))
-            self.threshold = np.abs(data[int(self.local_peaks_average_index)]) * 0.5 # threshold for
+            print(type(self.local_peaks_avarage_index))
+            self.threshold = np.abs(data[self.local_peaks_average_index]) * 0.5 # threshold for
 
             # com = np.argmax(power) / n  # globalt maximum #How does this work elementwise or not?
             # self.average_com.append(com)
