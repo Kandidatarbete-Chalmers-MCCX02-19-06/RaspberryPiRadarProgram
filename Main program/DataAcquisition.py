@@ -242,7 +242,7 @@ class PGUpdater:
 
         com_x = (1-data["tracked distance"])*self.interval[0] + data["tracked distance"]*self.interval[1]
 
-        self.distance_curve.setData(self.xs, np.array(data["abs"]))
+        self.distance_curve.setData(self.xs, np.array(data["abs"]).flatten())
         self.distance_plot.setYRange(0, self.smooth_max.update(np.amax(data["abs"])))
         self.distance_inf_line.setValue(com_x)
         # self.arg_curve.setData(self.xs, data["arg"])
