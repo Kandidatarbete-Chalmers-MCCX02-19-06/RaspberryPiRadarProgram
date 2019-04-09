@@ -115,7 +115,9 @@ class DataAcquisition(threading.Thread):
                 #         np.delete(self.local_peaks_index, index)
                 #         index += 1
                 #self.local_peaks_index = self.local_peaks_index[(np.abs(data[:]) > self.threshold)]
+                print("local peaks: ",self.local_peaks_index)
                 self.local_peaks_index = [x for x in self.local_peaks_index if (np.abs(data[x]) > self.threshold)]
+                print("local peaks: ",self.local_peaks_index)
                 peak_difference_index = np.subtract(self.local_peaks_index, self.local_peaks_average_index)
                 self.track_peak_index.append(np.argmin(np.abs(peak_difference_index))) # min difference of index
                 if len(self.local_peaks_index) == 0:
