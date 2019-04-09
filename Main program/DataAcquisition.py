@@ -60,7 +60,13 @@ class DataAcquisition(threading.Thread):
             data = self.get_data()
             tracked_data = self.tracking(data)
             if tracked_data is not None:
-                print("Tracked data: ", tracked_data.get("tracked distance"))
+                try:
+                    pg_process.put_data(tracked_data)
+                    print("Tracked data: ", tracked_data["tracked distance"])
+                except PGProccessDiedException:
+                    break
+            # if tracked_data is not None:
+            #     print("Tracked data: ", tracked_data.get("tracked distance"))
         self.client.disconnect()
 
     def get_data(self):
@@ -90,42 +96,42 @@ class DataAcquisition(threading.Thread):
             self.data_index = 1
             self.lp_ampl = ampl
         else:
-            a = self.alpha(0.1, self.dt)
-            self.lp_ampl = a * ampl + (1 - a) * self.lp_ampl
-            a = self.alpha(0.25, self.dt)
-            self.lp_com = a * com + (1 - a) * self.lp_com
-
-            com_idx = int(self.lp_com * n)
-            delta_angle = np.angle(data[com_idx] * np.conj(self.last_sweep[com_idx]))
-            vel = self.f * 2.5 * delta_angle / (2 * np.pi)
-
-            a = self.alpha(0.1, self.dt)
-            self.lp_vel = a * vel + (1 - a) * self.lp_vel
-
-            self.hist_vel = np.roll(self.hist_vel, -1)
-            self.hist_vel[-1] = self.lp_vel
-
-            dp = self.lp_vel / self.f
-            self.hist_pos = np.roll(self.hist_pos, -1)
-            self.hist_pos[-1] = self.hist_pos[-2] + dp
-
-            hist_len = len(self.hist_pos)
-            plot_hist_pos = self.hist_pos - self.hist_pos.mean()
-            plot_hist_pos_zoom = self.hist_pos[hist_len // 2:] - self.hist_pos[hist_len // 2:].mean()
-
-            iq_val = np.exp(1j * np.angle(data[com_idx])) * self.lp_ampl[com_idx]
-
-            plot_data = {
-                "abs": self.lp_ampl,
-                "arg": np.angle(data),
-                "com": self.lp_com,
-                "hist_pos": plot_hist_pos,
-                "hist_pos_zoom": plot_hist_pos_zoom,
-                "iq_val": iq_val,
-            }
-
-            self.last_sweep = data
-            self.data_index += 1
+            # a = self.alpha(0.1, self.dt)
+            # self.lp_ampl = a * ampl + (1 - a) * self.lp_ampl
+            # a = self.alpha(0.25, self.dt)
+            # self.lp_com = a * com + (1 - a) * self.lp_com
+            #
+            # com_idx = int(self.lp_com * n)
+            # delta_angle = np.angle(data[com_idx] * np.conj(self.last_sweep[com_idx]))
+            # vel = self.f * 2.5 * delta_angle / (2 * np.pi)
+            #
+            # a = self.alpha(0.1, self.dt)
+            # self.lp_vel = a * vel + (1 - a) * self.lp_vel
+            #
+            # self.hist_vel = np.roll(self.hist_vel, -1)
+            # self.hist_vel[-1] = self.lp_vel
+            #
+            # dp = self.lp_vel / self.f
+            # self.hist_pos = np.roll(self.hist_pos, -1)
+            # self.hist_pos[-1] = self.hist_pos[-2] + dp
+            #
+            # hist_len = len(self.hist_pos)
+            # plot_hist_pos = self.hist_pos - self.hist_pos.mean()
+            # plot_hist_pos_zoom = self.hist_pos[hist_len // 2:] - self.hist_pos[hist_len // 2:].mean()
+            #
+            # iq_val = np.exp(1j * np.angle(data[com_idx])) * self.lp_ampl[com_idx]
+            #
+            # plot_data = {
+            #     "abs": self.lp_ampl,
+            #     "arg": np.angle(data),
+            #     "com": self.lp_com,
+            #     "hist_pos": plot_hist_pos,
+            #     "hist_pos_zoom": plot_hist_pos_zoom,
+            #     "iq_val": iq_val,
+            # }
+            #
+            # self.last_sweep = data
+            # self.data_index += 1
             ################ ################ egen kod nedan ################# ###############
             a = self.alpha(0.25, self.dt)
             self.lp_com = a*com + (1-a)*self.lp_com
@@ -139,8 +145,15 @@ class DataAcquisition(threading.Thread):
             # print("Tracked Distance {} and com idx {}".format(self.com_x, com_idx))
             self.tracked_amplitude = np.abs(data[com_idx])
             self.tracked_phase = np.angle(data[com_idx])
+
+            # för plott
+            self.lp_ampl = a * ampl + (1 - a) * self.lp_ampl
+
+
+
             self.tracked_data = {"tracked distance": self.tracked_distance,
-                                 "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase}
+                                 "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase, "com": self.lp_com, "abs": self.lp_ampl}
+
 
         return self.tracked_data
 
@@ -157,50 +170,60 @@ class PGUpdater:
 
     def setup(self, win):
         win.resize(800, 600)
-        win.setWindowTitle("Acconeer phase tracking example")
+        win.setWindowTitle("Albins tracking example")
 
-        self.abs_plot = win.addPlot(row=0, col=0)
-        self.abs_plot.showGrid(x=True, y=True)
-        self.abs_plot.setLabel("left", "Amplitude")
-        self.abs_plot.setLabel("bottom", "Depth (m)")
-        self.abs_curve = self.abs_plot.plot(pen=example_utils.pg_pen_cycler(0))
+        self.distance_plot = win.addPlot(row=0, col=0)
+        self.distance_plot.showGrid(x=True, y=True)
+        self.distance_plot.setLabel("left", "Amplitude")
+        self.distance_plot.setLabel("bottom", "Depth (m)")
+        self.distance_curve = self.distance_plot.plot(pen=example_utils.pg_pen_cycler(0))
         pen = example_utils.pg_pen_cycler(1)
         pen.setStyle(QtCore.Qt.DashLine)
-        self.abs_inf_line = pg.InfiniteLine(pen=pen)
-        self.abs_plot.addItem(self.abs_inf_line)
+        self.distance_inf_line = pg.InfiniteLine(pen=pen)
+        self.distance_plot.addItem(self.distance_inf_line)
 
-        self.arg_plot = win.addPlot(row=1, col=0)
-        self.arg_plot.showGrid(x=True, y=True)
-        self.arg_plot.setLabel("bottom", "Depth (m)")
-        self.arg_plot.setLabel("left", "Phase")
-        self.arg_plot.setYRange(-np.pi, np.pi)
-        self.arg_plot.getAxis("left").setTicks(example_utils.pg_phase_ticks)
-        self.arg_curve = self.arg_plot.plot(pen=example_utils.pg_pen_cycler(0))
-        self.arg_inf_line = pg.InfiniteLine(pen=pen)
-        self.arg_plot.addItem(self.arg_inf_line)
+        # self.abs_plot = win.addPlot(row=0, col=0)
+        # self.abs_plot.showGrid(x=True, y=True)
+        # self.abs_plot.setLabel("left", "Amplitude")
+        # self.abs_plot.setLabel("bottom", "Depth (m)")
+        # self.abs_curve = self.abs_plot.plot(pen=example_utils.pg_pen_cycler(0))
+        # pen = example_utils.pg_pen_cycler(1)
+        # pen.setStyle(QtCore.Qt.DashLine)
+        # self.abs_inf_line = pg.InfiniteLine(pen=pen)
+        # self.abs_plot.addItem(self.abs_inf_line)
 
-        self.iq_plot = win.addPlot(row=1, col=1, title="IQ at line")
-        example_utils.pg_setup_polar_plot(self.iq_plot, 0.5)
-        self.iq_curve = self.iq_plot.plot(pen=example_utils.pg_pen_cycler())
-        self.iq_scatter = pg.ScatterPlotItem(
-            brush=pg.mkBrush(example_utils.color_cycler()),
-            size=15,
-        )
-        self.iq_plot.addItem(self.iq_scatter)
-
-        self.hist_plot = win.addPlot(row=0, col=1, colspan=2)
-        self.hist_plot.showGrid(x=True, y=True)
-        self.hist_plot.setLabel("bottom", "Time (s)")
-        self.hist_plot.setLabel("left", "Tracking (mm)")
-        self.hist_curve = self.hist_plot.plot(pen=example_utils.pg_pen_cycler())
-        self.hist_plot.setYRange(-5, 5)
-
-        self.hist_zoom_plot = win.addPlot(row=1, col=2)
-        self.hist_zoom_plot.showGrid(x=True, y=True)
-        self.hist_zoom_plot.setLabel("bottom", "Time (s)")
-        self.hist_zoom_plot.setLabel("left", "Tracking (mm)")
-        self.hist_zoom_curve = self.hist_zoom_plot.plot(pen=example_utils.pg_pen_cycler())
-        self.hist_zoom_plot.setYRange(-0.5, 0.5)
+        # self.arg_plot = win.addPlot(row=1, col=0)
+        # self.arg_plot.showGrid(x=True, y=True)
+        # self.arg_plot.setLabel("bottom", "Depth (m)")
+        # self.arg_plot.setLabel("left", "Phase")
+        # self.arg_plot.setYRange(-np.pi, np.pi)
+        # self.arg_plot.getAxis("left").setTicks(example_utils.pg_phase_ticks)
+        # self.arg_curve = self.arg_plot.plot(pen=example_utils.pg_pen_cycler(0))
+        # self.arg_inf_line = pg.InfiniteLine(pen=pen)
+        # self.arg_plot.addItem(self.arg_inf_line)
+        #
+        # self.iq_plot = win.addPlot(row=1, col=1, title="IQ at line")
+        # example_utils.pg_setup_polar_plot(self.iq_plot, 0.5)
+        # self.iq_curve = self.iq_plot.plot(pen=example_utils.pg_pen_cycler())
+        # self.iq_scatter = pg.ScatterPlotItem(
+        #     brush=pg.mkBrush(example_utils.color_cycler()),
+        #     size=15,
+        # )
+        # self.iq_plot.addItem(self.iq_scatter)
+        #
+        # self.hist_plot = win.addPlot(row=0, col=1, colspan=2)
+        # self.hist_plot.showGrid(x=True, y=True)
+        # self.hist_plot.setLabel("bottom", "Time (s)")
+        # self.hist_plot.setLabel("left", "Tracking (mm)")
+        # self.hist_curve = self.hist_plot.plot(pen=example_utils.pg_pen_cycler())
+        # self.hist_plot.setYRange(-5, 5)
+        #
+        # self.hist_zoom_plot = win.addPlot(row=1, col=2)
+        # self.hist_zoom_plot.showGrid(x=True, y=True)
+        # self.hist_zoom_plot.setLabel("bottom", "Time (s)")
+        # self.hist_zoom_plot.setLabel("left", "Tracking (mm)")
+        # self.hist_zoom_curve = self.hist_zoom_plot.plot(pen=example_utils.pg_pen_cycler())
+        # self.hist_zoom_plot.setYRange(-0.5, 0.5)
 
         self.smooth_max = example_utils.SmoothMax(self.config.sweep_rate)
         self.first = True
@@ -208,18 +231,18 @@ class PGUpdater:
     def update(self, data):
         if self.first:
             self.xs = np.linspace(*self.interval, len(data["abs"]))
-            self.ts = np.linspace(-3, 0, len(data["hist_pos"]))
-            self.ts_zoom = np.linspace(-1.5, 0, len(data["hist_pos_zoom"]))
+            # self.ts = np.linspace(-3, 0, len(data["hist_pos"]))
+            # self.ts_zoom = np.linspace(-1.5, 0, len(data["hist_pos_zoom"]))
             self.first = False
 
-        com_x = (1-data["com"])*self.interval[0] + data["com"]*self.interval[1]
+        com_x = (1-data["tracked distance"])*self.interval[0] + data["tracked distance"]*self.interval[1]
 
-        self.abs_curve.setData(self.xs, data["abs"])
-        self.abs_plot.setYRange(0, self.smooth_max.update(np.amax(data["abs"])))
-        self.abs_inf_line.setValue(com_x)
-        self.arg_curve.setData(self.xs, data["arg"])
-        self.arg_inf_line.setValue(com_x)
-        self.hist_curve.setData(self.ts, data["hist_pos"])
-        self.hist_zoom_curve.setData(self.ts_zoom, data["hist_pos_zoom"])
-        self.iq_curve.setData([0, np.real(data["iq_val"])], [0, np.imag(data["iq_val"])])
-        self.iq_scatter.setData([np.real(data["iq_val"])], [np.imag(data["iq_val"])])
+        self.distance_curve.setData(self.xs, data["abs"])
+        self.distance_plot.setYRange(0, self.smooth_max.update(np.amax(data["abs"])))
+        self.distance_inf_line.setValue(com_x)
+        # self.arg_curve.setData(self.xs, data["arg"])
+        # self.arg_inf_line.setValue(com_x)
+        # self.hist_curve.setData(self.ts, data["hist_pos"])
+        # self.hist_zoom_curve.setData(self.ts_zoom, data["hist_pos_zoom"])
+        # self.iq_curve.setData([0, np.real(data["iq_val"])], [0, np.imag(data["iq_val"])])
+        # self.iq_scatter.setData([np.real(data["iq_val"])], [np.imag(data["iq_val"])])
