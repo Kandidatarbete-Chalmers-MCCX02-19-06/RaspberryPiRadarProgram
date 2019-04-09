@@ -130,9 +130,9 @@ class DataAcquisition(threading.Thread):
                     self.threshold = 0.5 * max_peak
 
             a = self.alpha(0.25, self.dt)
-            self.local_peaks_average_index = a * np.round(np.average(self.track_peak_index)) + (
-                        1 - a) * self.local_peaks_average_index
-            ## self.local_peaks_average_index = np.round(np.average(self.track_peak_index))
+            #self.local_peaks_average_index = a * np.round(np.average(self.track_peak_index)) + (
+            #            1 - a) * self.local_peaks_average_index
+            self.local_peaks_average_index = np.round(np.average(self.track_peak_index))
             #print("local_peaks_avarage_index: ", self.local_peaks_average_index)
             # print(type(self.local_peaks_average_index))
             self.threshold = np.abs(data[int(self.local_peaks_average_index)]) * 0.5 # threshold for
