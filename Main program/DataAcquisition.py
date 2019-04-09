@@ -52,6 +52,7 @@ class DataAcquisition(threading.Thread):
         self.average_com = []  # array med avstånd
         self.track_peak_index = [] # index of last tracked peaks
         self.local_peaks_average_index = None # average of last tracked peaks
+        self.threshold = None # threshold for removing small local peaks
         self.data_index = 0
         # self.real_dist = np.linspace(
         #    self.config.range_interval[0], self.config.range_interval[1], num=self.num_points)
