@@ -98,7 +98,7 @@ class DataAcquisition(threading.Thread):
             max_peak_index = np.argmax(power)
             if self.data_index == 0: # first time
                 self.track_peak_index.append(max_peak_index)
-                self.track_peaks_average_index = self.track_peak_index
+                self.track_peaks_average_index = max_peak_index
                 # self.threshold = 0.5 * max_peak
                 # print("Threshold: ",self.threshold)
             else:
