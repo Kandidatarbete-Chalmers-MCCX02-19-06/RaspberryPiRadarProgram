@@ -51,6 +51,7 @@ class DataAcquisition(threading.Thread):
         self.tracked_distance = None
         self.tracked_amplitude = None
         self.tracked_phase = None
+        self.last_sweep = None # för plotten
 
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
