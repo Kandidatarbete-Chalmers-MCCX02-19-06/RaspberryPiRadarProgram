@@ -99,7 +99,7 @@ class DataAcquisition(threading.Thread):
                 # self.threshold = 0.5 * max_peak
                 # print("Threshold: ",self.threshold)
             else:
-                self.local_peaks_index, _ = signal.find_peaks(np.abs(data))  # find local maximas in data TODO improve to linear algebra
+                self.local_peaks_index, _ = signal.find_peaks(power)  # find local maximas in data TODO improve to linear algebra
                 #print(type(self.local_peaks_index))
                 ##self.local_peaks_index = self.local_peaks_index.flatten()
                 #print(type(self.local_peaks_index))
@@ -111,14 +111,14 @@ class DataAcquisition(threading.Thread):
                 index_list = []
                 # print("Threshold: ",self.threshold)
                 for peak in self.local_peaks_index:
-                    if np.abs(data[peak]) < self.threshold:
+                    if np.abs(power[peak]) < self.threshold:
                         # np.delete(self.local_peaks_index, index)
                         index_list.append(index)
                         index += 1
                 np.delete(self.local_peaks_index, index_list)       # deletes all indexes with amplitude < threshold
-                # self.local_peaks_index = self.local_peaks_index[(np.abs(data[:]) > self.threshold)]
+                # self.local_peaks_index = self.local_peaks_index[(np.abs(power[:]) > self.threshold)]
                 # print("local peaks: ",self.local_peaks_index)
-                #self.local_peaks_index = [x for x in self.local_peaks_index if (np.abs(data[x]) > self.threshold)]
+                #self.local_peaks_index = [x for x in self.local_peaks_index if (np.abs(power[x]) > self.threshold)]
                 # print("local peaks: ",self.local_peaks_index)
                 peak_difference_index = np.subtract(self.local_peaks_index, self.local_peaks_average_index)
                 self.track_peak_index.append(self.local_peaks_index[np.argmin(np.abs(peak_difference_index))]) # min difference of index
@@ -127,7 +127,7 @@ class DataAcquisition(threading.Thread):
                     self.track_peak_index[-1] = self.track_peak_index[-2]
                 if len(self.track_peak_index) > self.number_of_averages:  # removes oldest value
                     self.track_peak_index.pop(0)
-                if data[self.track_peak_index[-1]] < 0.2 * data[max_peak]:
+                if power[self.track_peak_index[-1]] < 0.2 * power[max_peak]:
                     self.track_peak_index.clear() # reset the array
                     self.track_peak_index.append(max_peak)  # new peak as global max
                     # self.local_peaks_index[:] = max_peak # reset the array and take the new global max as
@@ -140,7 +140,7 @@ class DataAcquisition(threading.Thread):
             self.local_peaks_average_index = np.round(np.average(self.track_peak_index))
             #print("local_peaks_avarage_index: ", self.local_peaks_average_index)
             # print(type(self.local_peaks_average_index))
-            self.threshold = np.abs(data[int(self.local_peaks_average_index)]) * 0.5 # threshold for
+            self.threshold = np.abs(power[int(self.local_peaks_average_index)]) * 0.5 # threshold for
             #print("Threshold: ", self.threshold)
 
             # com = np.argmax(power) / n  # globalt maximum #How does this work elementwise or not?
