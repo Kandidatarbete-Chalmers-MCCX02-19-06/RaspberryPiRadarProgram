@@ -130,7 +130,7 @@ class DataAcquisition(threading.Thread):
                     self.track_peak_index[-1] = self.track_peak_index[-2]
                 if len(self.track_peak_index) > self.number_of_averages:  # removes oldest value
                     self.track_peak_index.pop(0)
-                if power[self.track_peak_index[-1]] < 0.1 * power[max_peak_index]:
+                if ampl[self.track_peak_index[-1]] < 0.5 * ampl[max_peak_index]:
                     print("old peak to low: ",power[self.track_peak_index[-1]]," max: ",power[max_peak_index])
                     self.track_peak_index.clear() # reset the array
                     self.track_peak_index.append(max_peak_index)  # new peak as global max
