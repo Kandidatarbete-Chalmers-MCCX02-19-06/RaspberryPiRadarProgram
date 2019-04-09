@@ -48,7 +48,7 @@ class DataAcquisition(threading.Thread):
         # Inputs for tracking
         self.f = self.config.sweep_rate
         self.dt = 1 / self.f
-        self.number_of_averages = 1  # antalet medelvärdesbildningar
+        self.number_of_averages = 10  # antalet medelvärdesbildningar
         self.average_com = []  # array med avstånd
         self.local_peaks_index = [] # index of local peaks
         self.track_peak_index = [] # index of last tracked peaks
@@ -141,7 +141,7 @@ class DataAcquisition(threading.Thread):
             self.track_peaks_average_index = np.round(np.average(self.track_peak_index))
             #print("local_peaks_avarage_index: ", self.local_peaks_average_index)
             # print(type(self.local_peaks_average_index))
-            self.threshold = np.abs(power[int(self.track_peaks_average_index)]) * 0.5 # threshold for
+            self.threshold = np.abs(power[int(self.track_peaks_average_index)]) * 0.8 # threshold for
             #print("Threshold: ", self.threshold)
 
             # com = np.argmax(power) / n  # globalt maximum #How does this work elementwise or not?
