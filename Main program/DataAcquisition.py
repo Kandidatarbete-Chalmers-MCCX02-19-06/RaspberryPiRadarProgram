@@ -94,7 +94,7 @@ class DataAcquisition(threading.Thread):
         if np.sum(power) > 1e-6:
 
             max_peak = np.argmax(power)
-            if self.data_index: # first time
+            if self.data_index == 0: # first time
                 self.local_peaks_index.append(max_peak)
                 self.threshold = 0.5 * max_peak
             else:
