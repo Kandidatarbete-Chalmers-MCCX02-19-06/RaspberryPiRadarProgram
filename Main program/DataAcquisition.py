@@ -18,7 +18,7 @@ class DataAcquisition(threading.Thread):
     def __init__(self, go):
         super(DataAcquisition, self).__init__()  # Inherit threading vitals
         self.go = go
-        self.sweep_index = 0 # för plotten
+        #self.sweep_index = 0 # för plotten
         # Setup for collecting data from acconeers radar files.
         self.args = example_utils.ExampleArgumentParser().parse_args()
         example_utils.config_logging(self.args)
@@ -87,6 +87,7 @@ class DataAcquisition(threading.Thread):
             self.lp_com = com
             self.tracked_data = None
             self.data_index = 1
+            self.lp_ampl = ampl
         else:
             a = self.alpha(0.1, self.dt)
             self.lp_ampl = a * ampl + (1 - a) * self.lp_ampl
@@ -123,7 +124,7 @@ class DataAcquisition(threading.Thread):
             }
 
             self.last_sweep = data
-            self.sweep_index += 1
+            self.data_index += 1
             ################ ################ egen kod nedan ################# ###############
             a = self.alpha(0.25, self.dt)
             self.lp_com = a*com + (1-a)*self.lp_com
