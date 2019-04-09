@@ -99,7 +99,7 @@ class DataAcquisition(threading.Thread):
             self.tracked_amplitude = np.abs(data[com_idx])
             self.tracked_phase = np.angle(data[com_idx])
             self.tracked_data = {"tracked distance": self.tracked_distance,
-                                 "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase, }
+                                 "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase}
 
         return self.tracked_data
 

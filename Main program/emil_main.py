@@ -19,7 +19,6 @@ import subprocess       # for Raspberry Pi shutdown
 def main():
     # subprocess.call(
     #    "./Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c")
-    time.sleep(5)
 
     radar_queue = queue.Queue()
     #send_to_app_queue = queue.Queue()
