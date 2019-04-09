@@ -157,7 +157,7 @@ class DataAcquisition(threading.Thread):
 
 
             self.tracked_data = {"tracked distance": self.tracked_distance,
-                                 "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase, "com": com, "abs": self.lp_ampl}
+                                 "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase, "com": self.lp_com, "abs": self.lp_ampl}
 
 
         return self.tracked_data
