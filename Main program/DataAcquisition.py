@@ -32,9 +32,9 @@ class DataAcquisition(threading.Thread):
         self.config = configs.IQServiceConfig()
         self.config.sensor = self.args.sensors
         # Settings for radar setup
-        self.config.range_interval = [0.2, 1]  # Measurement interval
-        self.config.sweep_rate = 24  # Frequency for collecting data
-        self.config.gain = 0.7  # Gain between 0 and 1.
+        self.config.range_interval = [0.2, 1.5]  # Measurement interval
+        self.config.sweep_rate = 80  # Frequency for collecting data
+        self.config.gain = 0.8  # Gain between 0 and 1.
 
         # self.sweep_index = 0 # för plotten
         # för plotten
@@ -67,7 +67,7 @@ class DataAcquisition(threading.Thread):
             if tracked_data is not None:
                 try:
                     self.pg_process.put_data(tracked_data)
-                    print("Tracked data: ", tracked_data["tracked distance"])
+                    # print("Tracked data: ", tracked_data["tracked distance"])
                 except PGProccessDiedException:
                     break
             # if tracked_data is not None:
