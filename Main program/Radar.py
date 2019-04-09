@@ -111,7 +111,7 @@ class Radar(threading.Thread):
     def tracking(self, data):
         data = np.transpose(data)
         # self.data = data      # Removed because using local data variable. Easier to understand how data travells in class
-        print("Length of data input ", str(len(data)))
+        # print("Length of data input ", str(len(data)))
         if self.data_idx == 0 and self.counter == 0:      # things that only happens first time
             I = np.argmax(np.abs(data))
             self.I_peaks[:] = I
@@ -151,18 +151,14 @@ class Radar(threading.Thread):
             # else:
             # self.i_avg_start = self.data_idx - (self.N_avg - 1)
 
-            self.I_peaks_filtered[self.data_idx] = np.round(
-                np.mean(self.I_peaks))      # mean value of N_avg latest peaks
+            self.I_peaks_filtered[self.data_idx] = np.round(np.mean(self.I_peaks))      # mean value of N_avg latest peaks
 
             # determines threshold
             self.threshold = np.abs(data[int(self.I_peaks_filtered[self.data_idx])])*0.5
 
-            self.tracked_distance[self.data_idx] = self.real_dist[int(
-                self.I_peaks_filtered[self.data_idx])]
-            self.tracked_amplitude[self.data_idx] = np.abs(
-                data[int(self.I_peaks_filtered[self.data_idx])])
-            self.tracked_phase[self.data_idx] = np.angle(
-                data[int(self.I_peaks_filtered[self.data_idx])])
+            self.tracked_distance[self.data_idx] = self.real_dist[int(self.I_peaks_filtered[self.data_idx])]
+            self.tracked_amplitude[self.data_idx] = np.abs(data[int(self.I_peaks_filtered[self.data_idx])])
+            self.tracked_phase[self.data_idx] = np.angle(data[int(self.I_peaks_filtered[self.data_idx])])
 
         # print("I_peaks_filtered: ", self.I_peaks_filtered)
 
