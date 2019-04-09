@@ -5,6 +5,7 @@ import queue
 # Fs samplingsfrekvens
 # t vektor linspace, mättid
 
+
 def schmittTrigger(self, respiratory_queue_BR):
     # Variabeldeklarationer
     Tc = 5
@@ -19,10 +20,11 @@ def schmittTrigger(self, respiratory_queue_BR):
     countHys = 1        # for counting if hysteresis should be updated
     FHighBR = 0.7       # To remove outliers in mean value
     FLowBR = 0.2        # To remove outliers in mean value
-    trackedBRvector = np.zeros(Fs*Tc)       # for saving respiratory_queue_BR old values for hysteresis
+    # for saving respiratory_queue_BR old values for hysteresis
+    trackedBRvector = np.zeros(Fs*Tc)
 
-
-    trackedBRvector[countHys-1] = respiratory_queue_BR.get()  # to be able to use the same value in the whole loop
+    # to be able to use the same value in the whole loop
+    trackedBRvector[countHys-1] = respiratory_queue_BR.get()
 
     if countHys == Fs*Tc:
         Hcut = np.sqrt(np.mean(np.square(trackedBRvector)))     # rms of trackedBRvector
@@ -38,10 +40,12 @@ def schmittTrigger(self, respiratory_queue_BR):
             np.roll(freqArray, 1)
             freqArray[0] = Fs/count     # save the new frequency between two negative flanks
             # Take the mean value
-            CurFreq_queue = getMeanOfFreqArray()        # CurFreq_queue is supposed to be Breathing rate queue that is sent to app
+            # CurFreq_queue is supposed to be Breathing rate queue that is sent to app
+            CurFreq_queue = getMeanOfFreqArray(freqArray, FHighBR, FLowBR)
             # TODO put getMeanOfFreqArray() into queue that connects to send bluetooth values instead
             count = 0
-    elif trackedBRvector[countHys-1] >= Hcut:       # trackedBRvector[countHys-1] is the current data from filter
+    # trackedBRvector[countHys-1] is the current data from filter
+    elif trackedBRvector[countHys-1] >= Hcut:
         schNy = 1
         # TODO skicka data till app för realTime breathing
 
@@ -49,8 +53,10 @@ def schmittTrigger(self, respiratory_queue_BR):
     count += 1
     countHys += 1
 
-def getMeanOfFreqArray():       # remove outliers and return mean value over last avOver values
-    freqArrayTemp = [x for x in freqArray if(x < FHighBR and x > FLowBR)]       # remove all values > FHighBR and < FLowBR
+
+# remove outliers and return mean value over last avOver values
+def getMeanOfFreqArray(freqArray, FHighBR, FLowBR):  # remove all values > FHighBR and < FLowBR
+    freqArrayTemp = [x for x in freqArray if(x < FHighBR and x > FLowBR)]
     print(freqArrayTemp)
     freqArrayTemp = freqArrayTemp[np.nonzero(freqArrayTemp)]
     print(freqArrayTemp)
@@ -58,7 +64,8 @@ def getMeanOfFreqArray():       # remove outliers and return mean value over las
     median = np.median(freqArrayTemp)       # median value
     stanDev = np.std(freqArrayTemp)     # standard deviation
 
-    freqArrayTemp = [x for x in freqArrayTemp if (x > median - 3*stanDev and x < median + 3*stanDev)]
+    freqArrayTemp = [x for x in freqArrayTemp if (
+        x > median - 3*stanDev and x < median + 3*stanDev)]
     print(freqArrayTemp)
     mean = np.mean(freqArrayTemp)       # mean value of last avOver values excluding outliers
     return mean
