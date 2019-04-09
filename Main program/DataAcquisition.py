@@ -95,7 +95,7 @@ class DataAcquisition(threading.Thread):
             # Tracked phase is the angle between I and Q in data for tracked index
             self.tracked_distance = (1-self.lp_com) * \
                 self.config.range_interval[0] + self.lp_com*self.config.range_interval[1]
-            print("Tracked Distance {} and com idx {}".format(self.com_x, com_idx))
+            # print("Tracked Distance {} and com idx {}".format(self.com_x, com_idx))
             self.tracked_amplitude = np.abs(data[com_idx])
             self.tracked_phase = np.angle(data[com_idx])
             self.tracked_data = {"tracked distance": self.tracked_distance,
