@@ -18,6 +18,7 @@ class DataAcquisition(threading.Thread):
     def __init__(self, go):
         super(DataAcquisition, self).__init__()  # Inherit threading vitals
         self.go = go
+        self.sweep_index = 0 # för plotten
         # Setup for collecting data from acconeers radar files.
         self.args = example_utils.ExampleArgumentParser().parse_args()
         example_utils.config_logging(self.args)
@@ -87,6 +88,43 @@ class DataAcquisition(threading.Thread):
             self.tracked_data = None
             self.data_index = 1
         else:
+            a = self.alpha(0.1, self.dt)
+            self.lp_ampl = a * ampl + (1 - a) * self.lp_ampl
+            a = self.alpha(0.25, self.dt)
+            self.lp_com = a * com + (1 - a) * self.lp_com
+
+            com_idx = int(self.lp_com * n)
+            delta_angle = np.angle(data[com_idx] * np.conj(self.last_sweep[com_idx]))
+            vel = self.f * 2.5 * delta_angle / (2 * np.pi)
+
+            a = self.alpha(0.1, self.dt)
+            self.lp_vel = a * vel + (1 - a) * self.lp_vel
+
+            self.hist_vel = np.roll(self.hist_vel, -1)
+            self.hist_vel[-1] = self.lp_vel
+
+            dp = self.lp_vel / self.f
+            self.hist_pos = np.roll(self.hist_pos, -1)
+            self.hist_pos[-1] = self.hist_pos[-2] + dp
+
+            hist_len = len(self.hist_pos)
+            plot_hist_pos = self.hist_pos - self.hist_pos.mean()
+            plot_hist_pos_zoom = self.hist_pos[hist_len // 2:] - self.hist_pos[hist_len // 2:].mean()
+
+            iq_val = np.exp(1j * np.angle(data[com_idx])) * self.lp_ampl[com_idx]
+
+            plot_data = {
+                "abs": self.lp_ampl,
+                "arg": np.angle(data),
+                "com": self.lp_com,
+                "hist_pos": plot_hist_pos,
+                "hist_pos_zoom": plot_hist_pos_zoom,
+                "iq_val": iq_val,
+            }
+
+            self.last_sweep = data
+            self.sweep_index += 1
+            ################ ################ egen kod nedan ################# ###############
             a = self.alpha(0.25, self.dt)
             self.lp_com = a*com + (1-a)*self.lp_com
             com_idx = int(self.lp_com * n)
