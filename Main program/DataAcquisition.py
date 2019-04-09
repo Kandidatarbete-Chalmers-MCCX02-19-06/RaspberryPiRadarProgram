@@ -86,8 +86,8 @@ class DataAcquisition(threading.Thread):
         return data
 
     def tracking(self, data):
-        data = np.transpose(data)
-        # data = np.array(data).flatten()
+        # data = np.transpose(data)
+        data = np.array(data).flatten()
         n = len(data)
         ampl = np.abs(data)
         power = ampl*ampl
