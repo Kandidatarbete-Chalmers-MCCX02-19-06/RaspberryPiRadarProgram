@@ -94,6 +94,7 @@ class DataAcquisition(threading.Thread):
             max_peak = np.argmax(power)
             if self.track_peak_index is None:
                 self.local_peaks_index[:] = max_peak
+                self.threshold = 0.5 * max_peak
             else:
                 self.local_peaks_index, _ = signal.find_peaks(np.abs(data))  # find local maximas in data
                 self.local_peaks_index = [x for x in self.local_peaks_index if (np.abs(data[x]) > self.threshold)]
@@ -106,6 +107,7 @@ class DataAcquisition(threading.Thread):
                     self.track_peak_index.pop(0)
             if self.track_peak_index[-1] < 0.1 * max_peak:
                 self.local_peaks_index[:] = max_peak # reset the array and take the new global max as
+                self.threshold = 0.5 * max_peak
             self.local_peaks_avarage_index = np.round(np.average(self.track_peak_index))
             self.threshold = np.abs(data[int(self.local_peaks_average_index)]) * 0.5 # threshold for
 
