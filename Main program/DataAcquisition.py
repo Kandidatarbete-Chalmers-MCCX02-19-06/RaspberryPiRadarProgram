@@ -240,7 +240,7 @@ class PGUpdater:
             # self.ts_zoom = np.linspace(-1.5, 0, len(data["hist_pos_zoom"]))
             self.first = False
 
-        com_x = (1-data["tracked distance"])*self.interval[0] + data["tracked distance"]*self.interval[1]
+        com_x = (1-data["com"])*self.interval[0] + data["com"]*self.interval[1]
 
         self.distance_curve.setData(self.xs, np.array(data["abs"]).flatten())
         self.distance_plot.setYRange(0, self.smooth_max.update(np.amax(data["abs"])))
