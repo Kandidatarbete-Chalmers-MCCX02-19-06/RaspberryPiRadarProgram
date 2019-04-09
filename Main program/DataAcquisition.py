@@ -33,7 +33,7 @@ class DataAcquisition(threading.Thread):
         self.config.sensor = self.args.sensors
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.5]  # Measurement interval
-        self.config.sweep_rate = 80  # Frequency for collecting data
+        self.config.sweep_rate = 15  # Frequency for collecting data
         self.config.gain = 0.9  # Gain between 0 and 1.
 
         # self.sweep_index = 0 # för plotten
@@ -52,7 +52,7 @@ class DataAcquisition(threading.Thread):
         self.average_com = []  # array med avstånd
         self.local_peaks_index = [] # index of local peaks
         self.track_peak_index = [] # index of last tracked peaks
-        self.local_peaks_average_index = None # average of last tracked peaks
+        self.track_peaks_average_index = None # average of last tracked peaks
         self.threshold = None # threshold for removing small local peaks
         self.data_index = 0
         # self.real_dist = np.linspace(
@@ -120,7 +120,7 @@ class DataAcquisition(threading.Thread):
                 # print("local peaks: ",self.local_peaks_index)
                 #self.local_peaks_index = [x for x in self.local_peaks_index if (np.abs(power[x]) > self.threshold)]
                 # print("local peaks: ",self.local_peaks_index)
-                peak_difference_index = np.subtract(self.local_peaks_index, self.local_peaks_average_index)
+                peak_difference_index = np.subtract(self.local_peaks_index, self.track_peaks_average_index)
                 self.track_peak_index.append(self.local_peaks_index[np.argmin(np.abs(peak_difference_index))]) # min difference of index
                 if len(self.local_peaks_index) == 0:
                     print("No local peak found")
@@ -128,19 +128,20 @@ class DataAcquisition(threading.Thread):
                 if len(self.track_peak_index) > self.number_of_averages:  # removes oldest value
                     self.track_peak_index.pop(0)
                 if power[self.track_peak_index[-1]] < 0.2 * power[max_peak]:
+                    print("old peak to low: ",power[self.track_peak_index[-1]]," max: ",power[max_peak])
                     self.track_peak_index.clear() # reset the array
                     self.track_peak_index.append(max_peak)  # new peak as global max
                     # self.local_peaks_index[:] = max_peak # reset the array and take the new global max as
                     self.threshold = 0.5 * max_peak
 
-
+            print("tracked peak: ",self.track_peaks_average_index)
             a = self.alpha(0.25, self.dt)
             #self.local_peaks_average_index = a * np.round(np.average(self.track_peak_index)) + (
             #            1 - a) * self.local_peaks_average_index
-            self.local_peaks_average_index = np.round(np.average(self.track_peak_index))
+            self.track_peaks_average_index = np.round(np.average(self.track_peak_index))
             #print("local_peaks_avarage_index: ", self.local_peaks_average_index)
             # print(type(self.local_peaks_average_index))
-            self.threshold = np.abs(power[int(self.local_peaks_average_index)]) * 0.5 # threshold for
+            self.threshold = np.abs(power[int(self.track_peaks_average_index)]) * 0.5 # threshold for
             #print("Threshold: ", self.threshold)
 
             # com = np.argmax(power) / n  # globalt maximum #How does this work elementwise or not?
@@ -148,7 +149,7 @@ class DataAcquisition(threading.Thread):
             # if len(self.average_com) > self.averages:  # tar bort älsta värdet
             #     self.average_com.pop(0)
             # com = np.average(self.average_com)  # medelvärdet av tidigare avstånd
-            com = self.local_peaks_average_index/len(data)
+            com = self.track_peaks_average_index/len(data)
 
         else:
             com = 0
@@ -212,7 +213,7 @@ class DataAcquisition(threading.Thread):
             # för plott
             self.lp_ampl = a * ampl + (1 - a) * self.lp_ampl
 
-            tracked_distance = (1 - self.local_peaks_average_index/len(data)) * self.config.range_interval[0] + self.local_peaks_average_index/len(data) * self.config.range_interval[1]
+            tracked_distance = (1 - self.track_peaks_average_index/len(data)) * self.config.range_interval[0] + self.track_peaks_average_index/len(data) * self.config.range_interval[1]
 
             # self.tracked_data = {"tracked distance": self.tracked_distance,
             #                      "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase, "com": self.lp_com, "abs": self.lp_ampl}
