@@ -50,6 +50,7 @@ class DataAcquisition(threading.Thread):
         self.dt = 1 / self.f
         self.number_of_averages = 3  # antalet medelvärdesbildningar
         self.average_com = []  # array med avstånd
+        self.local_peaks_index = [] # index of local peaks
         self.track_peak_index = [] # index of last tracked peaks
         self.local_peaks_average_index = None # average of last tracked peaks
         self.threshold = None # threshold for removing small local peaks
@@ -93,7 +94,7 @@ class DataAcquisition(threading.Thread):
         if np.sum(power) > 1e-6:
 
             max_peak = np.argmax(power)
-            if self.threshold is None:
+            if self.threshold is None: # first time
                 self.local_peaks_index[:] = max_peak
                 self.threshold = 0.5 * max_peak
             else:
