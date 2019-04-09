@@ -108,17 +108,17 @@ class DataAcquisition(threading.Thread):
 
                 #print(self.local_peaks_index)
                 index = 0
-                # index_list = []
-                # # print("Threshold: ",self.threshold)
-                # for peak in self.local_peaks_index:
-                #     if np.abs(data[peak]) < self.threshold:
-                #         # np.delete(self.local_peaks_index, index)
-                #         index_list.append(index)
-                #         index += 1
-                # np.delete(self.local_peaks_index, index_list)       # deletes all indexes with amplitude < threshold
+                index_list = []
+                # print("Threshold: ",self.threshold)
+                for peak in self.local_peaks_index:
+                    if np.abs(data[peak]) < self.threshold:
+                        # np.delete(self.local_peaks_index, index)
+                        index_list.append(index)
+                        index += 1
+                np.delete(self.local_peaks_index, index_list)       # deletes all indexes with amplitude < threshold
                 # self.local_peaks_index = self.local_peaks_index[(np.abs(data[:]) > self.threshold)]
                 # print("local peaks: ",self.local_peaks_index)
-                self.local_peaks_index = [x for x in self.local_peaks_index if (np.abs(data[x]) > self.threshold)]
+                #self.local_peaks_index = [x for x in self.local_peaks_index if (np.abs(data[x]) > self.threshold)]
                 # print("local peaks: ",self.local_peaks_index)
                 peak_difference_index = np.subtract(self.local_peaks_index, self.local_peaks_average_index)
                 self.track_peak_index.append(self.local_peaks_index[np.argmin(np.abs(peak_difference_index))]) # min difference of index
