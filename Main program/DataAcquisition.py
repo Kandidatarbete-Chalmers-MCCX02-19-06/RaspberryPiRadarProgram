@@ -96,7 +96,6 @@ class DataAcquisition(threading.Thread):
             max_peak = np.argmax(power)
             if self.data_index == 0: # first time
                 self.track_peak_index.append(max_peak)
-                print("track_peak_index: ",self.track_peak_index)
                 # self.threshold = 0.5 * max_peak
                 # print("Threshold: ",self.threshold)
             else:
@@ -128,14 +127,12 @@ class DataAcquisition(threading.Thread):
                     self.track_peak_index[-1] = self.track_peak_index[-2]
                 if len(self.track_peak_index) > self.number_of_averages:  # removes oldest value
                     self.track_peak_index.pop(0)
-                # if data[self.track_peak_index[-1]] < 0.1 * data[max_peak]:
-                #     self.track_peak_index.clear() # reset the array
-                #     self.track_peak_index.append(max_peak)  # new peak as global max
-                #     # self.local_peaks_index[:] = max_peak # reset the array and take the new global max as
-                #     self.threshold = 0.5 * max_peak
+                if data[self.track_peak_index[-1]] < 0.1 * data[max_peak]:
+                    self.track_peak_index.clear() # reset the array
+                    self.track_peak_index.append(max_peak)  # new peak as global max
+                    # self.local_peaks_index[:] = max_peak # reset the array and take the new global max as
+                    self.threshold = 0.5 * max_peak
 
-
-                print("track_peak_index: ",self.track_peak_index)
 
             a = self.alpha(0.25, self.dt)
             #self.local_peaks_average_index = a * np.round(np.average(self.track_peak_index)) + (
