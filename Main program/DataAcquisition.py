@@ -32,7 +32,7 @@ class DataAcquisition(threading.Thread):
         self.config = configs.IQServiceConfig()
         self.config.sensor = self.args.sensors
         # Settings for radar setup
-        self.config.range_interval = [0.2, 1.5]  # Measurement interval
+        self.config.range_interval = [0.4, 1.5]  # Measurement interval
         self.config.sweep_rate = 80  # Frequency for collecting data
         self.config.gain = 0.9  # Gain between 0 and 1.
 
@@ -50,6 +50,8 @@ class DataAcquisition(threading.Thread):
         self.dt = 1 / self.f
         self.averages = 3  # antalet medelvärdesbildningar
         self.average_com = []  # array med avstånd
+        self.track_peak_index = [] # index of last tracked peaks
+        self.local_peaks_average_index = None # average of last tracked peaks
         self.data_index = 0
         # self.real_dist = np.linspace(
         #    self.config.range_interval[0], self.config.range_interval[1], num=self.num_points)
@@ -87,11 +89,31 @@ class DataAcquisition(threading.Thread):
         ampl = np.abs(data)
         power = ampl*ampl
         if np.sum(power) > 1e-6:
-            com = np.argmax(power) / n  # globalt maximum #How does this work elementwise or not?
-            self.average_com.append(com)
-            if len(self.average_com) > self.averages:  # tar bort älsta värdet
-                self.average_com.pop(0)
-            com = np.average(self.average_com)  # medelvärdet av tidigare avstånd
+
+            max_peak = np.argmax(power)
+            if self.track_peak_index is None:
+                self.local_peaks_index[:] = max_peak
+            else:
+                self.local_peaks_index, _ = signal.find_peaks(np.abs(data))  # find local maximas in data
+                self.local_peaks_index = [x for x in self.local_peaks_index if (np.abs(data[x]) > self.threshold)]
+                peak_difference_index = np.subtract(self.local_peaks_index, self.local_peaks_average_index)
+                self.track_peak_index.append(np.argmin(np.abs(peak_difference_index))) # min difference of index
+                if len(self.local_peaks_index) == 0:
+                    print("No local peak found")
+                    self.track_peak_index[-1] = self.track_peak_index[-2]
+                if len(self.track_peak_index) > self.averages:  # removes oldest value
+                    self.track_peak_index.pop(0)
+            if self.track_peak_index[-1] < 0.1 * max_peak:
+                self.local_peaks_index[:] = max_peak # reset the array and take the new global max as
+            self.local_peaks_avarage_index = np.round(np.average(self.track_peak_index))
+            self.threshold = np.abs(data[int(self.local_peaks_average_index)]) * 0.5 # threshold for
+
+            # com = np.argmax(power) / n  # globalt maximum #How does this work elementwise or not?
+            # self.average_com.append(com)
+            # if len(self.average_com) > self.averages:  # tar bort älsta värdet
+            #     self.average_com.pop(0)
+            # com = np.average(self.average_com)  # medelvärdet av tidigare avstånd
+
         else:
             com = 0
 
@@ -154,11 +176,14 @@ class DataAcquisition(threading.Thread):
             # för plott
             self.lp_ampl = a * ampl + (1 - a) * self.lp_ampl
 
+            tracked_distance = (1 - self.local_peaks_avarage_index/len(data)) * self.config.range_interval[0] + self.local_peaks_avarage_index/len(data) * self.config.range_interval[1]
 
+            # self.tracked_data = {"tracked distance": self.tracked_distance,
+            #                      "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase, "com": self.lp_com, "abs": self.lp_ampl}
 
-            self.tracked_data = {"tracked distance": self.tracked_distance,
-                                 "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase, "com": self.lp_com, "abs": self.lp_ampl}
-
+            self.tracked_data = {"tracked distance": tracked_distance,
+                                 "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase,
+                                 "com": self.lp_com, "abs": self.lp_ampl}
 
         return self.tracked_data
 
