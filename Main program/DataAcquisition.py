@@ -57,7 +57,8 @@ class DataAcquisition(threading.Thread):
             # This data is an 1D array in terminal print, not in Python script however....
             data = self.get_data()
             tracked_data = self.tracking(data)
-            print("Tracked data: ", tracked_data.get("tracked distance"))
+            if tracked_data is not None:
+                print("Tracked data: ", tracked_data.get("tracked distance"))
         self.client.disconnect()
 
     def get_data(self):
@@ -83,7 +84,7 @@ class DataAcquisition(threading.Thread):
 
         if self.data_index == 0:
             self.lp_com = com
-            self.tracked_data = 0
+            self.tracked_data = None
             self.data_index = 1
         else:
             a = self.alpha(0.25, self.dt)
