@@ -1,13 +1,15 @@
 import numpy as np
 from scipy import signal #Det här kanske behöver importeras på något annat sätt.
 import matplotlib.pyplot as plt #TODO: ta bort sen
+import time #TODO: Ta bort sen
 from scipy.fftpack import fft
 import threading
 import queue
 
 class SignalProcessing:
 
-    def __init__(self, HR_filtered_queue, HR_final_queue, RR_filtered_queue, RR_final_queue): #TODO: Lägg till RR_filtered_queue och RR_final_queue
+    def __init__(self,go, HR_filtered_queue, HR_final_queue, RR_filtered_queue, RR_final_queue): #TODO: Lägg till RR_filtered_queue och RR_final_queue
+        self.go = go
         self.HR_filtered_queue = HR_filtered_queue
         self.HR_final_queue = HR_final_queue
         self.counter_fft = 0
@@ -34,9 +36,13 @@ class SignalProcessing:
         T_resolution = 30
         overlap = 90
         beta = 1
-        for i in range(3):
-            fft_window = np.zeros(T_resolution*self.sample_freq) # Data in vector with length of window
+        fft_window = np.zeros(T_resolution*self.sample_freq) # Data in vector with length of window
+        i=0
+        while self.go:
+        #for i in range(3):
             [freq,fft_signal_out] = self.windowedFFT(fft_window, overlap, beta)
+            print(i)
+            i += 1
 
 
         plt.plot(freq,fft_signal_out)
@@ -46,21 +52,26 @@ class SignalProcessing:
 
     ### windowedFFT ###
     ### input:
-    # data_in:
-    # sample_freq:
+    # fft_window: array to be filled with filtered data. And then to be fft:d
+    # overlap: how many overlapping values between two consecutive fft windows. [in percentage] 
+    # beta: shape factor for kaiser window. 
+    ### returns:
+    # freq: corresponding frequency array
+    # fft_signal_out: fft:d array
     def windowedFFT(self,fft_window, overlap, beta): 
-        window_width = len(fft_window) 
-        window_slide = int(np.round(window_width*(1-overlap/100)))
+        window_width = len(fft_window) #size of each window
+        window_slide = int(np.round(window_width*(1-overlap/100))) #number of overlapping points
 
 
-        for i in range(window_slide):
+        for i in range(window_slide): # fills the fft_window array with window_slide values from filtered queue
             fft_window[self.index_fft] = HR_filtered_queue.get()
             self.index_fft += 1
             if self.index_fft == window_width-1:
                 self.index_fft = 0
         
-        fft_window = np.roll(fft_window, -(self.index_fft+1))
-        [freq, fft_signal_out] = self.smartFFT(fft_window,beta)
+        fft_window = np.roll(fft_window, -(self.index_fft+1)) #TODO: Check if necessary
+        [freq, fft_signal_out] = self.smartFFT(fft_window,beta) #do fft
+        fft_window = np.roll(fft_window, (self.index_fft+1))
         return freq, fft_signal_out
 
         
@@ -99,29 +110,22 @@ HR_filtered_queue = queue.Queue()
 HR_final_queue = queue.Queue()
 
 sample_freq = 20
-length_seq = 600
+length_seq = 100000
 sample_spacing = 1/sample_freq
 
 t = np.arange(length_seq)*sample_spacing
-signal_in = 4*np.sin(7 * 2.0*np.pi*t) + 0.5*np.sin(2 * 2.0*np.pi*t)
+signal_in = 4*np.sin(1 * 2.0*np.pi*t) + 0*np.sin(2 * 2.0*np.pi*t)
 #print(signal_in)
 
 for i in range(len(signal_in)):
     HR_filtered_queue.put(signal_in[i])
 
-for i in range(len(signal_in)):
-    HR_filtered_queue.put(signal_in[i])
+go =["True"]
 
-for i in range(len(signal_in)):
-    HR_filtered_queue.put(signal_in[i])
+signal_processing = SignalProcessing(HR_filtered_queue, HR_final_queue,go)
 
-for i in range(len(signal_in)):
-    HR_filtered_queue.put(signal_in[i])
-
-
-print(list(HR_filtered_queue.queue))
-
-signal_processing = SignalProcessing(HR_filtered_queue, HR_final_queue)
+time.sleep(0.5)
+go.pop(0)
 
 def schmittTrigger(self):
     # variable declaration
