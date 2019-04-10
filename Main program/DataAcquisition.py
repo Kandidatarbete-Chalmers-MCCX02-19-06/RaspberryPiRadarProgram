@@ -43,10 +43,11 @@ class DataAcquisition(threading.Thread):
         # Inputs for tracking
         self.f = self.config.sweep_rate  # frequency
         self.dt = 1 / self.f
-        self.a = self.alpha(0.25, self.dt)  # weighted integration for last two values to smooth the changes.
+        self.smooth_delay_weighting = self.delay_weighting_function(0.25, self.dt)  # Weighted delay to smooth changes.
         # tau changes the weight, lower tau means more weight on last value. Usually tau = 0.25 is good.
         self.number_of_averages = 2  # number of averages for tracked peak
-        self.number_of_time_samples = int(2 / self.dt)  # number of time samples when plotting distance over time
+        self.plot_time_length = 10  # length of plotted data
+        self.number_of_time_samples = int(self.plot_time_length / self.dt)  # number of time samples when plotting distance over time
         self.tracked_distance_over_time = np.zeros(self.number_of_time_samples) # array for distance over time
         self.average_com = []  # array med avstånd
         self.local_peaks_index = [] # index of local peaks
@@ -146,8 +147,9 @@ class DataAcquisition(threading.Thread):
                 if ampl[self.track_peak_index[-1]] < 0.5 * ampl[max_peak_index]:
                     self.track_peak_index.clear() # reset the array
                     self.track_peak_index.append(max_peak_index)  # new peak as global max
-                self.track_peaks_average_index = int(np.round(self.a * (np.average(self.track_peak_index)) + (
-                        1 - self.a) * self.track_peaks_average_index))
+                self.track_peaks_average_index = int(np.round(self.smooth_delay_weighting *
+                                            (np.average(self.track_peak_index)) + (1 - self.smooth_delay_weighting) *
+                                                              self.track_peaks_average_index))
 
             # self.track_peaks_average_index = int(np.round(np.average(self.track_peak_index)))
             self.threshold = np.abs(ampl[self.track_peaks_average_index]) * 0.8 # threshold for next peak
@@ -168,7 +170,7 @@ class DataAcquisition(threading.Thread):
             #self.data_index = 1
             self.lp_ampl = ampl
         else:
-            self.lp_com = self.a*com + (1-self.a)*self.lp_com
+            self.lp_com = self.smooth_delay_weighting*com + (1-self.smooth_delay_weighting)*self.lp_com
             com_idx = int(self.lp_com * n)
             # Here begins our own code
             # First row is taken from acconeer plot for how to convert lp_com to m
@@ -183,7 +185,7 @@ class DataAcquisition(threading.Thread):
             self.tracked_phase = np.angle(data[self.track_peaks_average_index])
 
             # för plott
-            self.lp_ampl = self.a * ampl + (1 - self.a) * self.lp_ampl
+            self.lp_ampl = self.smooth_delay_weighting * ampl + (1 - self.smooth_delay_weighting) * self.lp_ampl
 
             tracked_distance = (1 - self.track_peaks_average_index/len(data)) * self.config.range_interval[0] + self.track_peaks_average_index/len(data) * self.config.range_interval[1]
 
@@ -192,7 +194,7 @@ class DataAcquisition(threading.Thread):
 
             delta_angle = np.angle(data[com_idx] * np.conj(self.last_sweep[com_idx]))
             vel = self.f * 2.5 * delta_angle / (2 * np.pi)
-            self.lp_vel = self.a * vel + (1 - self.a) * self.lp_vel
+            self.lp_vel = self.smooth_delay_weighting * vel + (1 - self.smooth_delay_weighting) * self.lp_vel
             dp = self.lp_vel / self.f
             self.hist_pos = np.roll(self.hist_pos, -1)
             self.hist_pos[-1] = self.hist_pos[-2] + dp
@@ -206,7 +208,7 @@ class DataAcquisition(threading.Thread):
         self.last_sweep = data
         return self.tracked_data
 
-    def alpha(self, tau, dt):
+    def delay_weighting_function(self, tau, dt):
         return 1 - np.exp(-dt/tau)
 
     # TODO Kolla på hur stor matrisen med tracking data blir. Ändras index efter ett tag
@@ -271,7 +273,7 @@ class PGUpdater:
     def update(self, data):
         if self.first:
             self.xs = np.linspace(*self.interval, len(data["abs"]))
-            self.ts = np.linspace(-5, 0, len(data["tracked distance over time"]))
+            self.ts = np.linspace(-10, 0, len(data["tracked distance over time"]))
             # self.ts_zoom = np.linspace(-1.5, 0, len(data["hist_pos_zoom"]))
             self.first = False
 
