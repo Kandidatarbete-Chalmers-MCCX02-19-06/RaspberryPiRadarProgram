@@ -174,7 +174,7 @@ class DataAcquisition(threading.Thread):
 
             self.tracked_data = {"tracked distance": tracked_distance,
                                  "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase,
-                                 "com": self.lp_com, "abs": self.lp_ampl, "tracked distance over time": plot_hist_pos}
+                                 "com": self.lp_com, "abs": self.lp_ampl, "tracked distance over time": self.tracked_distance_over_time}
         self.data_index +=1
         self.last_sweep = data
         return self.tracked_data
@@ -209,7 +209,7 @@ class PGUpdater:
         self.distance_over_time_plot.setLabel("left", "Amplitude")
         self.distance_over_time_plot.setLabel("bottom", "Time (s)")
         self.distance_over_time_curve = self.distance_over_time_plot.plot(pen=example_utils.pg_pen_cycler(0))
-        self.distance_over_time_plot.setYRange(-5, 5)
+        self.distance_over_time_plot.setYRange(0, 1)
 
         self.smooth_max = example_utils.SmoothMax(self.config.sweep_rate)
         self.first = True
