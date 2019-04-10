@@ -8,8 +8,8 @@ import queue
 
 def schmittTrigger(self, RR_filtered_queue):
     # Variabeldeklarationer
-    Tc = 5
-    Fs = 20
+    Tc = 5      # medelvärdesbildning över antal [s]
+    Fs = 20     # sampelrate
     schNy = 0       # Schmitt ny
     schGa = 0       # Schmitt gammal
     Hcut = 0.001    # Higher hysteres cut. Change this according to filter. To manage startup of filter
@@ -21,7 +21,7 @@ def schmittTrigger(self, RR_filtered_queue):
     FHighBR = 0.7       # To remove outliers in mean value
     FLowBR = 0.2        # To remove outliers in mean value
     # for saving respiratory_queue_BR old values for hysteresis
-    trackedBRvector = np.zeros(Fs*Tc)
+    trackedBRvector = np.zeros(Fs*Tc)       # to save old values
 
     # to be able to use the same value in the whole loop
     trackedBRvector[countHys-1] = RR_filtered_queue.get()
