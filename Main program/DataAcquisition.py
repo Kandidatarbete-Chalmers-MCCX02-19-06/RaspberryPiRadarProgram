@@ -18,12 +18,11 @@ class DataAcquisition(threading.Thread):
     def __init__(self, go):
         super(DataAcquisition, self).__init__()  # Inherit threading vitals
         self.go = go
-        # Setup for collecting data from acconeers radar files.
+        # Setup for collecting data from acconeer's radar files.
         self.args = example_utils.ExampleArgumentParser().parse_args()
         example_utils.config_logging(self.args)
         if self.args.socket_addr:
             self.client = JSONClient(self.args.socket_addr)
-            # Test för att se vilken port som används av radarn
             print("RADAR Port = " + self.args.socket_addr)
         else:
             port = self.args.serial_port or example_utils.autodetect_serial_port()
@@ -31,24 +30,24 @@ class DataAcquisition(threading.Thread):
         self.client.squeeze = False
         self.config = configs.IQServiceConfig()
         self.config.sensor = self.args.sensors
+
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.5]  # Measurement interval
-        self.config.sweep_rate = 10  # Frequency for collecting data
-        self.config.gain = 0.7  # Gain between 0 and 1.
-
-        # för plotten
-        self.pg_updater = PGUpdater(self.config)
-        self.pg_process = PGProcess(self.pg_updater)
-        self.pg_process.start()
-
+        self.config.sweep_rate = 10  # Frequency for collecting data. To low means that fast movements can't be tracked.
+        # The hardware of UART/SPI limits the sweep rate.
+        self.config.gain = 0.7  # Gain between 0 and 1. Larger gain increase the SNR, but come at a cost
+        # with more instability. Optimally is around 0.7
         self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
-        self.num_points = self.info["data_length"]  # Length of data per sampel
+        self.data_length = self.info["data_length"]  # Length of data per sampel
 
         # Inputs for tracking
-        self.f = self.config.sweep_rate
+        self.f = self.config.sweep_rate  # frequency
         self.dt = 1 / self.f
-        self.number_of_averages = 2  # antalet medelvärdesbildningar
-        self.number_of_time_samples = int(10 / self.dt) # number of time samples when plotting distance over time
+        self.smooth_delay_weighting = self.delay_weighting_function(0.25, self.dt)  # Weighted delay to smooth changes.
+        # tau changes the weight, lower tau means more weight on last value. Usually tau = 0.25 is good.
+        self.number_of_averages = 2  # number of averages for tracked peak
+        self.plot_time_length = 10  # length of plotted data
+        self.number_of_time_samples = int(self.plot_time_length / self.dt)  # number of time samples when plotting distance over time
         self.tracked_distance_over_time = np.zeros(self.number_of_time_samples) # array for distance over time
         self.average_com = []  # array med avstånd
         self.local_peaks_index = [] # index of local peaks
@@ -62,8 +61,10 @@ class DataAcquisition(threading.Thread):
         self.last_sweep = None # för plotten
         self.tracked_data = None
 
-        self.a = self.alpha(0.25, self.dt) # integration for last two values
-
+        # Graphs
+        self.pg_updater = PGUpdater(self.config)
+        self.pg_process = PGProcess(self.pg_updater)
+        self.pg_process.start()
         # acconeer graph
         self.lp_vel = 0
         self.hist_vel = np.zeros(self.number_of_time_samples)
@@ -146,8 +147,9 @@ class DataAcquisition(threading.Thread):
                 if ampl[self.track_peak_index[-1]] < 0.5 * ampl[max_peak_index]:
                     self.track_peak_index.clear() # reset the array
                     self.track_peak_index.append(max_peak_index)  # new peak as global max
-                self.track_peaks_average_index = int(np.round(self.a * (np.average(self.track_peak_index)) + (
-                        1 - self.a) * self.track_peaks_average_index))
+                self.track_peaks_average_index = int(np.round(self.smooth_delay_weighting *
+                                            (np.average(self.track_peak_index)) + (1 - self.smooth_delay_weighting) *
+                                                              self.track_peaks_average_index))
 
             # self.track_peaks_average_index = int(np.round(np.average(self.track_peak_index)))
             self.threshold = np.abs(ampl[self.track_peaks_average_index]) * 0.8 # threshold for next peak
@@ -168,7 +170,7 @@ class DataAcquisition(threading.Thread):
             #self.data_index = 1
             self.lp_ampl = ampl
         else:
-            self.lp_com = self.a*com + (1-self.a)*self.lp_com
+            self.lp_com = self.smooth_delay_weighting*com + (1-self.smooth_delay_weighting)*self.lp_com
             com_idx = int(self.lp_com * n)
             # Here begins our own code
             # First row is taken from acconeer plot for how to convert lp_com to m
@@ -183,7 +185,7 @@ class DataAcquisition(threading.Thread):
             self.tracked_phase = np.angle(data[self.track_peaks_average_index])
 
             # för plott
-            self.lp_ampl = self.a * ampl + (1 - self.a) * self.lp_ampl
+            self.lp_ampl = self.smooth_delay_weighting * ampl + (1 - self.smooth_delay_weighting) * self.lp_ampl
 
             tracked_distance = (1 - self.track_peaks_average_index/len(data)) * self.config.range_interval[0] + self.track_peaks_average_index/len(data) * self.config.range_interval[1]
 
@@ -192,7 +194,7 @@ class DataAcquisition(threading.Thread):
 
             delta_angle = np.angle(data[com_idx] * np.conj(self.last_sweep[com_idx]))
             vel = self.f * 2.5 * delta_angle / (2 * np.pi)
-            self.lp_vel = self.a * vel + (1 - self.a) * self.lp_vel
+            self.lp_vel = self.smooth_delay_weighting * vel + (1 - self.smooth_delay_weighting) * self.lp_vel
             dp = self.lp_vel / self.f
             self.hist_pos = np.roll(self.hist_pos, -1)
             self.hist_pos[-1] = self.hist_pos[-2] + dp
@@ -206,7 +208,7 @@ class DataAcquisition(threading.Thread):
         self.last_sweep = data
         return self.tracked_data
 
-    def alpha(self, tau, dt):
+    def delay_weighting_function(self, tau, dt):
         return 1 - np.exp(-dt/tau)
 
     # TODO Kolla på hur stor matrisen med tracking data blir. Ändras index efter ett tag
@@ -263,7 +265,7 @@ class PGUpdater:
         self.distance_over_time_plot2.setLabel("left", "Distance")
         self.distance_over_time_plot2.setLabel("bottom", "Time (s)")
         self.distance_over_time_curve2 = self.distance_over_time_plot2.plot(pen=example_utils.pg_pen_cycler(0))
-        self.distance_over_time_plot2.setYRange(0.4, 1.4)
+        self.distance_over_time_plot2.setYRange(0.4, 1.5)
 
         self.smooth_max = example_utils.SmoothMax(self.config.sweep_rate)
         self.first = True
@@ -271,7 +273,7 @@ class PGUpdater:
     def update(self, data):
         if self.first:
             self.xs = np.linspace(*self.interval, len(data["abs"]))
-            self.ts = np.linspace(-5, 0, len(data["tracked distance over time"]))
+            self.ts = np.linspace(-10, 0, len(data["tracked distance over time"]))
             # self.ts_zoom = np.linspace(-1.5, 0, len(data["hist_pos_zoom"]))
             self.first = False
 
