@@ -33,8 +33,8 @@ class DataAcquisition(threading.Thread):
         self.config.sensor = self.args.sensors
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.5]  # Measurement interval
-        self.config.sweep_rate = 100  # Frequency for collecting data
-        self.config.gain = 0.8  # Gain between 0 and 1.
+        self.config.sweep_rate = 80  # Frequency for collecting data
+        self.config.gain = 0.7  # Gain between 0 and 1.
 
         # self.sweep_index = 0 # för plotten
         # för plotten
@@ -47,7 +47,7 @@ class DataAcquisition(threading.Thread):
 
         # Inputs for tracking
         self.f = self.config.sweep_rate
-        self.dt = 1 / self.f * 0.5
+        self.dt = 1 / self.f
         self.number_of_averages = 5  # antalet medelvärdesbildningar
         self.average_com = []  # array med avstånd
         self.local_peaks_index = [] # index of local peaks
@@ -62,7 +62,7 @@ class DataAcquisition(threading.Thread):
         self.tracked_phase = None
         self.last_sweep = None # för plotten
 
-        self.a = self.alpha(0.25, self.dt) # integration?
+        self.a = self.alpha(0.5, self.dt) # integration?
 
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
@@ -149,7 +149,7 @@ class DataAcquisition(threading.Thread):
             self.data_index = 1
             self.lp_ampl = ampl
         else:
-            a = self.alpha(0.25, self.dt)
+            #a = self.alpha(0.25, self.dt)
             self.lp_com = a*com + (1-a)*self.lp_com
             com_idx = int(self.lp_com * n)
             # Here begins our own code
