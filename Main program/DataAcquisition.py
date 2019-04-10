@@ -33,7 +33,7 @@ class DataAcquisition(threading.Thread):
         self.config.sensor = self.args.sensors
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.5]  # Measurement interval
-        self.config.sweep_rate = 80  # Frequency for collecting data
+        self.config.sweep_rate = 10  # Frequency for collecting data
         self.config.gain = 0.7  # Gain between 0 and 1.
 
         # self.sweep_index = 0 # för plotten
@@ -99,8 +99,6 @@ class DataAcquisition(threading.Thread):
             if self.data_index == 0: # first time
                 self.track_peak_index.append(max_peak_index)
                 self.track_peaks_average_index = max_peak_index
-                # self.threshold = 0.5 * max_peak
-                # print("Threshold: ",self.threshold)
             else:
                 self.local_peaks_index, _ = signal.find_peaks(power)  # find local maximas in data TODO improve to linear algebra
 
@@ -113,10 +111,10 @@ class DataAcquisition(threading.Thread):
                 #         index += 1
                 # np.delete(self.local_peaks_index, index_list)       # deletes all indexes with amplitude < threshold
                 self.local_peaks_index = self.local_peaks_index[(np.abs(power[:]) > self.threshold)]
-                # print("local peaks: ",self.local_peaks_index)
+                print("local peaks: ",self.local_peaks_index)
                 #self.local_peaks_index = [x for x in self.local_peaks_index if (np.abs(power[x]) > self.threshold)]
-                # print("local peaks: ",self.local_peaks_index)
                 peak_difference_index = np.subtract(self.local_peaks_index, self.track_peaks_average_index)
+                print("local peaks: ",self.local_peaks_index)
                 self.track_peak_index.append(self.local_peaks_index[np.argmin(np.abs(peak_difference_index))]) # min difference of index
                 if len(self.local_peaks_index) == 0:
                     print("No local peak found")
@@ -124,13 +122,11 @@ class DataAcquisition(threading.Thread):
                 if len(self.track_peak_index) > self.number_of_averages:  # removes oldest value
                     self.track_peak_index.pop(0)
                 if ampl[self.track_peak_index[-1]] < 0.5 * ampl[max_peak_index]:
-                    print("old peak to low: ",power[self.track_peak_index[-1]]," max: ",power[max_peak_index])
                     self.track_peak_index.clear() # reset the array
                     self.track_peak_index.append(max_peak_index)  # new peak as global max
                 self.track_peaks_average_index = int(np.round(self.a * (np.average(self.track_peak_index)) + (
                         1 - self.a) * self.track_peaks_average_index))
 
-            #print("tracked peak: ",self.track_peaks_average_index)
 
 
             # self.track_peaks_average_index = int(np.round(np.average(self.track_peak_index)))
