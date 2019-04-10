@@ -45,6 +45,8 @@ def main():
     # bvme.app_data()
     # print('End of bluetooth_app')
     time.sleep(10)
+    print("Initiate shutdown 1 sec")
+    time.sleep(1)
     # interrupt_queue.put(1)
     list_of_variables_for_threads["go"] = go.pop(0)
     # radar.join()
