@@ -179,6 +179,7 @@ class DataAcquisition(threading.Thread):
             #self.tracked_phase = np.angle(data[com_idx])
             self.tracked_amplitude = np.abs(data[self.track_peaks_average_index])
             self.tracked_phase = np.angle(data[self.track_peaks_average_index])
+            print(self.tracked_phase)
 
             # för plott
             self.lp_ampl = self.a * ampl + (1 - self.a) * self.lp_ampl
