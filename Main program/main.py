@@ -44,7 +44,7 @@ def main():
     # bvme = bluetooth_server.BluetoothServer(list_of_variables_for_threads)
     # bvme.app_data()
     # print('End of bluetooth_app')
-    time.sleep(300)
+    time.sleep(5)
     # interrupt_queue.put(1)
     list_of_variables_for_threads["go"] = go.pop(0)
     # radar.join()

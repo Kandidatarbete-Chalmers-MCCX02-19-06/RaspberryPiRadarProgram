@@ -116,6 +116,7 @@ class DataAcquisition(threading.Thread):
                     self.pg_process.put_data(tracked_data)  # plot data
                 except PGProccessDiedException:
                     break
+        print("out of while go in radar")
         self.client.disconnect()
 
     def get_data(self):
