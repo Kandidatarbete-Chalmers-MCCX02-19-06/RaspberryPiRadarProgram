@@ -197,7 +197,7 @@ class PGUpdater:
     def update(self, data):
         if self.first:
             self.xs = np.linspace(*self.interval, len(data["abs"]))
-            self.ts = np.linspace(-5, 0, len(data["hist_pos"]))
+            self.ts = np.linspace(-5, 0, 500)
             # self.ts_zoom = np.linspace(-1.5, 0, len(data["hist_pos_zoom"]))
             self.first = False
 
