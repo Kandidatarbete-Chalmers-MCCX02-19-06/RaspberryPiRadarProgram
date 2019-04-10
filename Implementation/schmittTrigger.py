@@ -6,7 +6,7 @@ import queue
 # t vektor linspace, mättid
 
 
-def schmittTrigger(self, respiratory_queue_BR):
+def schmittTrigger(self, RR_filtered_queue):
     # Variabeldeklarationer
     Tc = 5
     Fs = 20
@@ -24,7 +24,7 @@ def schmittTrigger(self, respiratory_queue_BR):
     trackedBRvector = np.zeros(Fs*Tc)
 
     # to be able to use the same value in the whole loop
-    trackedBRvector[countHys-1] = respiratory_queue_BR.get()
+    trackedBRvector[countHys-1] = RR_filtered_queue.get()
 
     if countHys == Fs*Tc:
         Hcut = np.sqrt(np.mean(np.square(trackedBRvector)))     # rms of trackedBRvector
@@ -40,8 +40,8 @@ def schmittTrigger(self, respiratory_queue_BR):
             np.roll(freqArray, 1)
             freqArray[0] = Fs/count     # save the new frequency between two negative flanks
             # Take the mean value
-            # CurFreq_queue is supposed to be Breathing rate queue that is sent to app
-            CurFreq_queue = getMeanOfFreqArray(freqArray, FHighBR, FLowBR)
+            # RR_final_queue is supposed to be the breathing rate queue that is sent to app
+            RR_final_queue = getMeanOfFreqArray(freqArray, FHighBR, FLowBR)
             # TODO put getMeanOfFreqArray() into queue that connects to send bluetooth values instead
             count = 0
     # trackedBRvector[countHys-1] is the current data from filter
