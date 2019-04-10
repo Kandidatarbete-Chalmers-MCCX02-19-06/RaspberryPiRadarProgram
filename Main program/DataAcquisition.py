@@ -174,7 +174,8 @@ class DataAcquisition(threading.Thread):
 
             self.tracked_data = {"tracked distance": tracked_distance,
                                  "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase,
-                                 "com": self.lp_com, "abs": self.lp_ampl, "tracked distance over time": plot_hist_pos}
+                                 "com": self.lp_com, "abs": self.lp_ampl, "tracked distance over time": plot_hist_pos,
+                                 "tracked distance over time 2": self.tracked_distance_over_time}
         self.data_index +=1
         self.last_sweep = data
         return self.tracked_data
@@ -191,7 +192,7 @@ class PGUpdater:
         self.interval = config.range_interval
 
     def setup(self, win):
-        win.resize(1200, 600)
+        win.resize(1600, 1000)
         win.setWindowTitle("Track distance example")
 
         self.distance_plot = win.addPlot(row=0, col=0)
@@ -204,12 +205,19 @@ class PGUpdater:
         self.distance_inf_line = pg.InfiniteLine(pen=pen)
         self.distance_plot.addItem(self.distance_inf_line)
 
-        self.distance_over_time_plot = win.addPlot(row=0, col=1)
+        self.distance_over_time_plot = win.addPlot(row=1, col=0)
         self.distance_over_time_plot.showGrid(x=True, y=True)
         self.distance_over_time_plot.setLabel("left", "Distance")
         self.distance_over_time_plot.setLabel("bottom", "Time (s)")
         self.distance_over_time_curve = self.distance_over_time_plot.plot(pen=example_utils.pg_pen_cycler(0))
         self.distance_over_time_plot.setYRange(-10, 10)
+
+        self.distance_over_time_plot2 = win.addPlot(row=1, col=1)
+        self.distance_over_time_plot2.showGrid(x=True, y=True)
+        self.distance_over_time_plot2.setLabel("left", "Distance")
+        self.distance_over_time_plot2.setLabel("bottom", "Time (s)")
+        self.distance_over_time_curve2 = self.distance_over_time_plot.plot(pen=example_utils.pg_pen_cycler(0))
+        self.distance_over_time_plot2.setYRange(0, 1)
 
         self.smooth_max = example_utils.SmoothMax(self.config.sweep_rate)
         self.first = True
@@ -225,5 +233,6 @@ class PGUpdater:
 
         self.distance_curve.setData(self.xs, np.array(data["abs"]).flatten())
         self.distance_over_time_curve.setData(self.ts, data["tracked distance over time"])
+        self.distance_over_time_curve2.setData(self.ts, data["tracked distance over time 2"])
         self.distance_plot.setYRange(0, self.smooth_max.update(np.amax(data["abs"])))
         self.distance_inf_line.setValue(data["tracked distance"])
