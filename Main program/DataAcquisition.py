@@ -130,7 +130,7 @@ class DataAcquisition(threading.Thread):
 
 
             # self.track_peaks_average_index = int(np.round(np.average(self.track_peak_index)))
-            self.threshold = np.abs(ampl[self.track_peaks_average_index]) * 0.8 # threshold for next peak
+            self.threshold = np.abs(ampl[self.track_peaks_average_index]) * 0.5 # threshold for next peak
 
             # com = np.argmax(power) / n  # globalt maximum #How does this work elementwise or not?
             # self.average_com.append(com)
