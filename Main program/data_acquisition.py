@@ -86,8 +86,10 @@ class DataAcquisition(threading.Thread):
                              0.0055361, 0.0057127, 0.001624, -0.0026926, -0.0039765, -0.0020194, 0.00091246, 0.0023996,
                              0.0017329, 1.9897e-18, -0.0012209, -0.0011887, -0.00031655, 0.0004875, 0.00066201,
                              0.00030536, -0.0001234, -0.0002844, -0.00017507, -2.1943e-19, 7.7519e-05]
+        
         self.length_of_input_vector = len(self.coefficients)  # Length of coefficient vector and length of input vector
         self.input_vector = np.zeros(self.length_of_input_vector)  # the same length as coefficients.
+
         # Important = zero from beginning
         self.output_vector_queue = queue.Queue()
         self.input_vector_index = 0  # to know where the latest input value is in input_vector
