@@ -216,7 +216,7 @@ class PGUpdater:
         self.distance_over_time_plot2.showGrid(x=True, y=True)
         self.distance_over_time_plot2.setLabel("left", "Distance")
         self.distance_over_time_plot2.setLabel("bottom", "Time (s)")
-        self.distance_over_time_curve2 = self.distance_over_time_plot.plot(pen=example_utils.pg_pen_cycler(0))
+        self.distance_over_time_curve2 = self.distance_over_time_plot2.plot(pen=example_utils.pg_pen_cycler(0))
         self.distance_over_time_plot2.setYRange(0, 1)
 
         self.smooth_max = example_utils.SmoothMax(self.config.sweep_rate)
