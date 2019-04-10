@@ -7,6 +7,8 @@ import queue
 import pyqtgraph as pg
 from PyQt5 import QtCore
 
+import filter
+
 from acconeer_utils.clients.reg.client import RegClient
 from acconeer_utils.clients.json.client import JSONClient
 from acconeer_utils.clients import configs
@@ -91,6 +93,12 @@ class DataAcquisition(threading.Thread):
         self.length_of_input_vector = len(self.coefficients)  # Length of coefficient vector and length of input vector
         self.input_vector = np.zeros(self.length_of_input_vector)  # the same length as coefficients.
 
+        self.highpass_HR = filter.Filter('highpass_HR')
+        self.lowpass_HR = filter.Filter('lowpass_HR')
+        self.highpass_RR = filter.Filter('highpass_RR')
+        self.lowhpass_RR = filter.Filter('lowpass_RR')
+
+
         # Important = zero from beginning
         self.output_vector_queue = queue.Queue()
         self.input_vector_index = 0  # to know where the latest input value is in input_vector
@@ -102,7 +110,9 @@ class DataAcquisition(threading.Thread):
             data = self.get_data()
             tracked_data = self.tracking(data)  # processing data and tracking peaks
             if tracked_data is not None:
-                filtered_tracked_data = self.filter(tracked_data["tracked phase"])  # filter the data
+                #filtered_tracked_data = self.filter(tracked_data["tracked phase"])  # filter the data
+                filtered_data_HR = self.highpass_HR.filter(tracked_data["tracked phase"])
+                print(filtered_data_HR)
                 self.output_vector_queue.put(
                     filtered_tracked_data)  # put filtered data in output queue to send to SignalProcessing
                 try:
