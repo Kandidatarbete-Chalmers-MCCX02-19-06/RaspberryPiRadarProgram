@@ -8,7 +8,7 @@ import queue
 
 class SignalProcessing:
 
-    def __init__(self,go, HR_filtered_queue, HR_final_queue, RR_filtered_queue, RR_final_queue): #TODO: Lägg till RR_filtered_queue och RR_final_queue
+    def __init__(self,go, HR_filtered_queue, HR_final_queue, RR_filtered_queue, RR_final_queue):
         self.go = go
         self.HR_filtered_queue = HR_filtered_queue
         self.HR_final_queue = HR_final_queue
@@ -24,8 +24,8 @@ class SignalProcessing:
         self.heart_rate_thread = threading.Thread(target = self.heart_rate)
         self.heart_rate_thread.start()
         #Starta schmitt
-        self.schmittTrigger = threading.Thread(target = self.schmittTrigger)
-        self.schmittTrigger.start()
+        self.schmittTrigger_thread = threading.Thread(target = self.schmittTrigger)
+        self.schmittTrigger_thread.start()
         
 
     def thread_start(self):         # used in Main to start and join the signal processing threads
@@ -69,9 +69,10 @@ class SignalProcessing:
             if self.index_fft == window_width-1:
                 self.index_fft = 0
         
-        fft_window = np.roll(fft_window, -(self.index_fft+1)) #TODO: Check if necessary
-        [freq, fft_signal_out] = self.smartFFT(fft_window,beta) #do fft
-        fft_window = np.roll(fft_window, (self.index_fft+1))
+        fft_window = np.roll(fft_window, -(self.index_fft+1)) #TODO: Check if necessary. # roll the matrix so that the last inserted value is to the right.
+        [freq, fft_signal_out] = self.smartFFT(fft_window,beta) # do fft
+        fft_window = np.roll(fft_window, (self.index_fft+1)) #TODO: check if necessayr. # roll the matrix back
+
         return freq, fft_signal_out
 
         
@@ -96,6 +97,7 @@ class SignalProcessing:
         freq = self.sample_freq*np.arange(length_seq/2)/length_seq # frequency array corresponding to frequencies in the fft
 
         return freq,signal_out
+
 
     def schmittTrigger(self):
         # variable declaration
@@ -145,7 +147,7 @@ class SignalProcessing:
             countHys += 1
 
     # Used in schmittTrigger. Removes outliers and return mean value over last avOver values.
-    def getMeanOfFreqArray(freqArray, FHighBR, FLowBR):  # remove all values > FHighBR and < FLowBR
+    def getMeanOfFreqArray(self,freqArray, FHighBR, FLowBR):  # remove all values > FHighBR and < FLowBR
         freqArrayTemp = [x for x in freqArray if (x < FHighBR and x > FLowBR)]
         # print(freqArrayTemp)
         freqArrayTemp = freqArrayTemp[np.nonzero(freqArrayTemp)]
@@ -166,6 +168,9 @@ class SignalProcessing:
 #windowedFFT(data_in, sample_freq, T_resolution, overlap, beta)
 HR_filtered_queue = queue.Queue()
 HR_final_queue = queue.Queue()
+RR_filtered_queue = queue.Queue()
+RR_final_queue = queue.Queue()
+
 
 sample_freq = 20
 length_seq = 100000
@@ -177,10 +182,11 @@ signal_in = 4*np.sin(1 * 2.0*np.pi*t) + 0*np.sin(2 * 2.0*np.pi*t)
 
 for i in range(len(signal_in)):
     HR_filtered_queue.put(signal_in[i])
+    RR_filtered_queue.put(signal_in[i])
 
 go =["True"]
 
-signal_processing = SignalProcessing(HR_filtered_queue, HR_final_queue,go)
+signal_processing = SignalProcessing(go,HR_filtered_queue, HR_final_queue,RR_filtered_queue, RR_final_queue)
 
 time.sleep(0.5)
 go.pop(0)
