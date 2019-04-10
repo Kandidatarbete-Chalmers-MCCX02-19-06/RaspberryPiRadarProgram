@@ -162,7 +162,7 @@ class DataAcquisition(threading.Thread):
             tracked_distance = (1 - self.track_peaks_average_index/len(data)) * self.config.range_interval[0] + self.track_peaks_average_index/len(data) * self.config.range_interval[1]
 
             self.tracked_distance_over_time = np.roll(self.tracked_distance_over_time,-1)
-            self.tracked_distance_over_time[-1] = tracked_distance - np.mean(self.tracked_distance_over_time)
+            self.tracked_distance_over_time[-1] = tracked_distance# - np.mean(self.tracked_distance_over_time)
 
             delta_angle = np.angle(data[com_idx] * np.conj(self.last_sweep[com_idx]))
             vel = self.f * 2.5 * delta_angle / (2 * np.pi)
@@ -217,7 +217,7 @@ class PGUpdater:
         self.distance_over_time_plot2.setLabel("left", "Distance")
         self.distance_over_time_plot2.setLabel("bottom", "Time (s)")
         self.distance_over_time_curve2 = self.distance_over_time_plot2.plot(pen=example_utils.pg_pen_cycler(0))
-        self.distance_over_time_plot2.setYRange(0, 1)
+        self.distance_over_time_plot2.setYRange(0, 1.4)
 
         self.smooth_max = example_utils.SmoothMax(self.config.sweep_rate)
         self.first = True
