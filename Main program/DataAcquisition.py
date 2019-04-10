@@ -175,8 +175,10 @@ class DataAcquisition(threading.Thread):
             self.tracked_distance = (1-self.lp_com) * \
                 self.config.range_interval[0] + self.lp_com*self.config.range_interval[1]
             # print("Tracked Distance {} and com idx {}".format(self.com_x, com_idx))
-            self.tracked_amplitude = np.abs(data[com_idx])
-            self.tracked_phase = np.angle(data[com_idx])
+            #self.tracked_amplitude = np.abs(data[com_idx])
+            #self.tracked_phase = np.angle(data[com_idx])
+            self.tracked_amplitude = np.abs(data[self.track_peaks_average_index])
+            self.tracked_phase = np.angle(data[self.track_peaks_average_index])
 
             # för plott
             self.lp_ampl = self.a * ampl + (1 - self.a) * self.lp_ampl
