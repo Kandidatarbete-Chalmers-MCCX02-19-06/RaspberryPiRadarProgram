@@ -224,7 +224,7 @@ class DataAcquisition(threading.Thread):
 
         self.input_vector_index += 1  # Note index += 1 before if statement
         if self.input_vector_index == self.N:  # len(input_vector = N)
-            input_vector_index = 0
+            self.input_vector_index = 0
         return yn
 
 # Test with acconeer plot is removed later on
