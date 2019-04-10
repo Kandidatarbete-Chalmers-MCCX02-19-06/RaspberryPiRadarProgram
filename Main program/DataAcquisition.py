@@ -44,8 +44,8 @@ class DataAcquisition(threading.Thread):
         self.first_data = True  # first time data is processed
         self.f = self.config.sweep_rate  # frequency
         self.dt = 1 / self.f
-        self.smooth_delay_weighting = self.delay_weighting_function(0.25, self.dt)  # Weighted delay to smooth changes.
-        # tau changes the weight, lower tau means more weight on last value. Usually tau = 0.25 is good.
+        self.low_pass_const = self.low_pass_filter_function(0.25, self.dt)  # Constant for a small low-pass filter to
+        # smooth the changes. tau changes the filter weight, lower tau means shorter delay. Usually tau = 0.25 is good.
         self.number_of_averages = 2  # number of averages for tracked peak
         self.plot_time_length = 10  # length of plotted data
         self.number_of_time_samples = int(self.plot_time_length / self.dt)  # number of time samples when plotting
@@ -59,6 +59,8 @@ class DataAcquisition(threading.Thread):
         self.tracked_amplitude = None
         self.tracked_phase = None
         self.tracked_data = None  # the final tracked data that is returned
+        self.low_pass_amplitude = None
+        self.low_pass_track_peak = None
 
         # Graphs
         self.pg_updater = PGUpdater(self.config)
@@ -144,30 +146,30 @@ class DataAcquisition(threading.Thread):
                     self.track_peak_index.clear()  # reset the array
                     self.track_peak_index.append(max_peak_index)  # new peak is global max
                 self.track_peaks_average_index = int(  # Average and smooth the movements of the tracked peak
-                    np.round(self.smooth_delay_weighting * (np.average(self.track_peak_index))
-                             + (1 - self.smooth_delay_weighting) * self.track_peaks_average_index))
+                    np.round(self.low_pass_const * (np.average(self.track_peak_index))
+                             + (1 - self.low_pass_const) * self.track_peaks_average_index))
             self.threshold = np.abs(amplitude[self.track_peaks_average_index]) * 0.8  # threshold for next peak 
             # so it won't follow a much smaller peak
             track_peak_relative_position = self.track_peaks_average_index / len(data) # Position of the peak
-            # relative the range
-
+            # relative the range of the data
         else:
             track_peak_relative_position = 0
 
         if self.first_data:
-            self.lp_com = track_peak_relative_position
+            self.low_pass_track_peak = track_peak_relative_position
             self.tracked_data = None
-            self.data_index = 1
-            self.lp_ampl = amplitude
+            self.low_pass_amplitude = amplitude
         else:
-            self.lp_com = self.smooth_delay_weighting * track_peak_relative_position + (1 - self.smooth_delay_weighting) * self.lp_com
-            com_idx = int(self.lp_com * data_length)
+            # Low pass
+            self.low_pass_track_peak = self.low_pass_const * track_peak_relative_position + (
+                        1 - self.low_pass_const) * self.low_pass_track_peak
+            com_idx = int(self.low_pass_track_peak * data_length)
             # Here begins our own code
             # First row is taken from acconeer plot for how to convert lp_com to m
             # Tracked amplitude is absolute value of data for the tracked index
             # Tracked phase is the angle between I and Q in data for tracked index
-            self.tracked_distance = (1 - self.lp_com) * \
-                                    self.config.range_interval[0] + self.lp_com * self.config.range_interval[1]
+            self.tracked_distance = (1 - self.low_pass_track_peak) * \
+                                    self.config.range_interval[0] + self.low_pass_track_peak * self.config.range_interval[1]
             # print("Tracked Distance {} and com idx {}".format(self.com_x, com_idx))
             # self.tracked_amplitude = np.abs(data[com_idx])
             # self.tracked_phase = np.angle(data[com_idx])
@@ -175,7 +177,7 @@ class DataAcquisition(threading.Thread):
             self.tracked_phase = np.angle(data[self.track_peaks_average_index])
 
             # för plott
-            self.lp_ampl = self.smooth_delay_weighting * amplitude + (1 - self.smooth_delay_weighting) * self.lp_ampl
+            self.low_pass_amplitude = self.low_pass_const * amplitude + (1 - self.low_pass_const) * self.low_pass_amplitude
 
             tracked_distance = (1 - self.track_peaks_average_index / len(data)) * self.config.range_interval[
                 0] + self.track_peaks_average_index / len(data) * self.config.range_interval[1]
@@ -185,7 +187,7 @@ class DataAcquisition(threading.Thread):
 
             delta_angle = np.angle(data[com_idx] * np.conj(self.last_data[com_idx]))
             vel = self.f * 2.5 * delta_angle / (2 * np.pi)
-            self.lp_vel = self.smooth_delay_weighting * vel + (1 - self.smooth_delay_weighting) * self.lp_vel
+            self.lp_vel = self.low_pass_const * vel + (1 - self.low_pass_const) * self.lp_vel
             dp = self.lp_vel / self.f
             self.hist_pos = np.roll(self.hist_pos, -1)
             self.hist_pos[-1] = self.hist_pos[-2] + dp
@@ -196,9 +198,10 @@ class DataAcquisition(threading.Thread):
                                  "com": self.lp_com, "abs": self.lp_ampl, "tracked distance over time": plot_hist_pos,
                                  "tracked distance over time 2": self.tracked_distance_over_time}
         self.last_data = data
+        self.first_data = False
         return self.tracked_data
 
-    def delay_weighting_function(self, tau, dt):
+    def low_pass_filter_function(self, tau, dt):  # Creates low-pass filter constants
         return 1 - np.exp(-dt / tau)
 
     # TODO Kolla på hur stor matrisen med tracking data blir. Ändras index efter ett tag
