@@ -48,7 +48,7 @@ class DataAcquisition(threading.Thread):
         self.f = self.config.sweep_rate
         self.dt = 1 / self.f
         self.number_of_averages = 2  # antalet medelvärdesbildningar
-        self.number_of_time_samples = 10*self.dt
+        self.number_of_time_samples = int(10*self.dt)
         self.tracked_distance_over_time = np.zeros(self.number_of_time_samples)
         self.average_com = []  # array med avstånd
         self.local_peaks_index = [] # index of local peaks
