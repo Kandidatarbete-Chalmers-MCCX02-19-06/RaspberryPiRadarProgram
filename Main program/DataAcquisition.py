@@ -108,7 +108,7 @@ class DataAcquisition(threading.Thread):
                 index_list = []
                 # print("Threshold: ",self.threshold)
                 for peak in self.local_peaks_index:
-                    if np.abs(power[peak]) < self.threshold:
+                    if np.abs(ampl[peak]) < self.threshold: # TODO ampl
                         index_list.append(index)
                         index += 1
                 np.delete(self.local_peaks_index, index_list)       # deletes all indexes with amplitude < threshold
@@ -134,7 +134,7 @@ class DataAcquisition(threading.Thread):
 
 
             # self.track_peaks_average_index = int(np.round(np.average(self.track_peak_index)))
-            self.threshold = np.abs(power[self.track_peaks_average_index]) * 0.8 # threshold for
+            self.threshold = np.abs(ampl[self.track_peaks_average_index]) * 0.8 # threshold for TODO amplitude
 
             # com = np.argmax(power) / n  # globalt maximum #How does this work elementwise or not?
             # self.average_com.append(com)
