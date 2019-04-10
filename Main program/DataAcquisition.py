@@ -158,7 +158,7 @@ class DataAcquisition(threading.Thread):
             tracked_distance = (1 - self.track_peaks_average_index/len(data)) * self.config.range_interval[0] + self.track_peaks_average_index/len(data) * self.config.range_interval[1]
 
             np.roll(self.tracked_distance_over_time, -1)
-            self.tracked_distance_over_time[-1] = tracked_distance
+            self.tracked_distance_over_time[-1] = tracked_distance - np.mean(self.tracked_distance_over_time)
 
             self.tracked_data = {"tracked distance": tracked_distance,
                                  "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase,
@@ -178,7 +178,7 @@ class PGUpdater:
         self.interval = config.range_interval
 
     def setup(self, win):
-        win.resize(800, 600)
+        win.resize(1200, 600)
         win.setWindowTitle("Graphs")
 
         self.distance_plot = win.addPlot(row=0, col=0)
@@ -196,6 +196,7 @@ class PGUpdater:
         self.distance_over_time_plot.setLabel("left", "Amplitude")
         self.distance_over_time_plot.setLabel("bottom", "Time (s)")
         self.distance_over_time_curve = self.distance_over_time_plot.plot(pen=example_utils.pg_pen_cycler(0))
+        self.distance_over_time_plot.setYRange(-5, 5)
 
         self.smooth_max = example_utils.SmoothMax(self.config.sweep_rate)
         self.first = True
@@ -204,6 +205,7 @@ class PGUpdater:
         if self.first:
             self.xs = np.linspace(*self.interval, len(data["abs"]))
             self.ts = np.linspace(-5, 0, len(data["tracked distance over time"]))
+            print(self.ts)
             # self.ts_zoom = np.linspace(-1.5, 0, len(data["hist_pos_zoom"]))
             self.first = False
 
