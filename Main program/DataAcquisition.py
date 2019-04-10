@@ -33,7 +33,7 @@ class DataAcquisition(threading.Thread):
         self.config.sensor = self.args.sensors
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.5]  # Measurement interval
-        self.config.sweep_rate = 80  # Frequency for collecting data
+        self.config.sweep_rate = 10  # Frequency for collecting data
         self.config.gain = 0.7  # Gain between 0 and 1.
 
         # för plotten
@@ -157,7 +157,8 @@ class DataAcquisition(threading.Thread):
 
             tracked_distance = (1 - self.track_peaks_average_index/len(data)) * self.config.range_interval[0] + self.track_peaks_average_index/len(data) * self.config.range_interval[1]
 
-            np.roll(self.tracked_distance_over_time, 1)
+            np.roll(self.tracked_distance_over_time, -1)
+            print(self.tracked_distance_over_time)
             self.tracked_distance_over_time[-1] = tracked_distance - np.mean(self.tracked_distance_over_time)
 
             self.tracked_data = {"tracked distance": tracked_distance,
