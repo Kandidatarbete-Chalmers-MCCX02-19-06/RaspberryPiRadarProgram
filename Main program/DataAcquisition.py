@@ -111,7 +111,7 @@ class DataAcquisition(threading.Thread):
                 #         index += 1
                 # np.delete(self.local_peaks_index, index_list)       # deletes all indexes with amplitude < threshold
                 #self.local_peaks_index = self.local_peaks_index[(ampl[]) > self.threshold)]
-                print("local peaks: ",self.local_peaks_index)
+
                 self.local_peaks_index = [x for x in self.local_peaks_index if (np.abs(ampl[x]) > self.threshold)]
                 if len(self.local_peaks_index) == 0:
                     print("No local peak found")
@@ -119,7 +119,6 @@ class DataAcquisition(threading.Thread):
                     #self.track_peak_index[-1] = self.track_peak_index[-2]
                 else:
                     peak_difference_index = np.subtract(self.local_peaks_index, self.track_peaks_average_index)
-                    print("local peaks: ",self.local_peaks_index)
                     self.track_peak_index.append(self.local_peaks_index[np.argmin(np.abs(peak_difference_index))]) # min difference of index
                 if len(self.track_peak_index) > self.number_of_averages:  # removes oldest value
                     self.track_peak_index.pop(0)
@@ -132,7 +131,7 @@ class DataAcquisition(threading.Thread):
 
 
             # self.track_peaks_average_index = int(np.round(np.average(self.track_peak_index)))
-            self.threshold = np.abs(ampl[self.track_peaks_average_index]) * 0.5 # threshold for next peak
+            self.threshold = np.abs(ampl[self.track_peaks_average_index]) * 0.8 # threshold for next peak
 
             # com = np.argmax(power) / n  # globalt maximum #How does this work elementwise or not?
             # self.average_com.append(com)
