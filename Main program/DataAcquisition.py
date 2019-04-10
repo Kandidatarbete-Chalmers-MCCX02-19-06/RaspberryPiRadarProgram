@@ -150,7 +150,7 @@ class DataAcquisition(threading.Thread):
             self.lp_ampl = ampl
         else:
             #a = self.alpha(0.25, self.dt)
-            self.lp_com = a*com + (1-a)*self.lp_com
+            self.lp_com = self.a*com + (1-self.a)*self.lp_com
             com_idx = int(self.lp_com * n)
             # Here begins our own code
             # First row is taken from acconeer plot for how to convert lp_com to m
@@ -163,7 +163,7 @@ class DataAcquisition(threading.Thread):
             self.tracked_phase = np.angle(data[com_idx])
 
             # för plott
-            self.lp_ampl = a * ampl + (1 - a) * self.lp_ampl
+            self.lp_ampl = self.a * ampl + (1 - self.a) * self.lp_ampl
 
             tracked_distance = (1 - self.track_peaks_average_index/len(data)) * self.config.range_interval[0] + self.track_peaks_average_index/len(data) * self.config.range_interval[1]
             self.tracked_data = {"tracked distance": tracked_distance,
