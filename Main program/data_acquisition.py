@@ -120,7 +120,7 @@ class DataAcquisition(threading.Thread):
                 filtered_data_HR = self.highpass_HR.filter(tracked_data["tracked phase"])
                 print(filtered_data_HR)
                 self.output_vector_queue.put(
-                    filtered_tracked_data)  # put filtered data in output queue to send to SignalProcessing
+                    filtered_data_HR)  # put filtered data in output queue to send to SignalProcessing
                 try:
                     self.pg_process.put_data(tracked_data)  # plot data
                 except PGProccessDiedException:
