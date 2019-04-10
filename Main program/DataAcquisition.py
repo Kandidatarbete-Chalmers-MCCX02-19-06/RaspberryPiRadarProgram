@@ -36,7 +36,6 @@ class DataAcquisition(threading.Thread):
         self.config.sweep_rate = 80  # Frequency for collecting data
         self.config.gain = 0.7  # Gain between 0 and 1.
 
-        # self.sweep_index = 0 # för plotten
         # för plotten
         self.pg_updater = PGUpdater(self.config)
         self.pg_process = PGProcess(self.pg_updater)
@@ -55,15 +54,12 @@ class DataAcquisition(threading.Thread):
         self.track_peaks_average_index = None # average of last tracked peaks
         self.threshold = None # threshold for removing small local peaks
         self.data_index = 0
-        # self.real_dist = np.linspace(
-        #    self.config.range_interval[0], self.config.range_interval[1], num=self.num_points)
         self.tracked_distance = None
         self.tracked_amplitude = None
         self.tracked_phase = None
         self.last_sweep = None # för plotten
 
         self.a = self.alpha(0.25, self.dt) # integration?
-        #self.b = self.alpha(0.25, self.dt)  # integration?
 
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
@@ -101,23 +97,17 @@ class DataAcquisition(threading.Thread):
                 self.track_peak_index.append(max_peak_index)
                 self.track_peaks_average_index = max_peak_index
             else:
-                self.local_peaks_index, _ = signal.find_peaks(power)  # find local maximas in data TODO improve to linear algebra
-
+                self.local_peaks_index, _ = signal.find_peaks(power)  # find local maximas in data
                 index = 0
                 index_list = []
-                # print("Threshold: ",self.threshold)
                 for peak in self.local_peaks_index:
                     if np.abs(ampl[peak]) < self.threshold:
                         index_list.append(index)
                         index += 1
                 np.delete(self.local_peaks_index, index_list)       # deletes all indexes with amplitude < threshold
-
-                #self.local_peaks_index = [x for x in self.local_peaks_index if (np.abs(ampl[x]) > self.threshold)]
-
                 if len(self.local_peaks_index) == 0:
                     print("No local peak found")
                     self.track_peak_index.append(self.track_peak_index[-1])
-                    #self.track_peak_index[-1] = self.track_peak_index[-2]
                 else:
                     peak_difference_index = np.subtract(self.local_peaks_index, self.track_peaks_average_index)
                     self.track_peak_index.append(self.local_peaks_index[np.argmin(np.abs(peak_difference_index))]) # min difference of index
@@ -128,8 +118,6 @@ class DataAcquisition(threading.Thread):
                     self.track_peak_index.append(max_peak_index)  # new peak as global max
                 self.track_peaks_average_index = int(np.round(self.a * (np.average(self.track_peak_index)) + (
                         1 - self.a) * self.track_peaks_average_index))
-
-
 
             # self.track_peaks_average_index = int(np.round(np.average(self.track_peak_index)))
             self.threshold = np.abs(ampl[self.track_peaks_average_index]) * 0.8 # threshold for next peak
@@ -185,7 +173,7 @@ class PGUpdater:
 
     def setup(self, win):
         win.resize(800, 600)
-        win.setWindowTitle("Albins tracking example")
+        win.setWindowTitle("Graphs")
 
         self.distance_plot = win.addPlot(row=0, col=0)
         self.distance_plot.showGrid(x=True, y=True)
@@ -197,18 +185,25 @@ class PGUpdater:
         self.distance_inf_line = pg.InfiniteLine(pen=pen)
         self.distance_plot.addItem(self.distance_inf_line)
 
+        self.distance_over_time_plot = win.addPlot(row=0, col=1)
+        self.distance_over_time_plot.showGrid(x=True, y=True)
+        self.distance_over_time_plot.setLabel("left", "Amplitude")
+        self.distance_over_time_plot.setLabel("bottom", "Time (s)")
+        self.distance_over_time_curve = self.distance_over_time_plot.plot(pen=example_utils.pg_pen_cycler(0))
+
         self.smooth_max = example_utils.SmoothMax(self.config.sweep_rate)
         self.first = True
 
     def update(self, data):
         if self.first:
             self.xs = np.linspace(*self.interval, len(data["abs"]))
-            # self.ts = np.linspace(-3, 0, len(data["hist_pos"]))
+            self.ts = np.linspace(-5, 0, len(data["hist_pos"]))
             # self.ts_zoom = np.linspace(-1.5, 0, len(data["hist_pos_zoom"]))
             self.first = False
 
         # com_x = (1-data["com"])*self.interval[0] + data["com"]*self.interval[1]
 
         self.distance_curve.setData(self.xs, np.array(data["abs"]).flatten())
+        self.distance_over_time_curve.setData(self.ts, data["tracked distance"])
         self.distance_plot.setYRange(0, self.smooth_max.update(np.amax(data["abs"])))
         self.distance_inf_line.setValue(data["tracked distance"])
