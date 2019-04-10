@@ -54,10 +54,6 @@ class SignalProcessing:
         return freq, fft_signal_out
 
         
-
-
-
-
     ### smartFFT ###
     ### input:
     # signal_in: in signal as an array
