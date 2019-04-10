@@ -17,9 +17,9 @@ from acconeer_utils.pg_process import PGProcess, PGProccessDiedException
 
 
 class DataAcquisition(threading.Thread):
-    def __init__(self, go):
+    def __init__(self, list_of_variables_for_threads):
         super(DataAcquisition, self).__init__()  # Inherit threading vitals
-        self.go = go
+        self.go = list_of_variables_for_threads["go"]
         # Setup for collecting data from acconeer's radar files.
         self.args = example_utils.ExampleArgumentParser().parse_args()
         example_utils.config_logging(self.args)
@@ -35,7 +35,8 @@ class DataAcquisition(threading.Thread):
 
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.5]  # Measurement interval
-        self.config.sweep_rate = 10  # Frequency for collecting data. To low means that fast movements can't be tracked.
+        # Frequency for collecting data. To low means that fast movements can't be tracked.
+        self.config.sweep_rate = 10
         # The hardware of UART/SPI limits the sweep rate.
         self.config.gain = 0.7  # Gain between 0 and 1. Larger gain increase the SNR, but come at a cost
         # with more instability. Optimally is around 0.7
@@ -46,13 +47,16 @@ class DataAcquisition(threading.Thread):
         self.first_data = True  # first time data is processed
         self.f = self.config.sweep_rate  # frequency
         self.dt = 1 / self.f
-        self.low_pass_const = self.low_pass_filter_constants_function(0.25, self.dt)  # Constant for a small low-pass filter to
+        self.low_pass_const = self.low_pass_filter_constants_function(
+            0.25, self.dt)  # Constant for a small low-pass filter to
         # smooth the changes. tau changes the filter weight, lower tau means shorter delay. Usually tau = 0.25 is good.
         self.number_of_averages = 2  # number of averages for tracked peak
         self.plot_time_length = 10  # length of plotted data
-        self.number_of_time_samples = int(self.plot_time_length / self.dt)  # number of time samples when plotting
+        # number of time samples when plotting
+        self.number_of_time_samples = int(self.plot_time_length / self.dt)
         # distance over time
-        self.tracked_distance_over_time = np.zeros(self.number_of_time_samples)  # array for distance over time plot
+        self.tracked_distance_over_time = np.zeros(
+            self.number_of_time_samples)  # array for distance over time plot
         self.local_peaks_index = []  # index of local peaks
         self.track_peak_index = []  # index of last tracked peaks
         self.track_peaks_average_index = None  # average of last tracked peaks
@@ -89,9 +93,11 @@ class DataAcquisition(threading.Thread):
                              0.0055361, 0.0057127, 0.001624, -0.0026926, -0.0039765, -0.0020194, 0.00091246, 0.0023996,
                              0.0017329, 1.9897e-18, -0.0012209, -0.0011887, -0.00031655, 0.0004875, 0.00066201,
                              0.00030536, -0.0001234, -0.0002844, -0.00017507, -2.1943e-19, 7.7519e-05]
-        
-        self.length_of_input_vector = len(self.coefficients)  # Length of coefficient vector and length of input vector
-        self.input_vector = np.zeros(self.length_of_input_vector)  # the same length as coefficients.
+
+        # Length of coefficient vector and length of input vector
+        self.length_of_input_vector = len(self.coefficients)
+        # the same length as coefficients.
+        self.input_vector = np.zeros(self.length_of_input_vector)
 
         self.highpass_HR = filter.Filter('highpass_HR')
         self.lowpass_HR = filter.Filter('lowpass_HR')
@@ -119,6 +125,7 @@ class DataAcquisition(threading.Thread):
                     self.pg_process.put_data(tracked_data)  # plot data
                 except PGProccessDiedException:
                     break
+        print("out of while go in radar")
         self.client.disconnect()
 
     def get_data(self):
@@ -145,27 +152,32 @@ class DataAcquisition(threading.Thread):
                     if np.abs(amplitude[peak]) < self.threshold:
                         index_list.append(index)
                         index += 1
-                np.delete(self.local_peaks_index, index_list)  # deletes all indexes with amplitude < threshold
+                # deletes all indexes with amplitude < threshold
+                np.delete(self.local_peaks_index, index_list)
                 if len(self.local_peaks_index) == 0:  # if no large peaks were found, use the latest value instead
                     print("No local peak found")
                     self.track_peak_index.append(self.track_peak_index[-1])
                 else:
                     # Difference between found local peaks and last tracked peak
-                    peak_difference_index = np.subtract(self.local_peaks_index, self.track_peaks_average_index)
+                    peak_difference_index = np.subtract(
+                        self.local_peaks_index, self.track_peaks_average_index)
                     # The tracked peak is expected to be the closest local peak found
-                    self.track_peak_index.append(self.local_peaks_index[np.argmin(np.abs(peak_difference_index))])
+                    self.track_peak_index.append(
+                        self.local_peaks_index[np.argmin(np.abs(peak_difference_index))])
                 if len(self.track_peak_index) > self.number_of_averages:
                     self.track_peak_index.pop(0)  # remove oldest value
                 if amplitude[self.track_peak_index[-1]] < 0.5 * amplitude[
-                    max_peak_index]:  # if there is a much larger peak
+                        max_peak_index]:  # if there is a much larger peak
                     self.track_peak_index.clear()  # reset the array
                     self.track_peak_index.append(max_peak_index)  # new peak is global max
                 self.track_peaks_average_index = int(  # Average and smooth the movements of the tracked peak
                     np.round(self.low_pass_const * (np.average(self.track_peak_index))
                              + (1 - self.low_pass_const) * self.track_peaks_average_index))
-            self.threshold = np.abs(amplitude[self.track_peaks_average_index]) * 0.8  # threshold for next peak 
+            # threshold for next peak
+            self.threshold = np.abs(amplitude[self.track_peaks_average_index]) * 0.8
             # so it won't follow a much smaller peak
-            self.track_peak_relative_position = self.track_peaks_average_index / len(data) # Position of the peak
+            self.track_peak_relative_position = self.track_peaks_average_index / \
+                len(data)  # Position of the peak
             # relative the range of the data
             # Converts relative distance to absolute distance
             self.tracked_distance = (1 - self.track_peaks_average_index / len(data)) * self.config.range_interval[
@@ -184,14 +196,18 @@ class DataAcquisition(threading.Thread):
             self.low_pass_amplitude = amplitude
         else:
             # Amplitude of data for plotting
-            self.low_pass_amplitude = self.low_pass_const * amplitude + (1 - self.low_pass_const) * self.low_pass_amplitude
-            self.tracked_distance_over_time = np.roll(self.tracked_distance_over_time, -1)  # Distance over time
-            self.tracked_distance_over_time[-1] = self.tracked_distance  # - np.mean(self.tracked_distance_over_time)
+            self.low_pass_amplitude = self.low_pass_const * amplitude + \
+                (1 - self.low_pass_const) * self.low_pass_amplitude
+            self.tracked_distance_over_time = np.roll(
+                self.tracked_distance_over_time, -1)  # Distance over time
+            # - np.mean(self.tracked_distance_over_time)
+            self.tracked_distance_over_time[-1] = self.tracked_distance
 
             com_idx = int(self.track_peak_relative_position * data_length)
             delta_angle = np.angle(data[com_idx] * np.conj(self.last_data[com_idx]))
             vel = self.f * 2.5 * delta_angle / (2 * np.pi)
-            self.low_pass_vel = self.low_pass_const * vel + (1 - self.low_pass_const) * self.low_pass_vel
+            self.low_pass_vel = self.low_pass_const * vel + \
+                (1 - self.low_pass_const) * self.low_pass_vel
             dp = self.low_pass_vel / self.f
             self.hist_pos = np.roll(self.hist_pos, -1)
             self.hist_pos[-1] = self.hist_pos[-2] + dp
@@ -206,20 +222,24 @@ class DataAcquisition(threading.Thread):
         self.first_data = False
         return self.tracked_data
 
-    def low_pass_filter_constants_function(self, tau, dt):  # Creates low-pass filter constants for a very small low-pass filter
+    # Creates low-pass filter constants for a very small low-pass filter
+    def low_pass_filter_constants_function(self, tau, dt):
         return 1 - np.exp(-dt / tau)
 
     # TODO Kolla på hur stor matrisen med tracking data blir. Ändras index efter ett tag
 
     def filter(self, input_value):  # send input value
-        self.input_vector[self.input_vector_index] = input_value  # saves the input data in a vector continuously
+        # saves the input data in a vector continuously
+        self.input_vector[self.input_vector_index] = input_value
 
         yn = 0  # to add all coefficients*values
         iterate_index = self.input_vector_index  # because variable value is changed in order to loop array
-        for i in range(0, self.length_of_input_vector - 1):  # iterate over all coefficients and relevant input values
+        # iterate over all coefficients and relevant input values
+        for i in range(0, self.length_of_input_vector - 1):
             if iterate_index - i < 0:  # if iterate_index is negative begin from right hand side and work our way to the left
                 iterate_index = self.length_of_input_vector + i - 1  # moving to the rightmost location of array
-            yn += self.coefficients[i] * self.input_vector[iterate_index - i]  # add value of coefficient*data
+            # add value of coefficient*data
+            yn += self.coefficients[i] * self.input_vector[iterate_index - i]
         # self.output_vector_queue.put(yn)  # put filtered data in output queue to send to SignalProcessing
 
         self.input_vector_index += 1  # Note index += 1 before if statement
@@ -253,7 +273,8 @@ class PGUpdater:
         self.distance_over_time_plot.showGrid(x=True, y=True)
         self.distance_over_time_plot.setLabel("left", "Distance")
         self.distance_over_time_plot.setLabel("bottom", "Time (s)")
-        self.distance_over_time_curve = self.distance_over_time_plot.plot(pen=example_utils.pg_pen_cycler(0))
+        self.distance_over_time_curve = self.distance_over_time_plot.plot(
+            pen=example_utils.pg_pen_cycler(0))
         self.distance_over_time_plot.setYRange(-8, 8)
 
         # Plot for tracked distance over time
@@ -261,7 +282,8 @@ class PGUpdater:
         self.distance_over_time_plot2.showGrid(x=True, y=True)
         self.distance_over_time_plot2.setLabel("left", "Distance")
         self.distance_over_time_plot2.setLabel("bottom", "Time (s)")
-        self.distance_over_time_curve2 = self.distance_over_time_plot2.plot(pen=example_utils.pg_pen_cycler(0))
+        self.distance_over_time_curve2 = self.distance_over_time_plot2.plot(
+            pen=example_utils.pg_pen_cycler(0))
         self.distance_over_time_plot2.setYRange(0.4, 1.5)
 
         self.smooth_max = example_utils.SmoothMax(self.config.sweep_rate)
@@ -278,4 +300,3 @@ class PGUpdater:
         self.distance_inf_line.setValue(data["tracked distance"])
         self.distance_over_time_curve.setData(self.ts, data["tracked distance over time"])
         self.distance_over_time_curve2.setData(self.ts, data["tracked distance over time 2"])
-

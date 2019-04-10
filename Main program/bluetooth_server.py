@@ -53,7 +53,7 @@ class BluetoothServer:
             self.write_data_to_app(data_pulse, 'heart rate')  # Sends pulse to app
             self.write_data_to_app(data_breath, 'breath rate')  # Sends heart rate to app
 
-    def connect_device(self):  # Does not work properly
+    def connect_device(self):
         os.system("echo 'power on\nquit' | bluetoothctl")  # Startup for bluetooth on rpi
         thread_list = []  # List which adds devices
         self.server.listen(7)  # Amount of devices that can simultaniously recive data.
