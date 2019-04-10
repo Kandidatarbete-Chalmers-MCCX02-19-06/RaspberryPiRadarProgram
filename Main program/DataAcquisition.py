@@ -60,6 +60,7 @@ class DataAcquisition(threading.Thread):
         self.tracked_amplitude = None
         self.tracked_phase = None
         self.last_sweep = None # för plotten
+        self.tracked_data = None
 
         self.a = self.alpha(0.25, self.dt) # integration for last two values
 
@@ -92,11 +93,11 @@ class DataAcquisition(threading.Thread):
             # This data is an 1D array in terminal print, not in Python script however....
             data = self.get_data()
             tracked_data = self.tracking(data)
-            print("passed tracked data: ",tracked_data)
-            filtered_tracked_data = self.filter(tracked_data["tracked phase"])
-            print(filtered_tracked_data)
-            self.output_vector_queue.put(filtered_tracked_data)  # put filtered data in output queue to send to SignalProcessing
             if tracked_data is not None:
+                filtered_tracked_data = self.filter(tracked_data["tracked phase"])
+                print(filtered_tracked_data)
+                self.output_vector_queue.put(
+                    filtered_tracked_data)  # put filtered data in output queue to send to SignalProcessing
                 try:
                     self.pg_process.put_data(tracked_data)
                     # print("Tracked data: ", tracked_data["tracked distance"])
@@ -180,7 +181,6 @@ class DataAcquisition(threading.Thread):
             #self.tracked_phase = np.angle(data[com_idx])
             self.tracked_amplitude = np.abs(data[self.track_peaks_average_index])
             self.tracked_phase = np.angle(data[self.track_peaks_average_index])
-            print(type(self.tracked_phase))
 
             # för plott
             self.lp_ampl = self.a * ampl + (1 - self.a) * self.lp_ampl
