@@ -172,7 +172,7 @@ class DataAcquisition(threading.Thread):
         if self.first_data:
             #self.low_pass_track_peak = track_peak_relative_position
             self.tracked_data = None
-            #self.low_pass_amplitude = amplitude
+            self.low_pass_amplitude = amplitude
         else:
             # Low-pass filtered data to smoothen fast movements
             #self.low_pass_track_peak = self.low_pass_const * track_peak_relative_position + (
