@@ -20,20 +20,12 @@ class SignalProcessing:
         # Variabler för Schmitt Trigger
         self.RR_filtered_queue = RR_filtered_queue
         self.RR_final_queue = RR_final_queue
-
-    def thread_start(self):         # used in Main to start and join the signal processing threads
         # Starta heart_rate
-        heart_rate_thread = threading.Thread(target=self.heart_rate)
-        heart_rate_thread.start()
+        self.heart_rate_thread = threading.Thread(target=self.heart_rate)
+        self.heart_rate_thread.start()
         # Starta schmitt
-        schmittTrigger_thread = threading.Thread(target=self.schmittTrigger)
-        schmittTrigger_thread.start()
-        while self.go:  # Check if proccesing is supposed to continue, if not close threads.
-            if not self.go:
-                print("Starting to shut down threads in signal processing")
-                schmittTrigger_thread.join()
-                heart_rate_thread.join()
-                print("Closed threads in signal processing")
+        self.schmittTrigger_thread = threading.Thread(target=self.schmittTrigger)
+        self.schmittTrigger_thread.start()
 
     def heart_rate(self):
         T_resolution = 30

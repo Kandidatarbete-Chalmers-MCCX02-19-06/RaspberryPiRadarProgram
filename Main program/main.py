@@ -37,7 +37,7 @@ def main():
     # radar.start()
     dataAcquisition = data_acquisition.DataAcquisition(list_of_variables_for_threads)
     dataAcquisition.start()
-    # signalProcessing = signal_processing.SignalProcessing(
+    # signal_processing = signal_processing.SignalProcessing(
     #    list_of_variables_for_threads)
     # signal_processing.thread_start()
 
@@ -48,6 +48,9 @@ def main():
     # interrupt_queue.put(1)
     list_of_variables_for_threads["go"] = go.pop(0)
     # radar.join()
+    # signal_processing.heart_rate_thread.join()
+    # signal_processing.schmittTrigger_thread.join()
+    time.sleep(1 / 20)  # Making sure signal processing have data in queue before radar quits.
     dataAcquisition.join()
     print("radar is closed")
     # bvme.connect_device_thread.join()
