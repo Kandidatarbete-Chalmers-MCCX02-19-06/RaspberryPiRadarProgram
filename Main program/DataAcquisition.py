@@ -49,7 +49,7 @@ class DataAcquisition(threading.Thread):
         self.dt = 1 / self.f
         self.number_of_averages = 2  # antalet medelvärdesbildningar
         self.number_of_time_samples = int(10 / self.dt) # number of time samples when plotting distance over time
-        self.tracked_distance_over_time = np.zeros(self.number_of_time_samples) # array for distance over time
+        self.tracked_distance_over_time = np.zeros(self.number_of_time_samples).flatten() # array for distance over time
         self.average_com = []  # array med avstånd
         self.local_peaks_index = [] # index of local peaks
         self.track_peak_index = [] # index of last tracked peaks
