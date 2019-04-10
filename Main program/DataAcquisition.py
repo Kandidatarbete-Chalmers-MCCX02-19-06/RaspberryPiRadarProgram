@@ -116,9 +116,10 @@ class DataAcquisition(threading.Thread):
                 if len(self.local_peaks_index) == 0:
                     print("No local peak found")
                     self.track_peak_index[-1] = self.track_peak_index[-2]
-                peak_difference_index = np.subtract(self.local_peaks_index, self.track_peaks_average_index)
-                print("local peaks: ",self.local_peaks_index)
-                self.track_peak_index.append(self.local_peaks_index[np.argmin(np.abs(peak_difference_index))]) # min difference of index
+                else:
+                    peak_difference_index = np.subtract(self.local_peaks_index, self.track_peaks_average_index)
+                    print("local peaks: ",self.local_peaks_index)
+                    self.track_peak_index.append(self.local_peaks_index[np.argmin(np.abs(peak_difference_index))]) # min difference of index
                 if len(self.track_peak_index) > self.number_of_averages:  # removes oldest value
                     self.track_peak_index.pop(0)
                 if ampl[self.track_peak_index[-1]] < 0.5 * ampl[max_peak_index]:
