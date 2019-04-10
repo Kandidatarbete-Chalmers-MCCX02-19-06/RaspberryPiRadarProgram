@@ -104,15 +104,15 @@ class DataAcquisition(threading.Thread):
             else:
                 self.local_peaks_index, _ = signal.find_peaks(power)  # find local maximas in data TODO improve to linear algebra
 
-                index = 0
-                index_list = []
-                # print("Threshold: ",self.threshold)
-                for peak in self.local_peaks_index:
-                    if np.abs(ampl[peak]) < self.threshold: # TODO ampl
-                        index_list.append(index)
-                        index += 1
-                np.delete(self.local_peaks_index, index_list)       # deletes all indexes with amplitude < threshold
-                # self.local_peaks_index = self.local_peaks_index[(np.abs(power[:]) > self.threshold)]
+                # index = 0
+                # index_list = []
+                # # print("Threshold: ",self.threshold)
+                # for peak in self.local_peaks_index:
+                #     if np.abs(ampl[peak]) < self.threshold:
+                #         index_list.append(index)
+                #         index += 1
+                # np.delete(self.local_peaks_index, index_list)       # deletes all indexes with amplitude < threshold
+                self.local_peaks_index = self.local_peaks_index[(np.abs(power[:]) > self.threshold)]
                 # print("local peaks: ",self.local_peaks_index)
                 #self.local_peaks_index = [x for x in self.local_peaks_index if (np.abs(power[x]) > self.threshold)]
                 # print("local peaks: ",self.local_peaks_index)
@@ -134,7 +134,7 @@ class DataAcquisition(threading.Thread):
 
 
             # self.track_peaks_average_index = int(np.round(np.average(self.track_peak_index)))
-            self.threshold = np.abs(ampl[self.track_peaks_average_index]) * 0.8 # threshold for TODO amplitude
+            self.threshold = np.abs(ampl[self.track_peaks_average_index]) * 0.8 # threshold for next peak
 
             # com = np.argmax(power) / n  # globalt maximum #How does this work elementwise or not?
             # self.average_com.append(com)
