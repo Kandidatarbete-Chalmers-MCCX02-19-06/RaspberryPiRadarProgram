@@ -49,7 +49,7 @@ class DataAcquisition(threading.Thread):
         self.dt = 1 / self.f
         self.number_of_averages = 2  # antalet medelvärdesbildningar
         self.number_of_time_samples = int(10*self.dt) # number of time samples when plotting distance over time
-        self.tracked_distance_over_time = []# = np.zeros(self.number_of_time_samples) # array for distance over time
+        self.tracked_distance_over_time = np.zeros(self.number_of_time_samples) # array for distance over time
         self.average_com = []  # array med avstånd
         self.local_peaks_index = [] # index of local peaks
         self.track_peak_index = [] # index of last tracked peaks
@@ -137,7 +137,7 @@ class DataAcquisition(threading.Thread):
         if self.data_index == 0:
             self.lp_com = com
             self.tracked_data = None
-            self.data_index = 1
+            #self.data_index = 1
             self.lp_ampl = ampl
         else:
             self.lp_com = self.a*com + (1-self.a)*self.lp_com
@@ -156,13 +156,14 @@ class DataAcquisition(threading.Thread):
             self.lp_ampl = self.a * ampl + (1 - self.a) * self.lp_ampl
 
             tracked_distance = (1 - self.track_peaks_average_index/len(data)) * self.config.range_interval[0] + self.track_peaks_average_index/len(data) * self.config.range_interval[1]
-            self.tracked_distance_over_time.append(tracked_distance)
-            if len(self.tracked_distance_over_time) > self.number_of_time_samples:
-                self.tracked_distance_over_time.pop(0)
+
+            np.roll(self.tracked_distance_over_time, -1)
+            self.tracked_distance_over_time[-1] = tracked_distance
+
             self.tracked_data = {"tracked distance": tracked_distance,
                                  "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase,
                                  "com": self.lp_com, "abs": self.lp_ampl, "tracked distance over time": self.tracked_distance_over_time}
-
+        self.data_index +=1
         return self.tracked_data
 
     def alpha(self, tau, dt):
