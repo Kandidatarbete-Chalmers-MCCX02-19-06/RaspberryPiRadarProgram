@@ -157,7 +157,7 @@ class DataAcquisition(threading.Thread):
 
             tracked_distance = (1 - self.track_peaks_average_index/len(data)) * self.config.range_interval[0] + self.track_peaks_average_index/len(data) * self.config.range_interval[1]
 
-            np.roll(self.tracked_distance_over_time)
+            np.roll(self.tracked_distance_over_time,-1,1)
             print(self.tracked_distance_over_time)
             self.tracked_distance_over_time[-1] = tracked_distance - np.mean(self.tracked_distance_over_time)
 
