@@ -33,8 +33,8 @@ class DataAcquisition(threading.Thread):
         self.config.sensor = self.args.sensors
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.5]  # Measurement interval
-        self.config.sweep_rate = 80  # Frequency for collecting data
-        self.config.gain = 0.7  # Gain between 0 and 1.
+        self.config.sweep_rate = 100  # Frequency for collecting data
+        self.config.gain = 0.8  # Gain between 0 and 1.
 
         # self.sweep_index = 0 # för plotten
         # för plotten
@@ -47,7 +47,7 @@ class DataAcquisition(threading.Thread):
 
         # Inputs for tracking
         self.f = self.config.sweep_rate
-        self.dt = 1 / self.f
+        self.dt = 1 / self.f * 0.5
         self.number_of_averages = 5  # antalet medelvärdesbildningar
         self.average_com = []  # array med avstånd
         self.local_peaks_index = [] # index of local peaks
@@ -102,17 +102,17 @@ class DataAcquisition(threading.Thread):
             else:
                 self.local_peaks_index, _ = signal.find_peaks(power)  # find local maximas in data TODO improve to linear algebra
 
-                # index = 0
-                # index_list = []
-                # # print("Threshold: ",self.threshold)
-                # for peak in self.local_peaks_index:
-                #     if np.abs(ampl[peak]) < self.threshold:
-                #         index_list.append(index)
-                #         index += 1
-                # np.delete(self.local_peaks_index, index_list)       # deletes all indexes with amplitude < threshold
-                #self.local_peaks_index = self.local_peaks_index[(ampl[]) > self.threshold)]
+                index = 0
+                index_list = []
+                # print("Threshold: ",self.threshold)
+                for peak in self.local_peaks_index:
+                    if np.abs(ampl[peak]) < self.threshold:
+                        index_list.append(index)
+                        index += 1
+                np.delete(self.local_peaks_index, index_list)       # deletes all indexes with amplitude < threshold
 
-                self.local_peaks_index = [x for x in self.local_peaks_index if (np.abs(ampl[x]) > self.threshold)]
+                #self.local_peaks_index = [x for x in self.local_peaks_index if (np.abs(ampl[x]) > self.threshold)]
+
                 if len(self.local_peaks_index) == 0:
                     print("No local peak found")
                     self.track_peak_index.append(self.track_peak_index[-1])
