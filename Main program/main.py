@@ -5,7 +5,7 @@ import threading
 import numpy as np
 import queue
 
-import Radar
+# import Radar
 import bluetooth_server        # import bluetooth class
 import data_acquisition      # Import class which collects and filters relevant data.
 import signal_processing
