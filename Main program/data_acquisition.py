@@ -44,7 +44,7 @@ class DataAcquisition(threading.Thread):
         self.first_data = True  # first time data is processed
         self.f = self.config.sweep_rate  # frequency
         self.dt = 1 / self.f
-        self.low_pass_const = self.low_pass_filter_function(0.25, self.dt)  # Constant for a small low-pass filter to
+        self.low_pass_const = self.low_pass_filter_constants_function(0.25, self.dt)  # Constant for a small low-pass filter to
         # smooth the changes. tau changes the filter weight, lower tau means shorter delay. Usually tau = 0.25 is good.
         self.number_of_averages = 2  # number of averages for tracked peak
         self.plot_time_length = 10  # length of plotted data
@@ -61,13 +61,14 @@ class DataAcquisition(threading.Thread):
         self.tracked_data = None  # the final tracked data that is returned
         self.low_pass_amplitude = None
         self.low_pass_track_peak = None
+        self.track_peak_relative_position = None
 
         # Graphs
         self.pg_updater = PGUpdater(self.config)
         self.pg_process = PGProcess(self.pg_updater)
         self.pg_process.start()
         # acconeer graph
-        self.lp_vel = 0
+        self.low_pass_vel = 0
         self.hist_vel = np.zeros(self.number_of_time_samples)
         self.hist_pos = np.zeros(self.number_of_time_samples)
         self.last_data = None  # saved old data
@@ -117,6 +118,8 @@ class DataAcquisition(threading.Thread):
         data_length = len(data)
         amplitude = np.abs(data)
         power = amplitude * amplitude
+
+        # Find and track peaks
         if np.sum(power) > 1e-6:
             max_peak_index = np.argmax(power)
             if self.first_data:  # first time
@@ -150,58 +153,58 @@ class DataAcquisition(threading.Thread):
                              + (1 - self.low_pass_const) * self.track_peaks_average_index))
             self.threshold = np.abs(amplitude[self.track_peaks_average_index]) * 0.8  # threshold for next peak 
             # so it won't follow a much smaller peak
-            track_peak_relative_position = self.track_peaks_average_index / len(data) # Position of the peak
+            self.track_peak_relative_position = self.track_peaks_average_index / len(data) # Position of the peak
             # relative the range of the data
-        else:
-            track_peak_relative_position = 0
-
-        if self.first_data:
-            self.low_pass_track_peak = track_peak_relative_position
-            self.tracked_data = None
-            self.low_pass_amplitude = amplitude
-        else:
-            # Low pass
-            self.low_pass_track_peak = self.low_pass_const * track_peak_relative_position + (
-                        1 - self.low_pass_const) * self.low_pass_track_peak
-            com_idx = int(self.low_pass_track_peak * data_length)
-            # Here begins our own code
-            # First row is taken from acconeer plot for how to convert lp_com to m
-            # Tracked amplitude is absolute value of data for the tracked index
-            # Tracked phase is the angle between I and Q in data for tracked index
-            self.tracked_distance = (1 - self.low_pass_track_peak) * \
-                                    self.config.range_interval[0] + self.low_pass_track_peak * self.config.range_interval[1]
-            # print("Tracked Distance {} and com idx {}".format(self.com_x, com_idx))
-            # self.tracked_amplitude = np.abs(data[com_idx])
-            # self.tracked_phase = np.angle(data[com_idx])
-            self.tracked_amplitude = np.abs(data[self.track_peaks_average_index])
-            self.tracked_phase = np.angle(data[self.track_peaks_average_index])
-
-            # för plott
-            self.low_pass_amplitude = self.low_pass_const * amplitude + (1 - self.low_pass_const) * self.low_pass_amplitude
-
-            tracked_distance = (1 - self.track_peaks_average_index / len(data)) * self.config.range_interval[
+            # Converts relative distance to absolute distance
+            self.tracked_distance = (1 - self.track_peaks_average_index / len(data)) * self.config.range_interval[
                 0] + self.track_peaks_average_index / len(data) * self.config.range_interval[1]
+            # Tracked amplitude is absolute value of data for the tracked index
+            self.tracked_amplitude = np.abs(data[self.track_peaks_average_index])
+            # Tracked phase is the angle between I and Q in data for tracked index
+            self.tracked_phase = np.angle(data[self.track_peaks_average_index])
+        else:
+            #track_peak_relative_position = 0
+            self.tracked_distance = 0
 
-            self.tracked_distance_over_time = np.roll(self.tracked_distance_over_time, -1)
-            self.tracked_distance_over_time[-1] = tracked_distance  # - np.mean(self.tracked_distance_over_time)
+        # Filter and plots
+        if self.first_data:
+            #self.low_pass_track_peak = track_peak_relative_position
+            self.tracked_data = None
+            #self.low_pass_amplitude = amplitude
+        else:
+            # Low-pass filtered data to smoothen fast movements
+            #self.low_pass_track_peak = self.low_pass_const * track_peak_relative_position + (
+            #            1 - self.low_pass_const) * self.low_pass_track_peak
+            #com_idx = int(self.low_pass_track_peak * data_length)
 
+            #self.tracked_distance = (1 - self.low_pass_track_peak) * self.config.range_interval[
+            #    0] + self.low_pass_track_peak * self.config.range_interval[1]
+
+            # Plots
+            # Amplitude of data for plotting
+            self.low_pass_amplitude = self.low_pass_const * amplitude + (1 - self.low_pass_const) * self.low_pass_amplitude
+            self.tracked_distance_over_time = np.roll(self.tracked_distance_over_time, -1)  # Distance over time
+            self.tracked_distance_over_time[-1] = self.tracked_distance  # - np.mean(self.tracked_distance_over_time)
+
+            com_idx = int(self.track_peak_relative_position * data_length)
             delta_angle = np.angle(data[com_idx] * np.conj(self.last_data[com_idx]))
             vel = self.f * 2.5 * delta_angle / (2 * np.pi)
-            self.lp_vel = self.low_pass_const * vel + (1 - self.low_pass_const) * self.lp_vel
-            dp = self.lp_vel / self.f
+            self.low_pass_vel = self.low_pass_const * vel + (1 - self.low_pass_const) * self.low_pass_vel
+            dp = self.low_pass_vel / self.f
             self.hist_pos = np.roll(self.hist_pos, -1)
             self.hist_pos[-1] = self.hist_pos[-2] + dp
             plot_hist_pos = self.hist_pos - self.hist_pos.mean()
 
-            self.tracked_data = {"tracked distance": tracked_distance,
+            # Tracked data to return and plot
+            self.tracked_data = {"tracked distance": self.tracked_distance,
                                  "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase,
-                                 "com": self.lp_com, "abs": self.lp_ampl, "tracked distance over time": plot_hist_pos,
+                                 "abs": self.low_pass_amplitude, "tracked distance over time": plot_hist_pos,
                                  "tracked distance over time 2": self.tracked_distance_over_time}
         self.last_data = data
         self.first_data = False
         return self.tracked_data
 
-    def low_pass_filter_function(self, tau, dt):  # Creates low-pass filter constants
+    def low_pass_filter_constants_function(self, tau, dt):  # Creates low-pass filter constants for a very small low-pass filter
         return 1 - np.exp(-dt / tau)
 
     # TODO Kolla på hur stor matrisen med tracking data blir. Ändras index efter ett tag
@@ -235,6 +238,7 @@ class PGUpdater:
         win.resize(1600, 1000)
         win.setWindowTitle("Track distance example")
 
+        # Plot amplitude from data and the tracked distance
         self.distance_plot = win.addPlot(row=0, col=0, colspan=2)
         self.distance_plot.showGrid(x=True, y=True)
         self.distance_plot.setLabel("left", "Amplitude")
@@ -245,7 +249,7 @@ class PGUpdater:
         self.distance_inf_line = pg.InfiniteLine(pen=pen)
         self.distance_plot.addItem(self.distance_inf_line)
 
-        # acconeers plot
+        # Dynamic plot to show breath over time
         self.distance_over_time_plot = win.addPlot(row=1, col=0)
         self.distance_over_time_plot.showGrid(x=True, y=True)
         self.distance_over_time_plot.setLabel("left", "Distance")
@@ -253,7 +257,7 @@ class PGUpdater:
         self.distance_over_time_curve = self.distance_over_time_plot.plot(pen=example_utils.pg_pen_cycler(0))
         self.distance_over_time_plot.setYRange(-8, 8)
 
-        # our plot
+        # Plot for tracked distance over time
         self.distance_over_time_plot2 = win.addPlot(row=1, col=1)
         self.distance_over_time_plot2.showGrid(x=True, y=True)
         self.distance_over_time_plot2.setLabel("left", "Distance")
@@ -268,11 +272,11 @@ class PGUpdater:
         if self.first:
             self.xs = np.linspace(*self.interval, len(data["abs"]))
             self.ts = np.linspace(-5, 0, len(data["tracked distance over time"]))
-            # self.ts_zoom = np.linspace(-1.5, 0, len(data["hist_pos_zoom"]))
             self.first = False
 
         self.distance_curve.setData(self.xs, np.array(data["abs"]).flatten())
-        self.distance_over_time_curve.setData(self.ts, data["tracked distance over time"])
-        self.distance_over_time_curve2.setData(self.ts, data["tracked distance over time 2"])
         self.distance_plot.setYRange(0, self.smooth_max.update(np.amax(data["abs"])))
         self.distance_inf_line.setValue(data["tracked distance"])
+        self.distance_over_time_curve.setData(self.ts, data["tracked distance over time"])
+        self.distance_over_time_curve2.setData(self.ts, data["tracked distance over time 2"])
+
