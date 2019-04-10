@@ -8,13 +8,17 @@ import queue
 
 class SignalProcessing:
 
-    def __init__(self, HR_filtered_queue, HR_final_queue,go): #TODO: Lägg till RR_filtered_queue och RR_final_queue
+    def __init__(self,go, HR_filtered_queue, HR_final_queue, RR_filtered_queue, RR_final_queue): #TODO: Lägg till RR_filtered_queue och RR_final_queue
         self.go = go
         self.HR_filtered_queue = HR_filtered_queue
         self.HR_final_queue = HR_final_queue
         self.counter_fft = 0
         self.index_fft = 0
         self.sample_freq = 20 #TODO:Temporary
+
+        # Variabler för Schmitt Trigger
+        self.RR_filtered_queue = RR_filtered_queue
+        self.RR_final_queue = RR_final_queue
 
         #Starta heart_rate
         self.heart_rate_thread = threading.Thread(target = self.heart_rate)
@@ -117,6 +121,68 @@ signal_processing = SignalProcessing(HR_filtered_queue, HR_final_queue,go)
 time.sleep(0.5)
 go.pop(0)
 
+def schmittTrigger(self):
+    # variable declaration
+    Tc = 5  # medelvärdesbildning över antal [s]
+    schNy = 0  # Schmitt ny
+    schGa = 0  # Schmitt gammal
+    Hcut = 0.001  # Higher hysteres cut. Change this according to filter. To manage startup of filter
+    Lcut = -Hcut  # Lower hysteres cut
+    avOver = 30  # average over old values. TODO ev. ingen medelvärdesbildning. För att förhindra att andningen går mot ett fast värde. Vi vill se mer i realtid.
+    freqArray = np.zeros(avOver)  # for averaging over old values
+    count = 1  # for counting number of samples passed since last negative flank
+    countHys = 1  # for counting if hysteresis should be updated
+    FHighBR = 0.7  # To remove outliers in mean value
+    FLowBR = 0.2  # To remove outliers in mean value
+    # for saving respiratory_queue_BR old values for hysteresis
+    trackedBRvector = np.zeros(self.sample_freq * Tc)  # to save old values
+
+    while self.go:
+        # to be able to use the same value in the whole loop
+        trackedBRvector[countHys-1] = self.RR_filtered_queue.get()
+
+        if countHys == self.sample_freq * Tc:
+            Hcut = np.sqrt(np.mean(np.square(trackedBRvector)))     # rms of trackedBRvector
+            Lcut = -Hcut
+            # TODO Hinder så att insvängningstiden för filtret hanteras
+            countHys = 0
+
+        schNy = schGa
+
+        if trackedBRvector[countHys-1] <= Lcut:     # trackedBRvector[countHys-1] is the current data from filter
+            schNy = 0
+            if schGa == 1:
+                np.roll(freqArray, 1)
+                freqArray[0] = self.sample_freq / count     # save the new frequency between two negative flanks
+                # Take the mean value
+                # RR_final_queue is supposed to be the breathing rate queue that is sent to app
+                self.RR_final_queue = self.getMeanOfFreqArray(freqArray, FHighBR, FLowBR)
+                # TODO put getMeanOfFreqArray() into queue that connects to send bluetooth values instead
+                count = 0
+        # trackedBRvector[countHys-1] is the current data from filter
+        elif trackedBRvector[countHys-1] >= Hcut:
+            schNy = 1
+            # TODO skicka data till app för realTime breathing
+
+        schGa = schNy
+        count += 1
+        countHys += 1
+
+
+# Used in schmittTrigger. Removes outliers and return mean value over last avOver values.
+def getMeanOfFreqArray(freqArray, FHighBR, FLowBR):  # remove all values > FHighBR and < FLowBR
+    freqArrayTemp = [x for x in freqArray if(x < FHighBR and x > FLowBR)]
+    # print(freqArrayTemp)
+    freqArrayTemp = freqArrayTemp[np.nonzero(freqArrayTemp)]
+    # print(freqArrayTemp)
+
+    median = np.median(freqArrayTemp)       # median value
+    stanDev = np.std(freqArrayTemp)     # standard deviation
+
+    freqArrayTemp = [x for x in freqArrayTemp if (x > median - 3*stanDev and x < median + 3*stanDev)]
+    # print(freqArrayTemp)
+    mean = np.mean(freqArrayTemp)       # mean value of last avOver values excluding outliers
+    return mean
 
 #### Test av smartFFT ####
 # sample_freq = 20
