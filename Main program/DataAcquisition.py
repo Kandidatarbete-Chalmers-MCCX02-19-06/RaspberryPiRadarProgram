@@ -48,7 +48,7 @@ class DataAcquisition(threading.Thread):
         # Inputs for tracking
         self.f = self.config.sweep_rate
         self.dt = 1 / self.f
-        self.number_of_averages = 2  # antalet medelvärdesbildningar
+        self.number_of_averages = 3  # antalet medelvärdesbildningar
         self.average_com = []  # array med avstånd
         self.local_peaks_index = [] # index of local peaks
         self.track_peak_index = [] # index of last tracked peaks
