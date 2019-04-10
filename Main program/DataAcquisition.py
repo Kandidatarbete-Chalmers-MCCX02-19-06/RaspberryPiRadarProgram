@@ -195,7 +195,7 @@ class PGUpdater:
         win.resize(1600, 1000)
         win.setWindowTitle("Track distance example")
 
-        self.distance_plot = win.addPlot(row=0, col=0)
+        self.distance_plot = win.addPlot(row=0, col=0, colspan=2)
         self.distance_plot.showGrid(x=True, y=True)
         self.distance_plot.setLabel("left", "Amplitude")
         self.distance_plot.setLabel("bottom", "Depth (m)")
