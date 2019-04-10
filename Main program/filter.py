@@ -66,18 +66,17 @@ class Filter:
     def filter(self, input_value):  # send input value
         self.input_vector[self.input_vector_index] = input_value  # saves the input data in a vector continuously
 
-        yn = 0  # to add all coefficients*values
+        output = 0  # to add all coefficients*values
         iterate_index = self.input_vector_index  # because variable value is changed in order to loop array
         for i in range(0, self.length_of_input_vector - 1):  # iterate over all coefficients and relevant input values
             if iterate_index - i < 0:  # if iterate_index is negative begin from right hand side and work our way to the left
                 iterate_index = self.length_of_input_vector + i - 1  # moving to the rightmost location of array
-            yn += self.coefficients[i] * self.input_vector[iterate_index - i]  # add value of coefficient*data
-        # self.output_vector_queue.put(yn)  # put filtered data in output queue to send to SignalProcessing
+            output += self.coefficients[i] * self.input_vector[iterate_index - i]  # add value of coefficient*data
 
         self.input_vector_index += 1  # Note index += 1 before if statement
         if self.input_vector_index == self.length_of_input_vector:  # len(input_vector = N)
             self.input_vector_index = 0
-        return yn
+        return output
 
 
 
