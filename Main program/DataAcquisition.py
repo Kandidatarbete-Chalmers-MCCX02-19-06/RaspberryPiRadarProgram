@@ -46,7 +46,7 @@ class DataAcquisition(threading.Thread):
         self.a = self.alpha(0.25, self.dt)  # weighted integration for last two values to smooth the changes.
         # tau changes the weight, lower tau means more weight on last value. Usually tau = 0.25 is good.
         self.number_of_averages = 2  # number of averages for tracked peak
-        self.number_of_time_samples = int(5 / self.dt)  # number of time samples when plotting distance over time
+        self.number_of_time_samples = int(2 / self.dt)  # number of time samples when plotting distance over time
         self.tracked_distance_over_time = np.zeros(self.number_of_time_samples) # array for distance over time
         self.average_com = []  # array med avstånd
         self.local_peaks_index = [] # index of local peaks
