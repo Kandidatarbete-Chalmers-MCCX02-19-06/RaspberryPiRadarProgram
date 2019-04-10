@@ -18,12 +18,11 @@ class DataAcquisition(threading.Thread):
     def __init__(self, go):
         super(DataAcquisition, self).__init__()  # Inherit threading vitals
         self.go = go
-        # Setup for collecting data from acconeers radar files.
+        # Setup for collecting data from acconeer's radar files.
         self.args = example_utils.ExampleArgumentParser().parse_args()
         example_utils.config_logging(self.args)
         if self.args.socket_addr:
             self.client = JSONClient(self.args.socket_addr)
-            # Test för att se vilken port som används av radarn
             print("RADAR Port = " + self.args.socket_addr)
         else:
             port = self.args.serial_port or example_utils.autodetect_serial_port()
@@ -31,24 +30,23 @@ class DataAcquisition(threading.Thread):
         self.client.squeeze = False
         self.config = configs.IQServiceConfig()
         self.config.sensor = self.args.sensors
+
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.5]  # Measurement interval
-        self.config.sweep_rate = 10  # Frequency for collecting data
-        self.config.gain = 0.7  # Gain between 0 and 1.
-
-        # för plotten
-        self.pg_updater = PGUpdater(self.config)
-        self.pg_process = PGProcess(self.pg_updater)
-        self.pg_process.start()
-
+        self.config.sweep_rate = 10  # Frequency for collecting data. To low means that fast movements can't be tracked.
+        # The hardware of UART/SPI limits the sweep rate.
+        self.config.gain = 0.7  # Gain between 0 and 1. Larger gain increase the SNR, but come at a cost
+        # with more instability. Optimally is around 0.7
         self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
-        self.num_points = self.info["data_length"]  # Length of data per sampel
+        self.data_length = self.info["data_length"]  # Length of data per sampel
 
         # Inputs for tracking
-        self.f = self.config.sweep_rate
+        self.f = self.config.sweep_rate  # frequency
         self.dt = 1 / self.f
-        self.number_of_averages = 2  # antalet medelvärdesbildningar
-        self.number_of_time_samples = int(10 / self.dt) # number of time samples when plotting distance over time
+        self.a = self.alpha(0.25, self.dt)  # weighted integration for last two values to smooth the changes.
+        # tau changes the weight, lower tau means more weight on last value. Usually tau = 0.25 is good.
+        self.number_of_averages = 2  # number of averages for tracked peak
+        self.number_of_time_samples = int(5 / self.dt)  # number of time samples when plotting distance over time
         self.tracked_distance_over_time = np.zeros(self.number_of_time_samples) # array for distance over time
         self.average_com = []  # array med avstånd
         self.local_peaks_index = [] # index of local peaks
@@ -62,8 +60,10 @@ class DataAcquisition(threading.Thread):
         self.last_sweep = None # för plotten
         self.tracked_data = None
 
-        self.a = self.alpha(0.25, self.dt) # integration for last two values
-
+        # Graphs
+        self.pg_updater = PGUpdater(self.config)
+        self.pg_process = PGProcess(self.pg_updater)
+        self.pg_process.start()
         # acconeer graph
         self.lp_vel = 0
         self.hist_vel = np.zeros(self.number_of_time_samples)
@@ -263,7 +263,7 @@ class PGUpdater:
         self.distance_over_time_plot2.setLabel("left", "Distance")
         self.distance_over_time_plot2.setLabel("bottom", "Time (s)")
         self.distance_over_time_curve2 = self.distance_over_time_plot2.plot(pen=example_utils.pg_pen_cycler(0))
-        self.distance_over_time_plot2.setYRange(0.4, 1.4)
+        self.distance_over_time_plot2.setYRange(0.4, 1.5)
 
         self.smooth_max = example_utils.SmoothMax(self.config.sweep_rate)
         self.first = True
