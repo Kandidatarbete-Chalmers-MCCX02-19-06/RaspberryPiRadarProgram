@@ -49,6 +49,7 @@ class SignalProcessing:
             if self.index_fft == window_width-1:
                 self.index_fft = 0
         
+        fft_window = np.roll()
         [freq, fft_signal_out] = self.smartFFT(fft_window,beta)
         return freq, fft_signal_out
 
