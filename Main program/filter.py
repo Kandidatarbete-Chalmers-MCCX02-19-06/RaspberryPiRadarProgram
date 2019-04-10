@@ -50,13 +50,13 @@ class Filter:
     
     def __init__(self,filter):
         if filter == 'highpass_HR':
-            self.coefficients = coefficients_highpass_HR
+            self.coefficients = Filter.coefficients_highpass_HR
         elif filter == 'lowpass_HR':
-            self.coefficients = coefficients_lowpass_HR
+            self.coefficients = Filter.coefficients_lowpass_HR
         elif filter == 'highpass_RR':
-            self.coefficients = coefficients_highpass_RR
+            self.coefficients = Filter.coefficients_highpass_RR
         elif filter == 'lowpass_RR':
-            self.coefficients = coefficients_lowpass_RR
+            self.coefficients = Filter.coefficients_lowpass_RR
         
         self.length_of_input_vector = len(self.coefficients)  # Length of coefficient vector and length of input vector
         self.input_vector = np.zeros(self.length_of_input_vector)  # the same length as coefficients.

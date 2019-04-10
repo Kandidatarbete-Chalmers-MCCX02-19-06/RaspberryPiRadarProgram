@@ -8,7 +8,7 @@ import queue
 #import Radar
 import bluetooth_server        # import bluetooth class
 import data_acquisition      # Import class which collects and filters relevant data.
-import signal_processing
+#import signal_processing
 
 # Bluetooth imports
 import bluetooth
