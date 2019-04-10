@@ -92,6 +92,7 @@ class DataAcquisition(threading.Thread):
             # This data is an 1D array in terminal print, not in Python script however....
             data = self.get_data()
             tracked_data = self.tracking(data)
+            print("passed tracked data: ",tracked_data)
             filtered_tracked_data = self.filter(tracked_data["tracked phase"])
             print(filtered_tracked_data)
             self.output_vector_queue.put(filtered_tracked_data)  # put filtered data in output queue to send to SignalProcessing
