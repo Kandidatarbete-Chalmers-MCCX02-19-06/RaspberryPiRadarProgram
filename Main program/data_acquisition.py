@@ -168,21 +168,11 @@ class DataAcquisition(threading.Thread):
             #track_peak_relative_position = 0
             self.tracked_distance = 0
 
-        # Filter and plots
+        # Plots
         if self.first_data:
-            #self.low_pass_track_peak = track_peak_relative_position
             self.tracked_data = None
             self.low_pass_amplitude = amplitude
         else:
-            # Low-pass filtered data to smoothen fast movements
-            #self.low_pass_track_peak = self.low_pass_const * track_peak_relative_position + (
-            #            1 - self.low_pass_const) * self.low_pass_track_peak
-            #com_idx = int(self.low_pass_track_peak * data_length)
-
-            #self.tracked_distance = (1 - self.low_pass_track_peak) * self.config.range_interval[
-            #    0] + self.low_pass_track_peak * self.config.range_interval[1]
-
-            # Plots
             # Amplitude of data for plotting
             self.low_pass_amplitude = self.low_pass_const * amplitude + (1 - self.low_pass_const) * self.low_pass_amplitude
             self.tracked_distance_over_time = np.roll(self.tracked_distance_over_time, -1)  # Distance over time
@@ -226,9 +216,6 @@ class DataAcquisition(threading.Thread):
         if self.input_vector_index == self.length_of_input_vector:  # len(input_vector = N)
             self.input_vector_index = 0
         return yn
-
-
-# Test with acconeer plot is removed later on
 
 
 class PGUpdater:
