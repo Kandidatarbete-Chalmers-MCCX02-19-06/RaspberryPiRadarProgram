@@ -48,7 +48,7 @@ class DataAcquisition(threading.Thread):
         # Inputs for tracking
         self.f = self.config.sweep_rate
         self.dt = 1 / self.f
-        self.number_of_averages = 3  # antalet medelvärdesbildningar
+        self.number_of_averages = 4  # antalet medelvärdesbildningar
         self.average_com = []  # array med avstånd
         self.local_peaks_index = [] # index of local peaks
         self.track_peak_index = [] # index of last tracked peaks
@@ -62,7 +62,7 @@ class DataAcquisition(threading.Thread):
         self.tracked_phase = None
         self.last_sweep = None # för plotten
 
-        self.a = self.alpha(0.1, self.dt) # integration?
+        self.a = self.alpha(0.2, self.dt) # integration?
 
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
