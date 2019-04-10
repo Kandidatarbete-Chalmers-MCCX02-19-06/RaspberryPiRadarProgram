@@ -15,7 +15,7 @@ from acconeer_utils.pg_process import PGProcess, PGProccessDiedException
 
 
 class DataAcquisition(threading.Thread):
-    def __init__(self, go):
+    def __init__(self, go, HR_filtered_queue, RR_filtered_queue):
         super(DataAcquisition, self).__init__()  # Inherit threading vitals
         self.go = go
         # Setup for collecting data from acconeer's radar files.
@@ -85,7 +85,7 @@ class DataAcquisition(threading.Thread):
                  -0.0002844, -0.00017507, -2.1943e-19, 7.7519e-05]
         self.N = len(self.coeff)  # Length of coefficient vector and length of input vector
         self.input_vector = np.zeros(self.N)  # the same length as coefficients. Important = zero from beginning
-        self.output_vector_queue = queue.Queue()
+        self.RR_filtered_queue = RR_filtered_queue
         self.input_vector_index = 0  # for knowing where the latest input value is in input_vector
 
     def run(self):
@@ -97,8 +97,7 @@ class DataAcquisition(threading.Thread):
             if tracked_data is not None:
                 filtered_tracked_data = self.filter(tracked_data["tracked phase"])
                 print(filtered_tracked_data)
-                self.output_vector_queue.put(
-                    filtered_tracked_data)  # put filtered data in output queue to send to SignalProcessing
+                self.RR_filtered_queue.put(filtered_tracked_data)  # put filtered data in output queue to send to SignalProcessing
                 try:
                     self.pg_process.put_data(tracked_data)
                     # print("Tracked data: ", tracked_data["tracked distance"])

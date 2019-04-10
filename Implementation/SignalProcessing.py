@@ -22,7 +22,13 @@ class SignalProcessing:
         self.heart_rate_thread = threading.Thread(target = self.heart_rate)
         self.heart_rate_thread.start()
         #Starta schmitt
+        self.schmittTrigger = threading.Thread(target = self.schmittTrigger)
+        self.schmittTrigger.start()
         
+
+    def thread_start(self):         # used in Main to start and join the signal processing threads
+
+
 
     def heart_rate(self):
         T_resolution = 30
