@@ -176,6 +176,7 @@ class DataAcquisition(threading.Thread):
                                  "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase,
                                  "com": self.lp_com, "abs": self.lp_ampl, "tracked distance over time": plot_hist_pos}
         self.data_index +=1
+        self.last_sweep = data
         return self.tracked_data
 
     def alpha(self, tau, dt):
