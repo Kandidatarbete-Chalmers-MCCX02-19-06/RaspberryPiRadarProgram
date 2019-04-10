@@ -9,7 +9,7 @@ import subprocess       # for Raspberry Pi shutdown
 import os
 
 
-class bluetooth_app:
+class BluetoothServer:
     run = True  # Argument for shuting down all loops at the same time with input from one device.
 
     def __init__(self, from_radar_queue, run_measurement, go):
