@@ -63,6 +63,10 @@ class DataAcquisition(threading.Thread):
 
         self.a = self.alpha(0.25, self.dt) # integration?
 
+        self.lp_vel = 0
+        self.hist_vel = np.zeros(self.number_of_time_samples)
+        self.hist_pos = np.zeros(self.number_of_time_samples)
+
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
         while self.go:
@@ -161,9 +165,17 @@ class DataAcquisition(threading.Thread):
             print(self.tracked_distance_over_time)
             self.tracked_distance_over_time[-1] = tracked_distance - np.mean(self.tracked_distance_over_time)
 
+            delta_angle = np.angle(data[com_idx] * np.conj(self.last_sweep[com_idx]))
+            vel = self.f * 2.5 * delta_angle / (2 * np.pi)
+            self.lp_vel = self.a * vel + (1 - self.a) * self.lp_vel
+            dp = self.lp_vel / self.f
+            self.hist_pos = np.roll(self.hist_pos, -1)
+            self.hist_pos[-1] = self.hist_pos[-2] + dp
+            plot_hist_pos = self.hist_pos - self.hist_pos.mean()
+
             self.tracked_data = {"tracked distance": tracked_distance,
                                  "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase,
-                                 "com": self.lp_com, "abs": self.lp_ampl, "tracked distance over time": self.tracked_distance_over_time}
+                                 "com": self.lp_com, "abs": self.lp_ampl, "tracked distance over time": plot_hist_pos}
         self.data_index +=1
         return self.tracked_data
 
