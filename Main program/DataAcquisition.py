@@ -210,14 +210,14 @@ class PGUpdater:
         self.distance_over_time_plot.setLabel("left", "Distance")
         self.distance_over_time_plot.setLabel("bottom", "Time (s)")
         self.distance_over_time_curve = self.distance_over_time_plot.plot(pen=example_utils.pg_pen_cycler(0))
-        self.distance_over_time_plot.setYRange(-10, 10)
+        self.distance_over_time_plot.setYRange(-8, 8)
 
         self.distance_over_time_plot2 = win.addPlot(row=1, col=1)
         self.distance_over_time_plot2.showGrid(x=True, y=True)
         self.distance_over_time_plot2.setLabel("left", "Distance")
         self.distance_over_time_plot2.setLabel("bottom", "Time (s)")
         self.distance_over_time_curve2 = self.distance_over_time_plot2.plot(pen=example_utils.pg_pen_cycler(0))
-        self.distance_over_time_plot2.setYRange(0, 1.4)
+        self.distance_over_time_plot2.setYRange(0.4, 1.4)
 
         self.smooth_max = example_utils.SmoothMax(self.config.sweep_rate)
         self.first = True
