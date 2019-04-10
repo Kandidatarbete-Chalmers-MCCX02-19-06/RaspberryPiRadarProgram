@@ -35,7 +35,9 @@ def main():
 
     # radar = Radar.Radar(radar_queue, go)
     # radar.start()
-    dataAcquisition = data_acquisition.DataAcquisition(go, HR_filtered_queue, RR_filtered_queue)
+    # dataAcquisition = data_acquisition.DataAcquisition(go, HR_filtered_queue, RR_filtered_queue)
+
+    dataAcquisition = data_acquisition.DataAcquisition(go)
     dataAcquisition.start()
     # signalProcessing = signal_processing.SignalProcessing(go, HR_filtered_queue, HR_final_queue, RR_filtered_queue, RR_final_queue)
 
