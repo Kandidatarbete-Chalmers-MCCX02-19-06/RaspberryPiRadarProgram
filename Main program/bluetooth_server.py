@@ -27,7 +27,8 @@ class BluetoothServer:
         self.server.setblocking(0)  # Makes server.accept() non-blocking, used for "poweroff"
         # TEMP: Data from radar used to make sure data can be accepted between threads
         # Queue from radar class to test if queue communication work
-        self.from_radar_queue = list_of_variables_for_threads["HR_final_queue"]
+        self.RR_final_queue = list_of_variables_for_threads["RR_final_queue"]
+        self.RTB_final_queue = list_of_variables_for_threads["RTB_final_queue"]
         self.run_measurement = list_of_variables_for_threads["run_measurement"]
         print('Bluetooth Socket Created')
         try:
@@ -42,24 +43,40 @@ class BluetoothServer:
         self.connect_device_thread.start()
 
     def app_data(self):  # The main loop which takes data from processing and sends data to all clients
-        while self.run:
+        while self.list_of_variables_for_threads["go"]:
             time.sleep(1)
             while len(self.client_list) == 0:
                 continue
-            try:
-                d = self.from_radar_queue.get(timeout=1)  # TEMP: Takes data from another thread
-            except:
-                pass
-            data = self.add_data(d)  # TEMP: Makes random data for testing of communication
-            data_pulse, data_breath = data.split(' ')  # Splits data in pulse and heart rate
-            self.write_data_to_app(data_pulse, 'heart rate')  # Sends pulse to app
-            self.write_data_to_app(data_breath, 'breath rate')  # Sends heart rate to app
+            self.schmitt_to_app()
+            self.real_time_breating_to_app()
+            # data = self.add_data(d)  # TEMP: Makes random data for testing of communication
+            # data_pulse, data_breath = data.split(' ')  # Splits data in pulse and heart rate
+            # self.write_data_to_app(data_pulse, 'heart rate')  # Sends pulse to app
+            # gitself.write_data_to_app(data_breath, 'breath rate')  # Sends heart rate to app
+
+    def schmitt_to_app(self):
+        try:
+            # TEMP: Takes data from Schmitt trigger
+            schmitt_data = self.RR_final_queue.get(timeout=0.2)
+            schmitt_data = ' RR ' + schmitt_data + ' '
+            self.send_data(schmitt_data)
+        except:
+            pass
+
+    def real_time_breating_to_app(self):
+        try:
+            # TEMP: Takes data from Schmitt trigger
+            real_time_breating_to_app = self.RTB_final_queue.get(timeout=0.2)
+            real_time_breating_to_app = ' RTB ' + real_time_breating_to_app + ' '
+            self.send_data(real_time_breating_to_app)
+        except:
+            pass
 
     def connect_device(self):
         os.system("echo 'power on\nquit' | bluetoothctl")  # Startup for bluetooth on rpi
         thread_list = []  # List which adds devices
         self.server.listen(7)  # Amount of devices that can simultaniously recive data.
-        while self.run:
+        while self.list_of_variables_for_threads["go"]:
             # Loop which takes listens for a new device, adds it to our list
             # and starts a new thread for listening on input from device
             try:
@@ -91,7 +108,7 @@ class BluetoothServer:
         print(c)
         print(self.address_list[-1])
         try:
-            while self.run:
+            while self.list_of_variables_for_threads["go"]:
                 data = c.recv(1024)  # Input argument from device
                 data = data.decode('utf-8')
                 data = data.strip()
