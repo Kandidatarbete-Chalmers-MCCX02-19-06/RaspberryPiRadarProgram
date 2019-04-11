@@ -143,8 +143,7 @@ class DataAcquisition(threading.Thread):
                     self.track_peak_index.append(self.track_peak_index[-1])
                 else:
                     # Difference between found local peaks and last tracked peak
-                    peak_difference_index = np.subtract(
-                        self.local_peaks_index, self.track_peaks_average_index)
+                    peak_difference_index = np.subtract(self.local_peaks_index, self.track_peaks_average_index)
                     # The tracked peak is expected to be the closest local peak found
                     self.track_peak_index.append(
                         self.local_peaks_index[np.argmin(np.abs(peak_difference_index))])
