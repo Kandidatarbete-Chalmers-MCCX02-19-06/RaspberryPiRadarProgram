@@ -26,8 +26,9 @@ class BluetoothServer:
         self.server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
         self.server.setblocking(0)  # Makes server.accept() non-blocking, used for "poweroff"
         # TEMP: Data from radar used to make sure data can be accepted between threads
-        self.from_radar_queue = from_radar_queue  # Queue from radar class to test if queue communication work
-        self.run_measurement = run_measurement
+        # Queue from radar class to test if queue communication work
+        self.from_radar_queue = list_of_variables_for_threads["HR_final_queue"]
+        self.run_measurement = list_of_variables_for_threads["run_measurement"]
         print('Bluetooth Socket Created')
         try:
             self.server.bind((self.host, self.port))
