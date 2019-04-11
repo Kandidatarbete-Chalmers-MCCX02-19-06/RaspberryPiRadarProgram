@@ -27,7 +27,7 @@ class BluetoothServer:
         self.server.setblocking(0)  # Makes server.accept() non-blocking, used for "poweroff"
         # TEMP: Data from radar used to make sure data can be accepted between threads
         # Queue from radar class to test if queue communication work
-        self.from_radar_queue = list_of_variables_for_threads["HR_final_queue"]
+        self.HR_final_queue = list_of_variables_for_threads["HR_final_queue"]
         self.run_measurement = list_of_variables_for_threads["run_measurement"]
         print('Bluetooth Socket Created')
         try:
@@ -47,13 +47,16 @@ class BluetoothServer:
             while len(self.client_list) == 0:
                 continue
             try:
-                d = self.from_radar_queue.get(timeout=1)  # TEMP: Takes data from another thread
+                # TEMP: Takes data from Schmitt trigger
+                schmitt_data = self.HR_final_queue.get(timeout=1)
+                schmitt_data = ' HR ' + schmitt_data + ' '
+                self.send_data(schmitt_data)
             except:
                 pass
-            data = self.add_data(d)  # TEMP: Makes random data for testing of communication
-            data_pulse, data_breath = data.split(' ')  # Splits data in pulse and heart rate
-            self.write_data_to_app(data_pulse, 'heart rate')  # Sends pulse to app
-            self.write_data_to_app(data_breath, 'breath rate')  # Sends heart rate to app
+            # data = self.add_data(d)  # TEMP: Makes random data for testing of communication
+            # data_pulse, data_breath = data.split(' ')  # Splits data in pulse and heart rate
+            # self.write_data_to_app(data_pulse, 'heart rate')  # Sends pulse to app
+            # self.write_data_to_app(data_breath, 'breath rate')  # Sends heart rate to app
 
     def connect_device(self):
         os.system("echo 'power on\nquit' | bluetoothctl")  # Startup for bluetooth on rpi
