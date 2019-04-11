@@ -10,16 +10,13 @@ import queue
 class SignalProcessing:
 
     def __init__(self, list_of_variables_for_threads):
-        #self.go = go
         self.list_of_variables_for_threads = list_of_variables_for_threads
         self.HR_filtered_queue = list_of_variables_for_threads["HR_filtered_queue"]
         self.HR_final_queue = list_of_variables_for_threads["HR_final_queue"]
-        self.counter_fft = 0
         self.index_fft = 0
-        #self.sample_freq = 20  # TODO:Temporary
         self.sample_freq = list_of_variables_for_threads["sample_freq"]
 
-        # Variabler för Schmitt Trigger
+        # Variables for Schmitt Trigger
         self.RR_filtered_queue = list_of_variables_for_threads["RR_filtered_queue"]
         self.RR_final_queue = list_of_variables_for_threads["RR_final_queue"]
         self.RTB_final_queue = list_of_variables_for_threads["RTB_final_queue"]
