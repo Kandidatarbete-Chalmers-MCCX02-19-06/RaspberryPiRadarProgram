@@ -28,6 +28,7 @@ class BluetoothServer:
         # TEMP: Data from radar used to make sure data can be accepted between threads
         # Queue from radar class to test if queue communication work
         self.HR_final_queue = list_of_variables_for_threads["HR_final_queue"]
+        self.RR_filtered_queue = list_of_variables_for_threads["RR_filtered_queue"]
         self.run_measurement = list_of_variables_for_threads["run_measurement"]
         print('Bluetooth Socket Created')
         try:
@@ -46,17 +47,30 @@ class BluetoothServer:
             time.sleep(1)
             while len(self.client_list) == 0:
                 continue
-            try:
-                # TEMP: Takes data from Schmitt trigger
-                schmitt_data = self.HR_final_queue.get(timeout=1)
-                schmitt_data = ' HR ' + schmitt_data + ' '
-                self.send_data(schmitt_data)
-            except:
-                pass
+            self.schmitt_to_app()
+            self.real_time_breating_to_app()
             # data = self.add_data(d)  # TEMP: Makes random data for testing of communication
             # data_pulse, data_breath = data.split(' ')  # Splits data in pulse and heart rate
             # self.write_data_to_app(data_pulse, 'heart rate')  # Sends pulse to app
-            # self.write_data_to_app(data_breath, 'breath rate')  # Sends heart rate to app
+            # gitself.write_data_to_app(data_breath, 'breath rate')  # Sends heart rate to app
+
+    def schmitt_to_app(self):
+        try:
+            # TEMP: Takes data from Schmitt trigger
+            schmitt_data = self.HR_final_queue.get(timeout=0.2)
+            schmitt_data = ' RR ' + schmitt_data + ' '
+            self.send_data(schmitt_data)
+        except:
+            pass
+
+    def real_time_breating_to_app(self):
+        try:
+            # TEMP: Takes data from Schmitt trigger
+            real_time_breating_to_app = self.HR_final_queue.get(timeout=0.2)
+            real_time_breating_to_app = ' RTB ' + real_time_breating_to_app + ' '
+            self.send_data(real_time_breating_to_app)
+        except:
+            pass
 
     def connect_device(self):
         os.system("echo 'power on\nquit' | bluetoothctl")  # Startup for bluetooth on rpi
