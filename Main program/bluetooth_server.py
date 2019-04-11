@@ -27,8 +27,8 @@ class BluetoothServer:
         self.server.setblocking(0)  # Makes server.accept() non-blocking, used for "poweroff"
         # TEMP: Data from radar used to make sure data can be accepted between threads
         # Queue from radar class to test if queue communication work
-        self.HR_final_queue = list_of_variables_for_threads["HR_final_queue"]
-        self.RR_filtered_queue = list_of_variables_for_threads["RR_filtered_queue"]
+        self.RR_final_queue = list_of_variables_for_threads["RR_final_queue"]
+        self.RTB_final_queue = list_of_variables_for_threads["RTB_final_queue"]
         self.run_measurement = list_of_variables_for_threads["run_measurement"]
         print('Bluetooth Socket Created')
         try:
@@ -57,7 +57,7 @@ class BluetoothServer:
     def schmitt_to_app(self):
         try:
             # TEMP: Takes data from Schmitt trigger
-            schmitt_data = self.HR_final_queue.get(timeout=0.2)
+            schmitt_data = self.RR_final_queue.get(timeout=0.2)
             schmitt_data = ' RR ' + schmitt_data + ' '
             self.send_data(schmitt_data)
         except:
@@ -66,7 +66,7 @@ class BluetoothServer:
     def real_time_breating_to_app(self):
         try:
             # TEMP: Takes data from Schmitt trigger
-            real_time_breating_to_app = self.HR_final_queue.get(timeout=0.2)
+            real_time_breating_to_app = self.RTB_final_queue.get(timeout=0.2)
             real_time_breating_to_app = ' RTB ' + real_time_breating_to_app + ' '
             self.send_data(real_time_breating_to_app)
         except:
