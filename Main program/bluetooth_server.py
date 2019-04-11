@@ -117,11 +117,13 @@ class BluetoothServer:
 
                 elif data == 'startMeasure':
                     self.run_measurement.append(c)
+                    self.list_of_variables_for_threads["run_measurement"] = self.run_measurement
                     print("Device added")
 
                 elif data == 'stopMeasure':
                     if c in self.run_measurement:
                         self.run_measurement.remove(c)
+                        self.list_of_variables_for_threads["run_measurement"] = self.run_measurement
                         print("Device removed")
 
         except Exception as error:
