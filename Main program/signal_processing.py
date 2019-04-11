@@ -9,17 +9,20 @@ import queue
 
 class SignalProcessing:
 
-    def __init__(self, go, HR_filtered_queue, HR_final_queue, RR_filtered_queue, RR_final_queue):
-        self.go = go
-        self.HR_filtered_queue = HR_filtered_queue
-        self.HR_final_queue = HR_final_queue
+    def __init__(self, list_of_variables_for_threads):
+        #self.go = go
+        self.list_of_variables_for_threads = list_of_variables_for_threads
+        self.HR_filtered_queue = list_of_variables_for_threads["HR_filtered_queue"]
+        self.HR_final_queue = list_of_variables_for_threads["HR_final_queue"]
         self.counter_fft = 0
         self.index_fft = 0
-        self.sample_freq = 20  # TODO:Temporary
+        #self.sample_freq = 20  # TODO:Temporary
+        self.sample_freq = list_of_variables_for_threads["sample_freq"]
 
         # Variabler för Schmitt Trigger
-        self.RR_filtered_queue = RR_filtered_queue
-        self.RR_final_queue = RR_final_queue
+        self.RR_filtered_queue = list_of_variables_for_threads["RR_filtered_queue"]
+        self.RR_final_queue = list_of_variables_for_threads["RR_final_queue"]
+
         # Starta heart_rate
         self.heart_rate_thread = threading.Thread(target=self.heart_rate)
         self.heart_rate_thread.start()
@@ -34,7 +37,7 @@ class SignalProcessing:
         # Data in vector with length of window
         fft_window = np.zeros(T_resolution*self.sample_freq)
         i = 0
-        while self.go:
+        while self.list_of_variables_for_threads["go"]:
             # for i in range(3):
             [freq, fft_signal_out] = self.windowedFFT(fft_window, overlap, beta)
             print(i)
@@ -111,7 +114,7 @@ class SignalProcessing:
         # for saving respiratory_queue_BR old values for hysteresis
         trackedBRvector = np.zeros(self.sample_freq * Tc)  # to save old values
 
-        while self.go:
+        while self.list_of_variables_for_threads["go"]:
             # to be able to use the same value in the whole loop
             trackedBRvector[countHys - 1] = self.RR_filtered_queue.get()
 
@@ -164,32 +167,32 @@ class SignalProcessing:
 # MAIN ##  TODO: Ta bort MAIN sen
 
 
-#windowedFFT(data_in, sample_freq, T_resolution, overlap, beta)
-HR_filtered_queue = queue.Queue()
-HR_final_queue = queue.Queue()
-RR_filtered_queue = queue.Queue()
-RR_final_queue = queue.Queue()
+# #windowedFFT(data_in, sample_freq, T_resolution, overlap, beta)
+# HR_filtered_queue = queue.Queue()
+# HR_final_queue = queue.Queue()
+# RR_filtered_queue = queue.Queue()
+# RR_final_queue = queue.Queue()
 
 
-sample_freq = 20
-length_seq = 100000
-sample_spacing = 1/sample_freq
+# sample_freq = 20
+# length_seq = 100000
+# sample_spacing = 1/sample_freq
 
-t = np.arange(length_seq)*sample_spacing
-signal_in = 4*np.sin(1 * 2.0*np.pi*t) + 0*np.sin(2 * 2.0*np.pi*t)
-# print(signal_in)
+# t = np.arange(length_seq)*sample_spacing
+# signal_in = 4*np.sin(1 * 2.0*np.pi*t) + 0*np.sin(2 * 2.0*np.pi*t)
+# # print(signal_in)
 
-for i in range(len(signal_in)):
-    HR_filtered_queue.put(signal_in[i])
-    RR_filtered_queue.put(signal_in[i])
+# for i in range(len(signal_in)):
+#     HR_filtered_queue.put(signal_in[i])
+#     RR_filtered_queue.put(signal_in[i])
 
-go = ["True"]
+# go = ["True"]
 
-signal_processing = SignalProcessing(
-    go, HR_filtered_queue, HR_final_queue, RR_filtered_queue, RR_final_queue)
+# signal_processing = SignalProcessing(
+#     go, HR_filtered_queue, HR_final_queue, RR_filtered_queue, RR_final_queue)
 
-time.sleep(0.5)
-go.pop(0)
+# time.sleep(0.5)
+# go.pop(0)
 
 
 #### Test av smartFFT ####
