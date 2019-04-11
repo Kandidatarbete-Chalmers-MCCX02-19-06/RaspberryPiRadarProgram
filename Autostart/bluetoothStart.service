@@ -1,0 +1,11 @@
+[Unit]
+Description=Commands and programs that will run on startup of Raspberry Pi
+After=bluetooth.service
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sleep 10
+ExecStart=/usr/bin/sudo /bin/hciconfig hci0 piscan
+
+[Install]
+WantedBy=multi-user.target
