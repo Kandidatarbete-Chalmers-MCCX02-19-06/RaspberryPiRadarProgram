@@ -1,0 +1,12 @@
+[Unit]
+Description=Commands and programs that will run on startup of Raspberry Pi
+After=bluetooth.service
+
+[Service]
+Type=simple
+WorkinDirectory=/home/pi/RaspberryPiServer
+User=pi
+ExecStart=/usr/bin/python3 /home/pi/RaspberryPiServer/rfcomm5.py
+
+[Install]
+WantedBy=multi-user.target
