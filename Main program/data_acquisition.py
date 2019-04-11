@@ -84,7 +84,7 @@ class DataAcquisition(threading.Thread):
         self.highpass_HR = filter.Filter('highpass_HR')
         self.lowpass_HR = filter.Filter('lowpass_HR')
         self.highpass_RR = filter.Filter('highpass_RR')
-        self.lowhpass_RR = filter.Filter('lowpass_RR')
+        self.lowpass_RR = filter.Filter('lowpass_RR')
 
         self.HR_filtered_queue = list_of_variables_for_threads["HR_filtered_queue"]
         self.RR_filtered_queue = list_of_variables_for_threads["RR_filtered_queue"]
