@@ -12,8 +12,9 @@ import os
 class BluetoothServer:
     run = True  # Argument for shuting down all loops at the same time with input from one device.
 
-    def __init__(self, from_radar_queue, run_measurement, go):
-        self.go = go  # Argument for shutting down all threads and loops at the same time.
+    def __init__(self, list_of_variables_for_threads):
+        # List of all variables from main to class.
+        self.list_of_variables_for_threads = list_of_variables_for_threads
         # Bluetooth variables
         self.client_list = []         # list for each connected device, sockets
         self.address_list = []        # list for mac-adresses from each connected device
@@ -25,8 +26,9 @@ class BluetoothServer:
         self.server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
         self.server.setblocking(0)  # Makes server.accept() non-blocking, used for "poweroff"
         # TEMP: Data from radar used to make sure data can be accepted between threads
-        self.from_radar_queue = from_radar_queue  # Queue from radar class to test if queue communication work
-        self.run_measurement = run_measurement
+        # Queue from radar class to test if queue communication work
+        self.from_radar_queue = list_of_variables_for_threads["HR_final_queue"]
+        self.run_measurement = list_of_variables_for_threads["run_measurement"]
         print('Bluetooth Socket Created')
         try:
             self.server.bind((self.host, self.port))
@@ -99,7 +101,7 @@ class BluetoothServer:
                     print("Shutdown starting")
                     try:
                         self.run = False
-                        self.go = self.go.pop(0)
+                        self.list_of_variables_for_threads["go"] = []
                         print("run= " + str(self.run))
                         for client in self.client_list:
                             print('try to remove client ' +
@@ -115,11 +117,13 @@ class BluetoothServer:
 
                 elif data == 'startMeasure':
                     self.run_measurement.append(c)
+                    self.list_of_variables_for_threads["run_measurement"] = self.run_measurement
                     print("Device added")
 
                 elif data == 'stopMeasure':
                     if c in self.run_measurement:
                         self.run_measurement.remove(c)
+                        self.list_of_variables_for_threads["run_measurement"] = self.run_measurement
                         print("Device removed")
 
         except Exception as error:

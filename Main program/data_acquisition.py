@@ -20,6 +20,7 @@ class DataAcquisition(threading.Thread):
     def __init__(self, list_of_variables_for_threads):
         super(DataAcquisition, self).__init__()  # Inherit threading vitals
         self.go = list_of_variables_for_threads["go"]
+        self.list_of_variables_for_threads = list_of_variables_for_threads
         # Setup for collecting data from acconeer's radar files.
         self.args = example_utils.ExampleArgumentParser().parse_args()
         example_utils.config_logging(self.args)
@@ -36,7 +37,7 @@ class DataAcquisition(threading.Thread):
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.5]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
-        self.config.sweep_rate = 10
+        self.config.sweep_rate = 80
         # The hardware of UART/SPI limits the sweep rate.
         self.config.gain = 0.7  # Gain between 0 and 1. Larger gain increase the SNR, but come at a cost
         # with more instability. Optimally is around 0.7
@@ -83,15 +84,14 @@ class DataAcquisition(threading.Thread):
         self.highpass_HR = filter.Filter('highpass_HR')
         self.lowpass_HR = filter.Filter('lowpass_HR')
         self.highpass_RR = filter.Filter('highpass_RR')
-        self.lowhpass_RR = filter.Filter('lowpass_RR')
+        self.lowpass_RR = filter.Filter('lowpass_RR')
 
         self.HR_filtered_queue = list_of_variables_for_threads["HR_filtered_queue"]
         self.RR_filtered_queue = list_of_variables_for_threads["RR_filtered_queue"]
 
-
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
-        while self.go:
+        while self.list_of_variables_for_threads["go"]:
             # This data is an 1D array in terminal print, not in Python script however....
             data = self.get_data()
             tracked_data = self.tracking(data)  # processing data and tracking peaks
@@ -101,10 +101,10 @@ class DataAcquisition(threading.Thread):
                 bandpass_filtered_data_HR = self.lowpass_HR.filter(highpass_filtered_data_HR)
                 highpass_filtered_data_RR = self.highpass_RR.filter(tracked_data["tracked phase"])
                 bandpass_filtered_data_RR = self.lowpass_RR.filter(highpass_filtered_data_RR)
-                
+
                 # put filtered data in output queue to send to SignalProcessing
                 self.HR_filtered_queue.put(bandpass_filtered_data_HR)
-                self.RR_filtered_queue.put(bandpass_filtered_data_RR) 
+                self.RR_filtered_queue.put(bandpass_filtered_data_RR)
                 try:
                     self.pg_process.put_data(tracked_data)  # plot data
                 except PGProccessDiedException:
@@ -209,6 +209,7 @@ class DataAcquisition(threading.Thread):
     # Creates low-pass filter constants for a very small low-pass filter
     def low_pass_filter_constants_function(self, tau, dt):
         return 1 - np.exp(-dt / tau)
+
 
 class PGUpdater:
     def __init__(self, config):
