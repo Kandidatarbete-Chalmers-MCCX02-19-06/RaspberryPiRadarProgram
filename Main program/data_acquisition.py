@@ -38,6 +38,8 @@ class DataAcquisition(threading.Thread):
         self.config.range_interval = [0.4, 1.5]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
         self.config.sweep_rate = 80
+        # For use of sample freq in other threads and classes.
+        self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
         self.config.gain = 0.7  # Gain between 0 and 1. Larger gain increase the SNR, but come at a cost
         # with more instability. Optimally is around 0.7

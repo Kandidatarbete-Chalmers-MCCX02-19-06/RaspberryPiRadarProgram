@@ -28,8 +28,9 @@ def main():
     RR_final_queue = queue.Queue()
     go = ["True"]
     run_measurement = []
+    sample_freq = 0
     list_of_variables_for_threads = {"HR_filtered_queue": HR_filtered_queue, "HR_final_queue": HR_final_queue,
-                                     "RR_filtered_queue": RR_filtered_queue, "RR_final_queue": RR_final_queue, "go": go, "run measurement": run_measurement}
+                                     "RR_filtered_queue": RR_filtered_queue, "RR_final_queue": RR_final_queue, "go": go, "run measurement": run_measurement, "sample_freq": sample_freq}
     # heart_rate_queue = queue.Queue()
     # resp_rate_queue = queue.Queue()
 
