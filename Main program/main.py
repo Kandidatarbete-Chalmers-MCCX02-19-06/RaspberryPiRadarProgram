@@ -41,8 +41,8 @@ def main():
     #    list_of_variables_for_threads)
     # signal_processing.thread_start()
 
-    # bvme = bluetooth_server.BluetoothServer(list_of_variables_for_threads)
-    # bvme.app_data()
+    # bluetooth_server = bluetooth_server.BluetoothServer(list_of_variables_for_threads)
+    # bluetooth_server.app_data()
     # print('End of bluetooth_app')
     time.sleep(300)
     # interrupt_queue.put(1)
@@ -53,7 +53,7 @@ def main():
     time.sleep(1 / 20)  # Making sure signal processing have data in queue before radar quits.
     dataAcquisition.join()
     print("radar is closed")
-    # bvme.connect_device_thread.join()
+    # bluetooth_server.connect_device_thread.join()
     print("connect_device is closed")
 
     print('Shut down succeed')
