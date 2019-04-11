@@ -93,7 +93,7 @@ class DataAcquisition(threading.Thread):
 
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
-        while self.list_of_variables_for_threads["go"]:
+        while self.go:
             # This data is an 1D array in terminal print, not in Python script however....
             data = self.get_data()
             tracked_data = self.tracking(data)  # processing data and tracking peaks
@@ -113,6 +113,7 @@ class DataAcquisition(threading.Thread):
                     break
         print("out of while go in radar")
         self.client.disconnect()
+        self.pg_process.close()
 
     def get_data(self):
         if self.list_of_variables_for_threads["run_measurement"]:

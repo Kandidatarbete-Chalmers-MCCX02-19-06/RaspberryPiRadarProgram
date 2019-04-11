@@ -15,6 +15,7 @@ class BluetoothServer:
     def __init__(self, list_of_variables_for_threads):
         # List of all variables from main to class.
         self.list_of_variables_for_threads = list_of_variables_for_threads
+        self.go = list_of_variables_for_threads["go"]
         # Bluetooth variables
         self.client_list = []         # list for each connected device, sockets
         self.address_list = []        # list for mac-adresses from each connected device
@@ -43,7 +44,7 @@ class BluetoothServer:
         self.connect_device_thread.start()
 
     def app_data(self):  # The main loop which takes data from processing and sends data to all clients
-        while self.list_of_variables_for_threads["go"]:
+        while self.go:
             time.sleep(1)
             while len(self.client_list) == 0:
                 continue
@@ -76,7 +77,7 @@ class BluetoothServer:
         os.system("echo 'power on\nquit' | bluetoothctl")  # Startup for bluetooth on rpi
         thread_list = []  # List which adds devices
         self.server.listen(7)  # Amount of devices that can simultaniously recive data.
-        while self.list_of_variables_for_threads["go"]:
+        while self.go:
             # Loop which takes listens for a new device, adds it to our list
             # and starts a new thread for listening on input from device
             try:
@@ -108,7 +109,7 @@ class BluetoothServer:
         print(c)
         print(self.address_list[-1])
         try:
-            while self.list_of_variables_for_threads["go"]:
+            while self.go:
                 data = c.recv(1024)  # Input argument from device
                 data = data.decode('utf-8')
                 data = data.strip()

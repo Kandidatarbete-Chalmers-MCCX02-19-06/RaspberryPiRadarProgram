@@ -11,6 +11,7 @@ class SignalProcessing:
 
     def __init__(self, list_of_variables_for_threads):
         self.list_of_variables_for_threads = list_of_variables_for_threads
+        self.go = list_of_variables_for_threads["go"]
         self.HR_filtered_queue = list_of_variables_for_threads["HR_filtered_queue"]
         self.HR_final_queue = list_of_variables_for_threads["HR_final_queue"]
         self.index_fft = 0
@@ -19,11 +20,13 @@ class SignalProcessing:
         # Variables for Schmitt Trigger
         self.RR_filtered_queue = list_of_variables_for_threads["RR_filtered_queue"]
         self.RR_final_queue = list_of_variables_for_threads["RR_final_queue"]
+        self.freqArrayTemp_last = []  # If no breathing rate is found use last value
+        # print(list(self.RR_final_queue.queue))
         self.RTB_final_queue = list_of_variables_for_threads["RTB_final_queue"]
 
         # Starta heart_rate
-        self.heart_rate_thread = threading.Thread(target=self.heart_rate)
-        self.heart_rate_thread.start()
+        # self.heart_rate_thread = threading.Thread(target=self.heart_rate)
+        # self.heart_rate_thread.start()
         # Starta schmitt
         self.schmittTrigger_thread = threading.Thread(target=self.schmittTrigger)
         self.schmittTrigger_thread.start()
@@ -35,7 +38,7 @@ class SignalProcessing:
         # Data in vector with length of window
         fft_window = np.zeros(T_resolution*self.sample_freq)
         i = 0
-        while self.list_of_variables_for_threads["go"]:
+        while self.go:
             [freq, fft_signal_out] = self.windowedFFT(fft_window, overlap, beta)
         #     print(i) TODO: ta bort sen
         #     i += 1
@@ -101,7 +104,7 @@ class SignalProcessing:
         Hcut = 0.001  # Higher hysteres cut. Change this according to filter. To manage startup of filter
         Lcut = -Hcut  # Lower hysteres cut
         # average over old values. TODO ev. ingen medelvärdesbildning. För att förhindra att andningen går mot ett fast värde. Vi vill se mer i realtid.
-        avOver = 30
+        avOver = 1
         freqArray = np.zeros(avOver)  # for averaging over old values
         count = 1  # for counting number of samples passed since last negative flank
         countHys = 1  # for counting if hysteresis should be updated
@@ -110,7 +113,7 @@ class SignalProcessing:
         # for saving respiratory_queue_RR old values for hysteresis
         trackedRRvector = np.zeros(self.sample_freq * Tc)  # to save old values
 
-        while self.list_of_variables_for_threads["go"]:
+        while self.go:
             # to be able to use the same value in the whole loop
             trackedRRvector[countHys - 1] = self.RR_filtered_queue.get()
             self.RTB_final_queue.put(trackedRRvector[countHys - 1])
@@ -132,7 +135,8 @@ class SignalProcessing:
                     freqArray[0] = self.sample_freq / count
                     # Take the mean value
                     # RR_final_queue is supposed to be the breathing rate queue that is sent to app
-                    self.RR_final_queue = self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR)
+                    self.RR_final_queue.put(self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR))
+                    print("Breathing rate: ", self.RR_final_queue.get())
                     # TODO put getMeanOfFreqArray() into queue that connects to send bluetooth values instead
                     count = 0
             # trackedRRvector[countHys-1] is the current data from filter
@@ -144,20 +148,48 @@ class SignalProcessing:
             count += 1
             countHys += 1
 
+        print("out of schmittTrigger")
+
     # Used in schmittTrigger. Removes outliers and return mean value over last avOver values.
     def getMeanOfFreqArray(self, freqArray, FHighRR, FLowRR):  # remove all values > FHighRR and < FLowRR
-        freqArrayTemp = [x for x in freqArray if (x < FHighRR and x > FLowRR)]
-        # print(freqArrayTemp)
-        freqArrayTemp = freqArrayTemp[np.nonzero(freqArrayTemp)]
-        # print(freqArrayTemp)
+
+        #freqArrayTemp = [x for x in freqArray if (x < FHighRR and x > FLowRR)]
+        index_list = []
+        index = 0
+        #print("Before removal: Array {} \n Low and high hyst {},{}".format(freqArray, FLowRR, FHighRR))
+        for freq_value in freqArray:
+            if freq_value < FLowRR or freq_value > FHighRR or freq_value == 0:
+                index_list.append(index)
+            index += 1
+        freqArrayTemp = np.delete(freqArray, index_list)
+        #print("After removal but before deviation: ", freqArrayTemp)
+        #freqArrayTemp = [x for x in freqArrayTemp if x != 0]
+        # print(non_zero_temp)
+        # print(type(non_zero_temp))
+        #freqArrayTemp = freqArrayTemp[non_zero_temp]
+        # a[nonzero(a)]
 
         median = np.median(freqArrayTemp)  # median value
         stanDev = np.std(freqArrayTemp)  # standard deviation
 
-        freqArrayTemp = [x for x in freqArrayTemp if (
-            x > median - 3 * stanDev and x < median + 3 * stanDev)]
+        # freqArrayTemp = [x for x in freqArrayTemp if (
+        #    x > median - 3 * stanDev and x < median + 3 * stanDev)]
         # print(freqArrayTemp)
+        index_list = []
+        index = 0
+        for freq_value in freqArrayTemp:
+            if freq_value < median - 3 * stanDev and freq_value > median - 3 * stanDev:
+                index_list.append(index)
+            index += 1
+        freqArrayTemp = np.delete(freqArrayTemp, index_list)
+        #print("Last array before mean value {}".format(freqArrayTemp))
+        if len(freqArrayTemp) == 0:
+            freqArrayTemp = self.freqArrayTemp_last
+        else:
+            self.freqArrayTemp_last = freqArrayTemp
+
         mean = np.mean(freqArrayTemp)  # mean value of last avOver values excluding outliers
+        mean = mean * 60  # To get resp rate in Hz to Bpm
         return mean
 
 
