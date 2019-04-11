@@ -115,7 +115,11 @@ class DataAcquisition(threading.Thread):
         self.client.disconnect()
 
     def get_data(self):
-        info, data = self.client.get_next()
+        if self.list_of_variables_for_threads["run_measurement"]:
+            info, data = self.client.get_next()
+        else:
+            info, data = self.client.get_next()
+
         return data
 
     def tracking(self, data):
