@@ -47,7 +47,7 @@ class BluetoothServer:
         while self.go:
             while len(self.client_list) == 0:
                 continue
-            self.schmitt_to_app()
+            #self.schmitt_to_app()
             self.real_time_breating_to_app()
             # data = self.add_data(2)  # TEMP: Makes random data for testing of communication
             # data_pulse, data_breath = data.split(' ')  # Splits data in pulse and heart rate

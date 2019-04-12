@@ -19,8 +19,7 @@ import subprocess       # for Raspberry Pi shutdown
 
 
 def main():
-    # subprocess.call(
-    #    "./Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c")
+    # subprocess.call("./Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c")
 
     radar_queue = queue.Queue()  # Not used right now?
     HR_filtered_queue = queue.Queue()
@@ -54,7 +53,7 @@ def main():
     #list_of_variables_for_threads["go"] = go.pop(0)
     # radar.join()
     # signal_processings.heart_rate_thread.join()
-    signal_processings.schmittTrigger_thread.join()
+    #signal_processings.schmittTrigger_thread.join()
     #print("signal_processing is closed")
     time.sleep(1 / 20)  # Making sure signal processing have data in queue before radar quits.
     dataAcquisition.join()
