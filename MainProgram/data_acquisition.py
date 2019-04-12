@@ -110,10 +110,10 @@ class DataAcquisition(threading.Thread):
             #     # put filtered data in output queue to send to SignalProcessing
             #     self.HR_filtered_queue.put(bandpass_filtered_data_HR)
             #     self.RR_filtered_queue.put(bandpass_filtered_data_RR)
-               try:
-                    self.pg_process.put_data(tracked_data)  # plot data
-                except PGProccessDiedException:
-                    break
+            try:
+                self.pg_process.put_data(tracked_data)  # plot data
+            except PGProccessDiedException:
+                break
         print("out of while go in radar")
         self.client.disconnect()
         self.pg_process.close()
