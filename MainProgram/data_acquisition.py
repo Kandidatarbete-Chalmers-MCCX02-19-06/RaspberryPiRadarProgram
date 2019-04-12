@@ -97,6 +97,7 @@ class DataAcquisition(threading.Thread):
             # This data is an 1D array in terminal print, not in Python script however....
             data = self.get_data()
             tracked_data = self.tracking(data)  # processing data and tracking peaks
+            print("Amplitude phase: " tracked_data["tracked phase"])
             if tracked_data is not None:
                 # filter the data
                 highpass_filtered_data_HR = self.highpass_HR.filter(tracked_data["tracked phase"])
