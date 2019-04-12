@@ -193,6 +193,7 @@ class SignalProcessing:
         if len(freqArrayTemp) == 0:
             mean = 1
         mean = mean * 60  # To get resp rate in Hz to BPM
+        mean = round(mean)
         print("data from schmitt {}".format(mean))
         return mean
 
