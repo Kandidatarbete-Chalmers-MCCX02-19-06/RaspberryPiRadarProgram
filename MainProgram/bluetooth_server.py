@@ -60,10 +60,11 @@ class BluetoothServer:
             # TEMP: Takes data from Schmitt trigger
             schmitt_data = self.RR_final_queue.get()
             print("got data from queue")
-            schmitt_data = ' BR ' + schmitt_data + ' '      # TODO ändra till RR istället för BR i appen också
-            print("made string")
-            self.send_data(schmitt_data)
-            print("sent data")
+            self.write_data_to_app(schmitt_data, 'breath rate')
+            # schmitt_data = ' BR ' + schmitt_data + ' '      # TODO ändra till RR istället för BR i appen också
+            # print("made string")
+            # self.send_data(schmitt_data)
+            # print("sent data")
         except:
             print("timeout in queue")
             pass
