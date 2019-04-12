@@ -90,6 +90,7 @@ class DataAcquisition(threading.Thread):
 
         self.HR_filtered_queue = list_of_variables_for_threads["HR_filtered_queue"]
         self.RR_filtered_queue = list_of_variables_for_threads["RR_filtered_queue"]
+        self.RTB_final_queue = list_of_variables_for_threads["RTB_final_queue"]
 
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
@@ -204,7 +205,8 @@ class DataAcquisition(threading.Thread):
             self.hist_pos = np.roll(self.hist_pos, -1)
             self.hist_pos[-1] = self.hist_pos[-2] + dp
             plot_hist_pos = self.hist_pos - self.hist_pos.mean()
-            print("Plot_hist_pos: ", plot_hist_pos)
+            #print("Plot_hist_pos: ", plot_hist_pos)
+            self.RTB_final_queue.put(plot_hist_pos[-1])
 
             # Tracked data to return and plot
             self.tracked_data = {"tracked distance": self.tracked_distance,
