@@ -188,10 +188,10 @@ class SignalProcessing:
         #     freqArrayTemp = self.freqArrayTemp_last
         # else:
         #     self.freqArrayTemp_last = freqArrayTemp
-
-        print("FreqarrayTemp {}".format(freqArrayTemp))
         mean = np.mean(freqArrayTemp)  # mean value of last avOver values excluding outliers
-        print("mean value of FreqarrayTemp {}".format(mean))
+        # mean is nan if FreqArrayTemp is zero, which creates error when sending data to app
+        if len(freqArrayTemp) == 0:
+            mean = 0
         mean = mean * 60  # To get resp rate in Hz to BPM
         return mean
 
