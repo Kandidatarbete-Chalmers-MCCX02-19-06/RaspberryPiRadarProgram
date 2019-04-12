@@ -48,7 +48,7 @@ class BluetoothServer:
             while len(self.client_list) == 0:
                 time.sleep(0.5)
                 continue
-            self.schmitt_to_app()
+            #self.schmitt_to_app()
             self.real_time_breating_to_app()
             # data = self.add_data(2)  # TEMP: Makes random data for testing of communication
             # data_pulse, data_breath = data.split(' ')  # Splits data in pulse and heart rate
@@ -58,6 +58,8 @@ class BluetoothServer:
     def schmitt_to_app(self):
         try:
             # TEMP: Takes data from Schmitt trigger
+            while len(self.RR_final_queue) == 0 and self.go:
+                time.sleep(0.001)
             schmitt_data = self.RR_final_queue.get_nowait()
             #print("got data from queue")
             self.write_data_to_app(schmitt_data, 'breath rate')
@@ -70,10 +72,16 @@ class BluetoothServer:
 
     def real_time_breating_to_app(self):
         try:
+            while len(self.RTB_final_queue) == 0 and self.go:
+                time.sleep(0.001)
             # TEMP: Takes data from filtered resp.rate
             real_time_breating_to_app = self.RTB_final_queue.get_nowait()
             #print("Real time breathing to app {}".format(real_time_breating_to_app))
             self.write_data_to_app(real_time_breating_to_app, 'real time breath')
+            if len(self.RR_final_queue) != 0 and self.go:
+                schmitt_data = self.RR_final_queue.get_nowait()
+                self.write_data_to_app(schmitt_data, 'breath rate')
+
         except:
             print("timeout RTB queue")
 
