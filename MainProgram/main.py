@@ -50,8 +50,8 @@ def main():
     bluetooth_servers.connect_device_thread.join()
 
     print('Bluetooth server is closed')
-    time.sleep(300)
-    list_of_variables_for_threads["go"] = go.pop(0)
+    # time.sleep(300)
+    #list_of_variables_for_threads["go"] = go.pop(0)
     # radar.join()
     # signal_processings.heart_rate_thread.join()
     signal_processings.schmittTrigger_thread.join()
