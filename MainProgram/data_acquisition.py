@@ -204,6 +204,7 @@ class DataAcquisition(threading.Thread):
             self.hist_pos = np.roll(self.hist_pos, -1)
             self.hist_pos[-1] = self.hist_pos[-2] + dp
             plot_hist_pos = self.hist_pos - self.hist_pos.mean()
+            print("Plot_hist_pos: ", plot_hist_pos)
 
             # Tracked data to return and plot
             self.tracked_data = {"tracked distance": self.tracked_distance,
