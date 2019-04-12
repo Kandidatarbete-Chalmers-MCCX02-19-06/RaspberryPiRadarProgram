@@ -59,7 +59,7 @@ class BluetoothServer:
         # try:
             # TEMP: Takes data from Schmitt trigger
         schmitt_data = self.RR_final_queue.get()
-        print("got data from queue")
+        #print("got data from queue")
         self.write_data_to_app(schmitt_data, 'breath rate')
         # schmitt_data = ' BR ' + schmitt_data + ' '      # TODO ändra till RR istället för BR i appen också
         # print("made string")
@@ -70,10 +70,9 @@ class BluetoothServer:
 
     def real_time_breating_to_app(self):
         try:
-            # TEMP: Takes data from Schmitt trigger
-            real_time_breating_to_app = self.RTB_final_queue.get(timeout=0.2)
-            real_time_breating_to_app = ' RTB ' + real_time_breating_to_app + ' '
-            self.send_data(real_time_breating_to_app)
+            # TEMP: Takes data from filtered resp.rate
+            real_time_breating_to_app = self.RTB_final_queue.get()
+            self.write_data_to_app(real_time_breating_to_app, 'real time breath')
         except:
             pass
 
@@ -163,7 +162,7 @@ class BluetoothServer:
             # print(string)
             self.send_data(string)
         elif data_type == 'breath rate':
-            string = ' BR ' + str(data) + ' '
+            string = ' RR ' + str(data) + ' '
             # print(string)
             self.send_data(string)
         elif data_type == 'real time breath':
