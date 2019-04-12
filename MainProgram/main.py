@@ -42,7 +42,7 @@ def main():
     # radar.start()
     dataAcquisition = data_acquisition.DataAcquisition(list_of_variables_for_threads)
     dataAcquisition.start()
-    signal_processings = signal_processing.SignalProcessing(list_of_variables_for_threads)
+    #signal_processings = signal_processing.SignalProcessing(list_of_variables_for_threads)
     # signal_processing.thread_start()
 
     #bluetooth_servers = bluetooth_server.BluetoothServer(list_of_variables_for_threads)
@@ -58,8 +58,8 @@ def main():
     #list_of_variables_for_threads["go"] = go.pop(0)
     # radar.join()
     # signal_processings.heart_rate_thread.join()
-    signal_processings.schmittTrigger_thread.join()
-    print("signal_processing is closed")
+    # signal_processings.schmittTrigger_thread.join()
+    #print("signal_processing is closed")
     time.sleep(1 / 20)  # Making sure signal processing have data in queue before radar quits.
     dataAcquisition.join()
     print("radar is closed")
