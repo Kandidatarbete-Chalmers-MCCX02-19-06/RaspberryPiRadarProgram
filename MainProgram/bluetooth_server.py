@@ -73,7 +73,7 @@ class BluetoothServer:
     def real_time_breating_to_app(self):
         try:
             while self.RTB_final_queue.empty() and self.go:
-                time.sleep(0.001)
+                time.sleep(0.01)
             # TEMP: Takes data from filtered resp.rate
             real_time_breating_to_app = self.RTB_final_queue.get_nowait()
             #print("Real time breathing to app {}".format(real_time_breating_to_app))
