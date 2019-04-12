@@ -183,10 +183,10 @@ class SignalProcessing:
             index += 1
         freqArrayTemp = np.delete(freqArrayTemp, index_list)
         #print("Last array before mean value {}".format(freqArrayTemp))
-        if len(freqArrayTemp) == 0:
-            freqArrayTemp = self.freqArrayTemp_last
-        else:
-            self.freqArrayTemp_last = freqArrayTemp
+        # if len(freqArrayTemp) == 0:
+        #     freqArrayTemp = self.freqArrayTemp_last
+        # else:
+        #     self.freqArrayTemp_last = freqArrayTemp
 
         mean = np.mean(freqArrayTemp)  # mean value of last avOver values excluding outliers
         mean = mean * 60  # To get resp rate in Hz to Bpm
