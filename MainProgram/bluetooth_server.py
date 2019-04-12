@@ -45,7 +45,6 @@ class BluetoothServer:
 
     def app_data(self):  # The main loop which takes data from processing and sends data to all clients
         while self.go:
-            time.sleep(1)
             while len(self.client_list) == 0:
                 continue
             self.schmitt_to_app()
@@ -58,7 +57,7 @@ class BluetoothServer:
     def schmitt_to_app(self):
         try:
             # TEMP: Takes data from Schmitt trigger
-            schmitt_data = self.RR_final_queue.get(timeout=0)
+            schmitt_data = self.RR_final_queue.get_nowait()
             #print("got data from queue")
             self.write_data_to_app(schmitt_data, 'breath rate')
         # schmitt_data = ' BR ' + schmitt_data + ' '      # TODO ändra till RR istället för BR i appen också
