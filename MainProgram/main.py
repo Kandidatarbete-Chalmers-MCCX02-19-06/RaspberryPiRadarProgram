@@ -43,10 +43,10 @@ def main():
     dataAcquisition.start()
     signal_processings = signal_processing.SignalProcessing(list_of_variables_for_threads)
 
-    #bluetooth_servers = bluetooth_server.BluetoothServer(list_of_variables_for_threads)
+    bluetooth_servers = bluetooth_server.BluetoothServer(list_of_variables_for_threads)
     ##bluetooth_servers = bluetooth_app.bluetooth_app(go)
-    #bluetooth_servers.app_data()
-    #bluetooth_servers.connect_device_thread.join()
+    bluetooth_servers.app_data()
+    bluetooth_servers.connect_device_thread.join()
 
     print('Bluetooth server is closed')
     # time.sleep(300)
