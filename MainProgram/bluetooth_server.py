@@ -73,7 +73,7 @@ class BluetoothServer:
     def real_time_breating_to_app(self):
         try:
             while self.RTB_final_queue.empty() and self.go:
-                time.sleep(0.01)
+                time.sleep(0.005)
             # TEMP: Takes data from filtered resp.rate
             real_time_breating_to_app = self.RTB_final_queue.get_nowait()
             #print("Real time breathing to app {}".format(real_time_breating_to_app))
@@ -179,7 +179,7 @@ class BluetoothServer:
             self.send_data(string)
 
     def send_data(self, write):
-        print('Send data: ' + write)
+        # print('Send data: ' + write)
         for client in self.client_list:  # Send the same data to all clients connected
             try:
                 client.send(write.encode('utf-8'))      # write.encode('utf-8')
