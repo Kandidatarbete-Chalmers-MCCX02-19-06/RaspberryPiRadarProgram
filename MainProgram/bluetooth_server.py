@@ -10,7 +10,7 @@ import os
 
 
 class BluetoothServer:
-    run = True  # Argument for shuting down all loops at the same time with input from one device.
+    # run = True  # Argument for shuting down all loops at the same time with input from one device.
 
     def __init__(self, list_of_variables_for_threads):
         # List of all variables from main to class.
@@ -48,12 +48,12 @@ class BluetoothServer:
             time.sleep(1)
             while len(self.client_list) == 0:
                 continue
-            self.schmitt_to_app()
+            # self.schmitt_to_app()
             # self.real_time_breating_to_app()
-            # data = self.add_data(2)  # TEMP: Makes random data for testing of communication
-            # data_pulse, data_breath = data.split(' ')  # Splits data in pulse and heart rate
-            # self.write_data_to_app(data_pulse, 'heart rate')  # Sends pulse to app
-            # self.write_data_to_app(data_breath, 'breath rate')  # Sends heart rate to app
+            data = self.add_data(2)  # TEMP: Makes random data for testing of communication
+            data_pulse, data_breath = data.split(' ')  # Splits data in pulse and heart rate
+            self.write_data_to_app(data_pulse, 'heart rate')  # Sends pulse to app
+            self.write_data_to_app(data_breath, 'breath rate')  # Sends heart rate to app
 
     def schmitt_to_app(self):
         try:
@@ -84,7 +84,7 @@ class BluetoothServer:
             try:
                 c, a = self.server.accept()
             except:
-                if self.run == False:
+                if self.go == False:
                     break
                 #print("Still accepting new phones" + str(error))
                 continue
@@ -115,13 +115,13 @@ class BluetoothServer:
                 data = data.decode('utf-8')
                 data = data.strip()
                 print(data)
-                # When device sends "poweroff" initiate shutdown by setting run to false, removing all clients and closing all threads.
+                # When device sends "poweroff" initiate shutdown by setting go to false, removing all clients and closing all threads.
                 if data == 'poweroff':
                     print("Shutdown starting")
                     try:
-                        self.run = False
+                        self.go = False
                         self.list_of_variables_for_threads["go"] = []
-                        print("run= " + str(self.run))
+                        print("go= " + str(self.go))
                         for client in self.client_list:
                             print('try to remove client ' +
                                   str(self.address_list[self.client_list.index(client)]))
@@ -189,6 +189,6 @@ class BluetoothServer:
     #     self.send_to_app_queue.put(self.add_data(1))
     #     return self.send_to_app_queue.get()
 
-    @staticmethod  # Test to send run variable to other threads, does not work yet.
-    def get_run(self):
-        return self.run
+    #@staticmethod  # Test to send run variable to other threads, does not work yet.
+    #def get_run(self):
+    #    return self.run
