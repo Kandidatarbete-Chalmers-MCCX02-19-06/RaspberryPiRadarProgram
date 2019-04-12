@@ -116,7 +116,7 @@ class SignalProcessing:
         while self.go:
             # to be able to use the same value in the whole loop
             trackedRRvector[countHys - 1] = self.RR_filtered_queue.get()
-            self.RTB_final_queue.put(trackedRRvector[countHys - 1])
+            #self.RTB_final_queue.put(trackedRRvector[countHys - 1])
 
             if countHys == self.sample_freq * Tc:
                 Hcut = np.sqrt(np.mean(np.square(trackedRRvector)))  # rms of trackedRRvector
@@ -136,7 +136,8 @@ class SignalProcessing:
                     # Take the mean value
                     # RR_final_queue is supposed to be the breathing rate queue that is sent to app
                     self.RR_final_queue.put(self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR))
-                    print("Breathing rate: ", self.RR_final_queue.get())
+                    print("Data added to schmitt should be sent to app")
+                    #print("Breathing rate: ", self.RR_final_queue.get())
                     # TODO put getMeanOfFreqArray() into queue that connects to send bluetooth values instead
                     count = 0
             # trackedRRvector[countHys-1] is the current data from filter
