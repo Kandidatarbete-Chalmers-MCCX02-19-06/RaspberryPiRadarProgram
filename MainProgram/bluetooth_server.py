@@ -159,15 +159,15 @@ class BluetoothServer:
     def write_data_to_app(self, data, data_type):
         # print(data + ' ' + data_type)
         if data_type == 'heart rate':
-            string = ' HR ' + data + ' '
+            string = ' HR ' + str(data) + ' '
             # print(string)
             self.send_data(string)
         elif data_type == 'breath rate':
-            string = ' BR ' + data + ' '
+            string = ' BR ' + str(data) + ' '
             # print(string)
             self.send_data(string)
         elif data_type == 'real time breath':
-            string = ' RTB ' + data + ' '
+            string = ' RTB ' + str(data) + ' '
             self.send_data(string)
 
     def send_data(self, write):
