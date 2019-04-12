@@ -72,13 +72,13 @@ class BluetoothServer:
 
     def real_time_breating_to_app(self):
         try:
-            while len(self.RTB_final_queue) == 0 and self.go:
+            while self.RTB_final_queue.empty() and self.go:
                 time.sleep(0.001)
             # TEMP: Takes data from filtered resp.rate
             real_time_breating_to_app = self.RTB_final_queue.get_nowait()
             #print("Real time breathing to app {}".format(real_time_breating_to_app))
             self.write_data_to_app(real_time_breating_to_app, 'real time breath')
-            if len(self.RR_final_queue) != 0:
+            if not self.RR_final_queue.empty():
                 schmitt_data = self.RR_final_queue.get_nowait()
                 self.write_data_to_app(schmitt_data, 'breath rate')
 
