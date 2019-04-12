@@ -189,7 +189,7 @@ class SignalProcessing:
         #     self.freqArrayTemp_last = freqArrayTemp
 
         mean = np.mean(freqArrayTemp)  # mean value of last avOver values excluding outliers
-        mean = mean * 60  # To get resp rate in Hz to Bpm
+        mean = mean * 60  # To get resp rate in Hz to BPM
         return mean
 
 
