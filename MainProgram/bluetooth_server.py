@@ -69,12 +69,12 @@ class BluetoothServer:
         #     print("timeout in queue")
 
     def real_time_breating_to_app(self):
-        try:
-            # TEMP: Takes data from filtered resp.rate
-            real_time_breating_to_app = self.RTB_final_queue.get()
-            self.write_data_to_app(real_time_breating_to_app, 'real time breath')
-        except:
-            pass
+        # try:
+        # TEMP: Takes data from filtered resp.rate
+        real_time_breating_to_app = self.RTB_final_queue.get()
+        self.write_data_to_app(real_time_breating_to_app, 'real time breath')
+        # except:
+        #    pass
 
     def connect_device(self):
         os.system("echo 'power on\nquit' | bluetoothctl")  # Startup for bluetooth on rpi
