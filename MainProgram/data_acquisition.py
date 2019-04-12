@@ -35,7 +35,7 @@ class DataAcquisition(threading.Thread):
         self.config.sensor = self.args.sensors
 
         # Settings for radar setup
-        self.config.range_interval = [0.4, 1.5]  # Measurement interval
+        self.config.range_interval = [0.4, 1]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
         self.config.sweep_rate = 20
         # For use of sample freq in other threads and classes.
