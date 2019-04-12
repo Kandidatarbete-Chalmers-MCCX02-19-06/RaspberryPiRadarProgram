@@ -191,8 +191,9 @@ class SignalProcessing:
         mean = np.mean(freqArrayTemp)  # mean value of last avOver values excluding outliers
         # mean is nan if FreqArrayTemp is zero, which creates error when sending data to app
         if len(freqArrayTemp) == 0:
-            mean = 0
+            mean = 1
         mean = mean * 60  # To get resp rate in Hz to BPM
+        print("data from schmitt {}".format(mean))
         return mean
 
 

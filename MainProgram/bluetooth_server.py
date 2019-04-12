@@ -164,7 +164,7 @@ class BluetoothServer:
             self.send_data(string)
         elif data_type == 'breath rate':
             string = ' BR ' + str(data) + ' '
-            # print(string)
+            print(string)
             self.send_data(string)
         elif data_type == 'real time breath':
             string = ' RTB ' + str(data) + ' '
