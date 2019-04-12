@@ -56,18 +56,17 @@ class BluetoothServer:
             # self.write_data_to_app(data_breath, 'breath rate')  # Sends heart rate to app
 
     def schmitt_to_app(self):
-        try:
+        # try:
             # TEMP: Takes data from Schmitt trigger
-            schmitt_data = self.RR_final_queue.get()
-            print("got data from queue")
-            self.write_data_to_app(schmitt_data, 'breath rate')
-            # schmitt_data = ' BR ' + schmitt_data + ' '      # TODO ändra till RR istället för BR i appen också
-            # print("made string")
-            # self.send_data(schmitt_data)
-            # print("sent data")
-        except:
-            print("timeout in queue")
-            pass
+        schmitt_data = self.RR_final_queue.get()
+        print("got data from queue")
+        self.write_data_to_app(schmitt_data, 'breath rate')
+        # schmitt_data = ' BR ' + schmitt_data + ' '      # TODO ändra till RR istället för BR i appen också
+        # print("made string")
+        # self.send_data(schmitt_data)
+        # print("sent data")
+        # except:
+        #     print("timeout in queue")
 
     def real_time_breating_to_app(self):
         try:
