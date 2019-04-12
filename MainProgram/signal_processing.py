@@ -109,7 +109,7 @@ class SignalProcessing:
         count = 1  # for counting number of samples passed since last negative flank
         countHys = 1  # for counting if hysteresis should be updated
         FHighRR = 0.7  # To remove outliers in mean value
-        FLowRR = 0.2  # To remove outliers in mean value
+        FLowRR = 0.1  # To remove outliers in mean value
         # for saving respiratory_queue_RR old values for hysteresis
         trackedRRvector = np.zeros(self.sample_freq * Tc)  # to save old values
 
@@ -136,7 +136,7 @@ class SignalProcessing:
                     # Take the mean value
                     # RR_final_queue is supposed to be the breathing rate queue that is sent to app
                     self.RR_final_queue.put(self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR))
-                    print("Breathing rate: ", self.RR_final_queue.get())
+                    #print("Breathing rate: ", self.RR_final_queue.get())
                     # TODO put getMeanOfFreqArray() into queue that connects to send bluetooth values instead
                     count = 0
             # trackedRRvector[countHys-1] is the current data from filter

@@ -45,7 +45,7 @@ class BluetoothServer:
 
     def app_data(self):  # The main loop which takes data from processing and sends data to all clients
         while self.go:
-            time.sleep(1)
+            # time.sleep(1)
             while len(self.client_list) == 0:
                 continue
             self.schmitt_to_app()
