@@ -116,7 +116,7 @@ class SignalProcessing:
         while self.go:
             # to be able to use the same value in the whole loop
             trackedRRvector[countHys - 1] = self.RR_filtered_queue.get()
-            #self.RTB_final_queue.put(trackedRRvector[countHys - 1])
+            self.RTB_final_queue.put(trackedRRvector[countHys - 1])
 
             if countHys == self.sample_freq * Tc:
                 Hcut = np.sqrt(np.mean(np.square(trackedRRvector)))  # rms of trackedRRvector
@@ -194,7 +194,7 @@ class SignalProcessing:
             mean = 1
         mean = mean * 60  # To get resp rate in Hz to BPM
         mean = int(round(mean))
-        print("data from schmitt {}".format(mean))
+        #print("data from schmitt {}".format(mean))
         return mean
 
 

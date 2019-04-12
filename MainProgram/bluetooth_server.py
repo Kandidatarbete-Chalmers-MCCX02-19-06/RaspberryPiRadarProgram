@@ -72,6 +72,7 @@ class BluetoothServer:
         # try:
         # TEMP: Takes data from filtered resp.rate
         real_time_breating_to_app = self.RTB_final_queue.get()
+        print("Real time breathing to app {}".format(real_time_breating_to_app))
         self.write_data_to_app(real_time_breating_to_app, 'real time breath')
         # except:
         #    pass
