@@ -206,7 +206,7 @@ class DataAcquisition(threading.Thread):
             self.hist_pos[-1] = self.hist_pos[-2] + dp
             plot_hist_pos = self.hist_pos - self.hist_pos.mean()
             #print("Plot_hist_pos: ", plot_hist_pos)
-            self.RTB_final_queue.put(plot_hist_pos[-1]*1000)  # Gets tracked breathing in mm
+            self.RTB_final_queue.put(plot_hist_pos[-1]*10)  # Gets tracked breathing in mm
 
             # Tracked data to return and plot
             self.tracked_data = {"tracked distance": self.tracked_distance,
