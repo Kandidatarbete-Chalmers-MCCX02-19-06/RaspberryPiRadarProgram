@@ -57,7 +57,7 @@ class BluetoothServer:
     def schmitt_to_app(self):
         try:
             # TEMP: Takes data from Schmitt trigger
-            schmitt_data = self.RR_final_queue.get()
+            schmitt_data = self.RR_final_queue.get_nowait()
             #print("got data from queue")
             self.write_data_to_app(schmitt_data, 'breath rate')
         # schmitt_data = ' BR ' + schmitt_data + ' '      # TODO ändra till RR istället för BR i appen också
