@@ -109,7 +109,7 @@ class SignalProcessing:
         Hcut = 0.001  # Higher hysteres cut. Change this according to filter. To manage startup of filter
         Lcut = -Hcut  # Lower hysteres cut
         # average over old values. TODO ev. ingen medelvärdesbildning. För att förhindra att andningen går mot ett fast värde. Vi vill se mer i realtid.
-        avOver = 1
+        avOver = 5
         freqArray = np.zeros(avOver)  # for averaging over old values
         count = 1  # for counting number of samples passed since last negative flank
         countHys = 1  # for counting if hysteresis should be updated
@@ -126,10 +126,10 @@ class SignalProcessing:
 
             if countHys == self.sample_freq * Tc:
                 Hcut = np.sqrt(np.mean(np.square(trackedRRvector)))/2  # rms of trackedRRvector
-                #Hcut = 0.2
+                #Hcut = 0.002
                 Lcut = -Hcut
-                # print("Hcut: ", Hcut)       # se vad hysteres blir
-                # print("The last value of vector {}".format(trackedRRvector[countHys-1]))
+                print("Hcut: ", Hcut)       # se vad hysteres blir
+                print("The last value of vector {}".format(trackedRRvector[countHys-1]))
                 # TODO Hinder så att insvängningstiden för filtret hanteras
                 countHys = 0
 
