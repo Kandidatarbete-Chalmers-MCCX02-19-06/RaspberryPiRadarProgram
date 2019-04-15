@@ -31,8 +31,8 @@ class SignalProcessing:
         self.schmittTrigger_thread = threading.Thread(target=self.schmittTrigger)
         self.schmittTrigger_thread.start()
 
-        self.st = 0
-        self.sto = 0
+        self.last_time = time.time()
+        self.time = time.time()
 
     def heart_rate(self):
         T_resolution = 30
@@ -141,13 +141,6 @@ class SignalProcessing:
                 schNy = 0
                 if schGa == 1:
                     #print("Inside update resprate loop")
-                    if Inside == True:
-                        self.st = time.time()
-                        Inside == False
-                    else:
-                        self.sto = time.time()
-                        Inside == True
-                        print("Time between update {}".format(self.sto-self.st))
                     np.roll(freqArray, 1)
                     # save the new frequency between two negative flanks
                     freqArray[0] = self.sample_freq / count
@@ -174,6 +167,9 @@ class SignalProcessing:
 
     # Used in schmittTrigger. Removes outliers and return mean value over last avOver values.
     def getMeanOfFreqArray(self, freqArray, FHighRR, FLowRR):  # remove all values > FHighRR and < FLowRR
+        self.time = time.time()
+        print("Since last time {}".format(self.time - self.last_time))
+        self.last_time = self.time
         start = time.time()
         # freqArrayTemp = [x for x in freqArray if (x < FHighRR and x > FLowRR)]
         index_list = []
