@@ -97,6 +97,8 @@ class SignalProcessing:
         return freq, signal_out
 
     def schmittTrigger(self):
+        # Test for time
+        Inside = True
         # variable declaration
         Tc = 5  # medelvärdesbildning över antal [s]
         schNy = 0  # Schmitt ny
@@ -135,7 +137,14 @@ class SignalProcessing:
             if trackedRRvector[countHys - 1] <= Lcut:
                 schNy = 0
                 if schGa == 1:
-                    print("Inside update resprate loop")
+                    #print("Inside update resprate loop")
+                    if Inside:
+                        st = time.time()
+                        Inside == False
+                    else:
+                        sto = time.time()
+                        Inside == True
+                        print("Time between update {}".format(sto-st))
                     np.roll(freqArray, 1)
                     # save the new frequency between two negative flanks
                     freqArray[0] = self.sample_freq / count
