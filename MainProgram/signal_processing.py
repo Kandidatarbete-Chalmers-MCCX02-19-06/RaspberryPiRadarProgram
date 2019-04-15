@@ -120,7 +120,8 @@ class SignalProcessing:
             # self.RTB_final_queue.put(trackedRRvector[countHys - 1])
 
             if countHys == self.sample_freq * Tc:
-                Hcut = np.sqrt(np.mean(np.square(trackedRRvector)))/2  # rms of trackedRRvector
+                # Hcut = np.sqrt(np.mean(np.square(trackedRRvector)))/2  # rms of trackedRRvector
+                Hcut = 0.001
                 Lcut = -Hcut
                 # print("Hcut: ", Hcut)       # se vad hysteres blir
                 # print("The last value of vector which determines Hcut {}".format(
@@ -131,6 +132,7 @@ class SignalProcessing:
             # schNy = schGa   behövs inte. Görs nedan
 
             # trackedRRvector[countHys-1] is the current data from filter
+            # Takes long time to go into this loop
             if trackedRRvector[countHys - 1] <= Lcut:
                 schNy = 0
                 if schGa == 1:
@@ -154,7 +156,7 @@ class SignalProcessing:
             countHys += 1
 
             end = time.time()
-            print("Tid genom schmittTrigger: ", end-start)
+            #print("Tid genom schmittTrigger: ", end-start)
 
         print("out of schmittTrigger")
 
@@ -204,7 +206,7 @@ class SignalProcessing:
         mean = int(round(mean))
         # print("data from schmitt {}".format(mean))
         end = time.time()
-        print("Time through getMeanFreq {}".format(end-start))
+        #print("Time through getMeanFreq {}".format(end-start))
         return mean
 
 
