@@ -37,7 +37,7 @@ def main():
     #     stderr=None,
     #     shell=True
     # )
-    subprocess.Popen("sudo ./~/Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c",shell=True)
+    subprocess.Popen("sudo ./home/pi/Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c",shell=True)
 
     # process = subprocess.Popen(
     #     'lxterminal -e "ls -ls"',
