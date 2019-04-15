@@ -34,6 +34,7 @@ def main():
         stderr=None,
         shell=True
     )
+    process.communicate("Hallå eller")
 
     radar_queue = queue.Queue()  # Not used right now?
     HR_filtered_queue = queue.Queue()
