@@ -37,8 +37,8 @@ def main():
 
     process = subprocess.Popen(
         'lxterminal -e "ls -ls"',
-        #stdout=subprocess.PIPE,
-        #stderr=None,
+        stdout=subprocess.PIPE,
+        stderr=None,
         shell=True
     )
     print(process.stdout)
