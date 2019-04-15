@@ -34,8 +34,6 @@ F_resolution = 0.5/60%JUST FOR TEST (!) To be set according to beta...
 
 for i = 1:(N_windows + 1)
     %Window indexes, moving with i
-    %test
-    i = i
     i_window_min = center_index(i)-w/2;
     i_window_max = min(center_index(i)+w/2,length(data_in));
     i_window = i_window_min:i_window_max;

@@ -13,10 +13,10 @@ function [f_true] = trueToneFinder(f,FoM)
     %Margin for definining half of frequency span
     f_max = f(end);
     f_min = f(1);
-    f_margin = 0.1*(f_max-f_min);
+    f_margin = 0*(f_max-f_min);
     
     %Index for border between upper and lower span
-    i_upper_start = round((f_max/2-f_margin-f_min)/f_res) %defines the start of the upper span, depends on the max,min pulse range settings
+    i_upper_start = round((f_max/2-f_margin-f_min)/f_res); %defines the start of the upper span, depends on the max,min pulse range settings
     if i_upper_start > 0
        f_upper_start = f(i_upper_start);
     else
@@ -25,10 +25,10 @@ function [f_true] = trueToneFinder(f,FoM)
     end
     
     %Frequency tolerance between expected tone and detected upper tone.
-    f_tolerance = 40/60;
+    f_tolerance = 5/60;
     
     %Margin for amplitude
-    ampRatioErrorLog_tolerance = 10;
+    ampRatioErrorLog_tolerance = 1.3;
     
     
     FoM_filtered = movmean(FoM,N_filter);
@@ -50,6 +50,8 @@ function [f_true] = trueToneFinder(f,FoM)
         i_max = LOCS(i_LOCS_max);%Index for the highest peak
 
         f_maxPeak = f(i_max);%frequency of peak
+        
+        i_maxPeak_double = round(i_max+f_maxPeak/f_res);%index for double frequency
 
         if f_maxPeak < f_max/2-f_margin
             %The detected peak is below half of the highest frequency
@@ -64,7 +66,7 @@ function [f_true] = trueToneFinder(f,FoM)
             %filtered upper part of the data
 
             %Find peak closest to double the frequency
-            [N_f_error,I] = min( abs(LOCS - 2*i_max) );
+            [N_f_error,I] = min( abs(LOCS - i_maxPeak_double) );
             %Now I contains the index(es) of the peaks closest to the expected
             %tone, and N_f_error the number of index deviation from the
             %expected index
@@ -73,10 +75,10 @@ function [f_true] = trueToneFinder(f,FoM)
 
             f_upper_maxPeak = f(i_upper_max);%frequency of peak in the upper frequency range
 
-            f_error = abs(N_f_error * f_res);%Difference frequency between expecged peak and found peak in upper range
+            f_error = abs(f_upper_maxPeak - f_maxPeak*2);%Difference frequency between expecged peak and found peak in upper range
 
             %Check amplitude ratio
-            ampRatioErrorLog = abs( log10( FoM_filtered(i_upper_max)/FoM_filtered(i_max) ) );%Ratio between upper and lower peaks
+            ampRatioErrorLog = abs(FoM_filtered(i_upper_max)-FoM_filtered(i_max) );%Ratio between upper and lower peaks
 
             %Check if the upper signal is a a potential candidate for a real
             %signal by comparing the error between the peak and expected peak
@@ -87,13 +89,36 @@ function [f_true] = trueToneFinder(f,FoM)
             if and((f_error < f_tolerance), (ampRatioErrorLog < ampRatioErrorLog_tolerance))
                 %The signal is probably the real one, estimate frequency from
                 %this one and report
-                disp( ['Error, f:' , num2str(f_error) , 'Amp:' ,num2str(ampRatioErrorLog)] )
-                FoM_upper = FoM(i_upper_start:end);
-                f_upper = f(i_upper_start:end);
+                disp( ['Probable false detect, f:' , num2str(f_error) , 'Amp:' ,num2str(ampRatioErrorLog)] )
+                disp(['F lower: ',num2str(f_maxPeak),' F upper: ',num2str(f_upper_maxPeak)])
+                
+                %instead of using upper part use detected double tone +- 1
+                %margin
+                i_margin = round(f_margin/f_res);
+                i_min_upper_span = max(1,i_upper_max-i_margin);
+                i_max_upper_span = min(length(f),i_upper_max+i_margin);
+                i_span_upper_tone = i_min_upper_span:i_max_upper_span;
+                
+                FoM_upper = FoM(i_span_upper_tone);
+                f_upper = f(i_span_upper_tone);
                 f_true = HR_estimator(f_upper,FoM_upper);
+                
+                
+                
+%                 FoM_upper = FoM(i_upper_start:end);
+%                 f_upper = f(i_upper_start:end);
+%                 f_true = HR_estimator(f_upper,FoM_upper);
 
 
             else
+                if f_error > f_tolerance
+                   disp('No false detect: too high frequency error')
+                end
+                if ampRatioErrorLog > ampRatioErrorLog_tolerance
+                    disp('No false detect: too high amplitude error')
+                end
+                disp(['F lower: ',num2str(f_maxPeak),' F upper: ',num2str(f_upper_maxPeak)])
+                
                 %The             %Frequency error is too large, the lower tone can't be half the
                 %frequency of this one, suggesting the actual tone is in the
                 %lower span. The upper tone is therefore thrown away.
@@ -105,7 +130,6 @@ function [f_true] = trueToneFinder(f,FoM)
                 %compared to the expected level. This means that the detected
                 %tone in the upper range is most likely not a true tone and
                 %therefore the output is estimated from the lower span.
-
                 FoM_lower = FoM(1:i_upper_start);
                 f_lower = f(1:i_upper_start);
                 f_true = HR_estimator(f_lower,FoM_lower);
@@ -116,6 +140,7 @@ function [f_true] = trueToneFinder(f,FoM)
             %The tone detected is already in the upper range, and there is no
             %lower half tone detected, making this whole program useless...
             %Proceed... Without me...
+            disp('Tone already in the upper range')
             f_true = HR_estimator(f,FoM);
         end
     end

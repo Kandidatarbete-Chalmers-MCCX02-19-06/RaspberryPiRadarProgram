@@ -1,4 +1,4 @@
-function [f_search,P_sum_N,f_fine] = basetone_finder(f,FFT_SS,Fs,Fscan_min,Fscan_max,BW_comb,N_harmonics,plot_selection)
+function [f_search,P_sum_N_log,f_fine] = basetone_finder(f,FFT_SS,Fs,Fscan_min,Fscan_max,BW_comb,N_harmonics,plot_selection)
 %Finds fundamental tone in noisy data by looking at harmonics
 %   Looks for fundamental tone with the most energy in it and it's
 %   harmoincs.
@@ -49,7 +49,7 @@ end
 P_sum_N = abs(P_sum_N);
 
 %normalize
-P_sum_N = P_sum_N./mean(P_sum_N);
+%P_sum_N = P_sum_N./mean(P_sum_N);
 
 [maxval,i_crude] = max(P_sum_N);%Finds index of crude measurement of frequency.
 f_crude = f_search(i_crude);%Crude frequency measurement
@@ -66,19 +66,17 @@ if size(f_crude) == [0 1]
     f_crude = 0
 end
 
-%Find peak in FFT for fine reading
-%[PKS,LOCS]= findpeaks(FFT_SS);
-%Finds peak with f closest to crude frequency measurement
-%[minval,i_fine] = min( abs( f(LOCS) - f_crude ) );
-%Sets f_fine to be fine measuremed value
-%f_fine = f(LOCS(i_fine));
+
+%Make into log for easier everything.
+P_sum_N_log = 10*log10(P_sum_N);
 
 %better estimation
-%f_fine = HR_estimator(f_search,P_sum_N);
+f_fine = HR_estimator(f_search,P_sum_N_log);
 
 %test to avoid half tone detection instead of directly estimating the
 %frequency
-f_fine = trueToneFinder(f_search,P_sum_N);
+
+%f_fine = trueToneFinder(f_search,P_sum_N_log);
 
 
 if plot_selection
