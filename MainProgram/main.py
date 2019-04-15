@@ -20,8 +20,8 @@ import subprocess       # for Raspberry Pi shutdown
 
 def main():
     # subprocess.call("./Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c")
-    evk = subprocess.Popen('cd ..')
-    #evk = subprocess.Popen('/evk_service_linux_armv7l_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c', shell=False)
+    #evk = subprocess.Popen('cd ..')
+    evk = subprocess.Popen('../evk_service_linux_armv7l_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c', shell=False)
 
     radar_queue = queue.Queue()  # Not used right now?
     HR_filtered_queue = queue.Queue()
