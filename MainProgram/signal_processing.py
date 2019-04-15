@@ -152,7 +152,7 @@ class SignalProcessing:
             countHys += 1
 
             end = time.time()
-            print("Tid genom schmittTrigger: ", end-start)
+            #print("Tid genom schmittTrigger: ", end-start)
 
         print("out of schmittTrigger")
 
