@@ -26,10 +26,10 @@ def main():
     #os.system('gnome-terminal -x ./evk_service_linux_armv7l_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c')
 
     process = subprocess.Popen(
-        "sudo gnome-terminal -x cd ..",
+        "sudo gnome-terminal -x ls",
         stdout=subprocess.PIPE,
         stderr=None,
-        shell=False
+        shell=True
     )
 
     radar_queue = queue.Queue()  # Not used right now?
