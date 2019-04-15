@@ -120,11 +120,11 @@ class SignalProcessing:
             # self.RTB_final_queue.put(trackedRRvector[countHys - 1])
 
             if countHys == self.sample_freq * Tc:
-                # Hcut = np.sqrt(np.mean(np.square(trackedRRvector)))/2  # rms of trackedRRvector
-                Hcut = 0.2
+                Hcut = np.sqrt(np.mean(np.square(trackedRRvector)))/2  # rms of trackedRRvector
+                #Hcut = 0.2
                 Lcut = -Hcut
-                print("Hcut: ", Hcut)       # se vad hysteres blir
-                print("The last value of vector {}".format(trackedRRvector[countHys-1]))
+                # print("Hcut: ", Hcut)       # se vad hysteres blir
+                # print("The last value of vector {}".format(trackedRRvector[countHys-1]))
                 # TODO Hinder så att insvängningstiden för filtret hanteras
                 countHys = 0
 
