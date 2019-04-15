@@ -114,10 +114,10 @@ class SignalProcessing:
         trackedRRvector = np.zeros(self.sample_freq * Tc)  # to save old values
 
         while self.go:
+            start = time.time()
             # to be able to use the same value in the whole loop
             trackedRRvector[countHys - 1] = self.RR_filtered_queue.get()
             #self.RTB_final_queue.put(trackedRRvector[countHys - 1])
-            start = time.time()
 
             if countHys == self.sample_freq * Tc:
                 Hcut = np.sqrt(np.mean(np.square(trackedRRvector)))  # rms of trackedRRvector
@@ -154,7 +154,7 @@ class SignalProcessing:
             countHys += 1
 
             end = time.time()
-            #print("Tid genom schmittTrigger: ", end-start)
+            print("Tid genom schmittTrigger: ", end-start)
 
         print("out of schmittTrigger")
 
