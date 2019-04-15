@@ -32,7 +32,7 @@ def main():
         "sudo lxterminal -e man ls",
         stdout=subprocess.PIPE,
         stderr=None,
-        shell=True
+        shell=False
     )
 
     radar_queue = queue.Queue()  # Not used right now?
