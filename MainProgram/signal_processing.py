@@ -103,7 +103,7 @@ class SignalProcessing:
         # Test for time
         Inside = True
         # variable declaration
-        Tc = 5  # medelvärdesbildning över antal [s]
+        Tc = 12  # medelvärdesbildning över antal [s]
         schNy = 0  # Schmitt ny
         schGa = 0  # Schmitt gammal
         Hcut = 0.001  # Higher hysteres cut. Change this according to filter. To manage startup of filter
@@ -125,7 +125,7 @@ class SignalProcessing:
             # self.RTB_final_queue.put(trackedRRvector[countHys - 1])
 
             if countHys == self.sample_freq * Tc:
-                Hcut = np.sqrt(np.mean(np.square(trackedRRvector)))/2  # rms of trackedRRvector
+                Hcut = np.sqrt(np.mean(np.square(trackedRRvector)))*0.7  # rms of trackedRRvector
                 #Hcut = 0.002
                 Lcut = -Hcut
                 print("Hcut: ", Hcut)       # se vad hysteres blir
