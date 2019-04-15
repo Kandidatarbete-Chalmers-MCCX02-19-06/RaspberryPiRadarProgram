@@ -37,7 +37,7 @@ def main():
 
     process = subprocess.Popen(
         'lxterminal -e "cd"',
-        stdout=subprocess.PIPE,
+        #stdout=subprocess.PIPE,
         stderr=None,
         shell=True
     )
