@@ -38,7 +38,7 @@ def main():
     process = subprocess.Popen(
         'lxterminal -e "cd"',
         #stdout=subprocess.PIPE,
-        stderr=None,
+        #stderr=None,
         shell=True
     )
     process.communicate("gallp")
