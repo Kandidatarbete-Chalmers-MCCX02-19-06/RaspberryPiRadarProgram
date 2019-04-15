@@ -25,8 +25,8 @@ def main():
     #evk = subprocess.Popen('./evk_service_linux_armv7l_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c', shell=False)
     #os.system('gnome-terminal -x ./evk_service_linux_armv7l_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c')
 
-    #p = os.popen('man ls')
-    #print(p.read()) # fungerar
+    p = os.popen('ls')
+    print(p.read()) # fungerar
 
     # process = subprocess.Popen(
     #     'lxterminal -e "./home/pi/Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c"',
@@ -35,13 +35,13 @@ def main():
     #     shell=True
     # )
 
-    process = subprocess.Popen(
-        'lxterminal -e "ls -ls"',
-        stdout=subprocess.PIPE,
-        stderr=None,
-        shell=True
-    )
-    print(process.stdout)
+    # process = subprocess.Popen(
+    #     'lxterminal -e "ls -ls"',
+    #     stdout=subprocess.PIPE,
+    #     stderr=None,
+    #     shell=True
+    # )
+    # print(process.stdout)
 
     radar_queue = queue.Queue()  # Not used right now?
     HR_filtered_queue = queue.Queue()
