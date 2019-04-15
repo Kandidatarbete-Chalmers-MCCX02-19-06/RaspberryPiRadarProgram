@@ -21,8 +21,8 @@ import os
 
 def main():
     # subprocess.call("./Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c")
-    #evk = subprocess.Popen('cd ..')
-    evk = subprocess.Popen('./evk_service_linux_armv7l_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c', shell=False)
+    subprocess.Popen('cd ..', shell=True)
+    #evk = subprocess.Popen('./evk_service_linux_armv7l_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c', shell=False)
     #os.system('gnome-terminal -x ./evk_service_linux_armv7l_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c')
 
     radar_queue = queue.Queue()  # Not used right now?
