@@ -120,58 +120,58 @@ class SignalProcessing:
             # self.RTB_final_queue.put(trackedRRvector[countHys - 1])
 
             if countHys == self.sample_freq * Tc:
-                # Hcut = np.sqrt(np.mean(np.square(trackedRRvector)))/2  # rms of trackedRRvector
-                Hcut = 0.001
+                Hcut = np.sqrt(np.mean(np.square(trackedRRvector)))/2  # rms of trackedRRvector
+                # Hcut = 0.001
                 Lcut = -Hcut
-                # print("Hcut: ", Hcut)       # se vad hysteres blir
-                # print("The last value of vector which determines Hcut {}".format(
+                print("Hcut: ", Hcut)       # se vad hysteres blir
+                print("The last value of vector {}".format(
                 #    trackedRRvector[countHys-1]))
                 # TODO Hinder så att insvängningstiden för filtret hanteras
-                countHys = 0
+                countHys=0
 
             # schNy = schGa   behövs inte. Görs nedan
 
             # trackedRRvector[countHys-1] is the current data from filter
             # Takes long time to go into this loop
             if trackedRRvector[countHys - 1] <= Lcut:
-                schNy = 0
+                schNy=0
                 if schGa == 1:
                     np.roll(freqArray, 1)
                     # save the new frequency between two negative flanks
-                    freqArray[0] = self.sample_freq / count
+                    freqArray[0]=self.sample_freq / count
                     # Take the mean value
                     # RR_final_queue is supposed to be the breathing rate queue that is sent to app
                     self.RR_final_queue.put(self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR))
                     # print("Data added to schmitt should be sent to app")
                     # print("Breathing rate: ", self.RR_final_queue.get())
                     # TODO put getMeanOfFreqArray() into queue that connects to send bluetooth values instead
-                    count = 0
+                    count=0
             # trackedRRvector[countHys-1] is the current data from filter
             elif trackedRRvector[countHys - 1] >= Hcut:
-                schNy = 1
+                schNy=1
                 # TODO skicka data till app för realTime breathing
 
-            schGa = schNy
+            schGa=schNy
             count += 1
             countHys += 1
 
-            end = time.time()
-            #print("Tid genom schmittTrigger: ", end-start)
+            end=time.time()
+            # print("Tid genom schmittTrigger: ", end-start)
 
         print("out of schmittTrigger")
 
     # Used in schmittTrigger. Removes outliers and return mean value over last avOver values.
     def getMeanOfFreqArray(self, freqArray, FHighRR, FLowRR):  # remove all values > FHighRR and < FLowRR
-        start = time.time()
+        start=time.time()
         # freqArrayTemp = [x for x in freqArray if (x < FHighRR and x > FLowRR)]
-        index_list = []
-        index = 0
+        index_list=[]
+        index=0
         # print("Before removal: Array {} \n Low and high hyst {},{}".format(freqArray, FLowRR, FHighRR))
         for freq_value in freqArray:
             if freq_value < FLowRR or freq_value > FHighRR or freq_value == 0:
                 index_list.append(index)
             index += 1
-        freqArrayTemp = np.delete(freqArray, index_list)
+        freqArrayTemp=np.delete(freqArray, index_list)
         # print("After removal but before deviation: ", freqArrayTemp)
         # freqArrayTemp = [x for x in freqArrayTemp if x != 0]
         # print(non_zero_temp)
@@ -179,34 +179,34 @@ class SignalProcessing:
         # freqArrayTemp = freqArrayTemp[non_zero_temp]
         # a[nonzero(a)]
 
-        median = np.median(freqArrayTemp)  # median value
-        stanDev = np.std(freqArrayTemp)  # standard deviation
+        median=np.median(freqArrayTemp)  # median value
+        stanDev=np.std(freqArrayTemp)  # standard deviation
 
         # freqArrayTemp = [x for x in freqArrayTemp if (
         #    x > median - 3 * stanDev and x < median + 3 * stanDev)]
         # print(freqArrayTemp)
-        index_list = []
-        index = 0
+        index_list=[]
+        index=0
         for freq_value in freqArrayTemp:
             if freq_value < median - 3 * stanDev and freq_value > median - 3 * stanDev:
                 index_list.append(index)
             index += 1
-        freqArrayTemp = np.delete(freqArrayTemp, index_list)
+        freqArrayTemp=np.delete(freqArrayTemp, index_list)
         # print("Last array before mean value {}".format(freqArrayTemp))
         # if len(freqArrayTemp) == 0:
         #     freqArrayTemp = self.freqArrayTemp_last
         # else:
         #     self.freqArrayTemp_last = freqArrayTemp
-        mean = np.mean(freqArrayTemp)  # mean value of last avOver values excluding outliers
+        mean=np.mean(freqArrayTemp)  # mean value of last avOver values excluding outliers
         # mean is nan if FreqArrayTemp is zero, which creates error when sending data to app
         if len(freqArrayTemp) == 0:
-            mean = 0        # TODO ta det föregående värdet istället
+            mean=0        # TODO ta det föregående värdet istället
             print("No values left in freqArrayTemp")
-        mean = mean * 60  # To get resp rate in Hz to BPM
-        mean = int(round(mean))
+        mean=mean * 60  # To get resp rate in Hz to BPM
+        mean=int(round(mean))
         # print("data from schmitt {}".format(mean))
-        end = time.time()
-        #print("Time through getMeanFreq {}".format(end-start))
+        end=time.time()
+        # print("Time through getMeanFreq {}".format(end-start))
         return mean
 
 
