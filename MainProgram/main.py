@@ -41,7 +41,7 @@ def main():
         #stderr=None,
         shell=True
     )
-    print(process)
+    print(process.stdout)
 
     radar_queue = queue.Queue()  # Not used right now?
     HR_filtered_queue = queue.Queue()
