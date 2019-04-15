@@ -36,12 +36,12 @@ def main():
     # )
 
     process = subprocess.Popen(
-        'lxterminal -e "cd"',
+        'lxterminal -e "ls -ls"',
         #stdout=subprocess.PIPE,
         #stderr=None,
         shell=True
     )
-    process.communicate("gallp")
+    print(process)
 
     radar_queue = queue.Queue()  # Not used right now?
     HR_filtered_queue = queue.Queue()
