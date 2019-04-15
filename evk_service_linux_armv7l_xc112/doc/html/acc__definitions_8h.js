@@ -1,0 +1,38 @@
+var acc__definitions_8h =
+[
+    [ "acc_calibration_context_t", "structacc__calibration__context__t.html", "structacc__calibration__context__t" ],
+    [ "PRIsensor_id", "acc__definitions_8h.html#ae2ddc82b4481619b79cd8cafe9e43836", null ],
+    [ "acc_hal_get_frequency_function_t", "group__HAL.html#ga8eed346aab46a15848ec42cdcd1fced2", null ],
+    [ "acc_hal_sensor_isr_t", "group__HAL.html#ga91983b76509997e81a23e12adb103b74", null ],
+    [ "acc_hal_sensor_pin_function_t", "group__HAL.html#gaf993061bbc4d82596e5cfb1532025477", null ],
+    [ "acc_hal_sensor_power_function_t", "group__HAL.html#ga198694f53811c55fdec7e440b4d5d691", null ],
+    [ "acc_hal_sensor_register_isr_function_t", "group__HAL.html#ga94a729d8c8614985e13dd264c5398293", null ],
+    [ "acc_hal_sensor_transfer_function_t", "group__HAL.html#ga291d457e3ada369072de2ba35c57b969", null ],
+    [ "acc_os_get_thread_id_function_t", "group__OS.html#ga7f7faf0237c8e19ec5e679d9cc835653", null ],
+    [ "acc_os_get_time_function_t", "group__OS.html#ga39f34d73388fb4b672b79916887082a4", null ],
+    [ "acc_os_mem_alloc_function_t", "group__OS.html#ga6da3e04201684415a639fbd41bc2487d", null ],
+    [ "acc_os_mem_free_function_t", "group__OS.html#ga7eb3ce6b829b2705c8eb7ffa72f7aba2", null ],
+    [ "acc_os_mutex_create_function_t", "group__OS.html#ga9c9938cd630ee2a889f2c8cfebb4db2f", null ],
+    [ "acc_os_mutex_destroy_function_t", "group__OS.html#ga5abbaa01031a500353a418f5330196fb", null ],
+    [ "acc_os_mutex_lock_function_t", "group__OS.html#gabea9195df1fd9cc5d905c3dd894d06f6", null ],
+    [ "acc_os_mutex_t", "group__OS.html#gafab256f50823abf8da9fac562fbc6e80", null ],
+    [ "acc_os_mutex_unlock_function_t", "group__OS.html#ga3938e91512362a97e7286cadd6ff474b", null ],
+    [ "acc_os_semaphore_create_function_t", "group__OS.html#gac60f602fdd5da43426e03b8eb9f58e1c", null ],
+    [ "acc_os_semaphore_destroy_function_t", "group__OS.html#ga65c1e744b3a53f5fbc24bacabdafaf19", null ],
+    [ "acc_os_semaphore_signal_from_interrupt_function_t", "group__OS.html#gafe33a7d40c2799c97d863ebe89898de6", null ],
+    [ "acc_os_semaphore_signal_function_t", "group__OS.html#ga110d2373b1fdb9a42f6730c60e7944f0", null ],
+    [ "acc_os_semaphore_t", "group__OS.html#ga6c1b62217073964035be93cfb223a804", null ],
+    [ "acc_os_semaphore_wait_function_t", "group__OS.html#gaaaee23a6ca5173345d2c2d1470783422", null ],
+    [ "acc_os_sleep_us_function_t", "group__OS.html#ga6ace0083c486e9dbfa92ee39eab1d989", null ],
+    [ "acc_os_thread_cleanup_function_t", "group__OS.html#gab5cf8f9e6203e8a3dc2213b49b412597", null ],
+    [ "acc_os_thread_create_function_t", "group__OS.html#ga27571372838af8c86816dc08dccb89d2", null ],
+    [ "acc_os_thread_exit_function_t", "group__OS.html#gaf6ecc8dc723148e54f0824e6c541e35e", null ],
+    [ "acc_os_thread_handle_t", "group__OS.html#gaa06acffa83d65a1adccb893cd59af0c7", null ],
+    [ "acc_os_thread_id_t", "group__OS.html#ga961d4d3bd54b2a20eae7ae1a08262b55", null ],
+    [ "acc_sensor_id_t", "acc__definitions_8h.html#a7af0e4bb3660c7c6843354709751178b", null ],
+    [ "acc_integration_register_isr_status_t", "group__HAL.html#ga8378d281dd4e952ee7b9abdb8fa3cbf9", [
+      [ "ACC_INTEGRATION_REGISTER_ISR_STATUS_OK", "group__HAL.html#gga8378d281dd4e952ee7b9abdb8fa3cbf9adcbf6cac97527ba209aa0d8128967671", null ],
+      [ "ACC_INTEGRATION_REGISTER_ISR_STATUS_UNSUPPORTED", "group__HAL.html#gga8378d281dd4e952ee7b9abdb8fa3cbf9abc2287007ddf53af63efa24235213dbd", null ],
+      [ "ACC_INTEGRATION_REGISTER_ISR_STATUS_FAILURE", "group__HAL.html#gga8378d281dd4e952ee7b9abdb8fa3cbf9a761e5c8428858168baccc75e66fc8682", null ]
+    ] ]
+];
