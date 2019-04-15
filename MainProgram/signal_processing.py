@@ -154,13 +154,13 @@ class SignalProcessing:
             countHys += 1
 
             end = time.time()
-            print("Tid genom schmittTrigger: ", end-start)
+            #print("Tid genom schmittTrigger: ", end-start)
 
         print("out of schmittTrigger")
 
     # Used in schmittTrigger. Removes outliers and return mean value over last avOver values.
     def getMeanOfFreqArray(self, freqArray, FHighRR, FLowRR):  # remove all values > FHighRR and < FLowRR
-
+        start = time.time()
         #freqArrayTemp = [x for x in freqArray if (x < FHighRR and x > FLowRR)]
         index_list = []
         index = 0
@@ -203,6 +203,8 @@ class SignalProcessing:
         mean = mean * 60  # To get resp rate in Hz to BPM
         mean = int(round(mean))
         #print("data from schmitt {}".format(mean))
+        end = time.time()
+        print("Time through getMeanFreq {}".format(end-start))
         return mean
 
 
