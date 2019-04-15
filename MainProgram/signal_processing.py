@@ -31,6 +31,9 @@ class SignalProcessing:
         self.schmittTrigger_thread = threading.Thread(target=self.schmittTrigger)
         self.schmittTrigger_thread.start()
 
+        self.st = 0
+        self.sto = 0
+
     def heart_rate(self):
         T_resolution = 30
         overlap = 90
@@ -138,13 +141,13 @@ class SignalProcessing:
                 schNy = 0
                 if schGa == 1:
                     #print("Inside update resprate loop")
-                    if Inside:
-                        st = time.time()
+                    if Inside == True:
+                        self.st = time.time()
                         Inside == False
                     else:
-                        sto = time.time()
+                        self.sto = time.time()
                         Inside == True
-                        print("Time between update {}".format(sto-st))
+                        print("Time between update {}".format(self.sto-self.st))
                     np.roll(freqArray, 1)
                     # save the new frequency between two negative flanks
                     freqArray[0] = self.sample_freq / count
