@@ -29,10 +29,10 @@ def main():
     #print(p.read()) # fungerar
 
     process = subprocess.Popen(
-        "sudo lxterminal -e man ls",
+        "sudo lxterminal -e ./Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c",
         stdout=subprocess.PIPE,
         stderr=None,
-        shell=False
+        shell=True
     )
 
     radar_queue = queue.Queue()  # Not used right now?
