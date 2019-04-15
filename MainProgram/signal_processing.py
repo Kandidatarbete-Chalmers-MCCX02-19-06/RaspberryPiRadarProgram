@@ -123,6 +123,8 @@ class SignalProcessing:
                 Hcut = np.sqrt(np.mean(np.square(trackedRRvector)))  # rms of trackedRRvector
                 Lcut = -Hcut
                 print("Hcut: ", Hcut)       # se vad hysteres blir
+                print("The last value of vector which determines Hcut {}".format(
+                    trackedRRvector[countHys-1]))
                 # TODO Hinder så att insvängningstiden för filtret hanteras
                 countHys = 0
 
