@@ -108,8 +108,8 @@ class DataAcquisition(threading.Thread):
                 bandpass_filtered_data_RR = self.lowpass_RR.filter(highpass_filtered_data_RR)
 
                 # put filtered data in output queue to send to SignalProcessing
-                self.HR_filtered_queue.put(bandpass_filtered_data_HR)
-                self.RR_filtered_queue.put(bandpass_filtered_data_RR)
+                # self.HR_filtered_queue.put(bandpass_filtered_data_HR)
+                # self.RR_filtered_queue.put(bandpass_filtered_data_RR)
             try:
                 self.pg_process.put_data(tracked_data)  # plot data
             except PGProccessDiedException:
@@ -208,7 +208,7 @@ class DataAcquisition(threading.Thread):
             plot_hist_pos = self.hist_pos - self.hist_pos.mean()
             #print("Plot_hist_pos: ", plot_hist_pos)
             self.RTB_final_queue.put(plot_hist_pos[-1]*10)  # Gets tracked breathing in mm
-            # self.RR_filtered_queue.put(plot_hist_pos[-1]*10)
+            self.RR_filtered_queue.put(plot_hist_pos[-1]*10)
 
             # Tracked data to return and plot
             self.tracked_data = {"tracked distance": self.tracked_distance,
