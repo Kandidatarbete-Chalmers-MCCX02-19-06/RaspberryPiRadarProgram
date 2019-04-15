@@ -25,12 +25,14 @@ def main():
     #evk = subprocess.Popen('./evk_service_linux_armv7l_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c', shell=False)
     #os.system('gnome-terminal -x ./evk_service_linux_armv7l_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c')
 
-    process = subprocess.Popen(
-        "sudo gnome-terminal -x ls",
-        stdout=subprocess.PIPE,
-        stderr=None,
-        shell=True
-    )
+    p = os.popen('ls -la')
+    print(p.read())
+    # process = subprocess.Popen(
+    #     "sudo gnome-terminal -x ls",
+    #     stdout=subprocess.PIPE,
+    #     stderr=None,
+    #     shell=True
+    # )
 
     radar_queue = queue.Queue()  # Not used right now?
     HR_filtered_queue = queue.Queue()
