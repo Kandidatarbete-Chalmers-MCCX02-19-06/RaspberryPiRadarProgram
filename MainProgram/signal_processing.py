@@ -117,14 +117,16 @@ class SignalProcessing:
             # to be able to use the same value in the whole loop
             trackedRRvector[countHys - 1] = self.RR_filtered_queue.get()
             #self.RTB_final_queue.put(trackedRRvector[countHys - 1])
+            start = time.time()
 
             if countHys == self.sample_freq * Tc:
                 Hcut = np.sqrt(np.mean(np.square(trackedRRvector)))  # rms of trackedRRvector
                 Lcut = -Hcut
+                print("Hcut: ", Hcut)       # se vad hysteres blir
                 # TODO Hinder så att insvängningstiden för filtret hanteras
                 countHys = 0
 
-            schNy = schGa
+            # schNy = schGa   behövs inte. Görs nedan
 
             # trackedRRvector[countHys-1] is the current data from filter
             if trackedRRvector[countHys - 1] <= Lcut:
@@ -148,6 +150,9 @@ class SignalProcessing:
             schGa = schNy
             count += 1
             countHys += 1
+
+            end = time.time()
+            print("Tid genom schmittTrigger: ", end-start)
 
         print("out of schmittTrigger")
 
@@ -191,7 +196,8 @@ class SignalProcessing:
         mean = np.mean(freqArrayTemp)  # mean value of last avOver values excluding outliers
         # mean is nan if FreqArrayTemp is zero, which creates error when sending data to app
         if len(freqArrayTemp) == 0:
-            mean = 1
+            mean = 0        # TODO ta det föregående värdet istället
+            print("No values left in freqArrayTemp")
         mean = mean * 60  # To get resp rate in Hz to BPM
         mean = int(round(mean))
         #print("data from schmitt {}".format(mean))
