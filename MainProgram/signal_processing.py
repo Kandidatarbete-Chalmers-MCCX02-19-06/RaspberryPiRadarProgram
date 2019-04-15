@@ -121,7 +121,7 @@ class SignalProcessing:
 
             if countHys == self.sample_freq * Tc:
                 # Hcut = np.sqrt(np.mean(np.square(trackedRRvector)))/2  # rms of trackedRRvector
-                Hcut = 0.001
+                Hcut = 0.2
                 Lcut = -Hcut
                 print("Hcut: ", Hcut)       # se vad hysteres blir
                 print("The last value of vector {}".format(trackedRRvector[countHys-1]))
@@ -135,6 +135,7 @@ class SignalProcessing:
             if trackedRRvector[countHys - 1] <= Lcut:
                 schNy = 0
                 if schGa == 1:
+                    print("Inside update resprate loop")
                     np.roll(freqArray, 1)
                     # save the new frequency between two negative flanks
                     freqArray[0] = self.sample_freq / count
