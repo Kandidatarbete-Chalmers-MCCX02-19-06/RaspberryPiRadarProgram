@@ -40,7 +40,7 @@ class SignalProcessing:
         beta = 1
         # Data in vector with length of window
         fft_window = np.zeros(T_resolution*self.sample_freq)
-        i = 0
+        #i = 0
         while self.go:
             [freq, fft_signal_out] = self.windowedFFT(fft_window, overlap, beta)
         #     print(i) TODO: ta bort sen
