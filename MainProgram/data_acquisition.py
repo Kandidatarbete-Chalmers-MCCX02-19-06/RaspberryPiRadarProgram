@@ -47,7 +47,7 @@ class DataAcquisition(threading.Thread):
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
-        self.config.gain = 0.8  # Gain between 0 and 1. Larger gain increase the SNR, but come at a cost
+        self.config.gain = 0.7  # Gain between 0 and 1. Larger gain increase the SNR, but come at a cost
         # with more instability. Optimally is around 0.7
         self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
         self.data_length = self.info["data_length"]  # Length of data per sampel
