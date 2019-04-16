@@ -17,10 +17,11 @@ from acconeer_utils.pg_process import PGProcess, PGProccessDiedException
 
 
 class DataAcquisition(threading.Thread):
-    def __init__(self, list_of_variables_for_threads):
+    def __init__(self, list_of_variables_for_threads, bluetooth_server):
         super(DataAcquisition, self).__init__()  # Inherit threading vitals
         self.go = list_of_variables_for_threads["go"]
         self.list_of_variables_for_threads = list_of_variables_for_threads
+        self.bluetooth_server = bluetooth_server
         # Setup for collecting data from acconeer's radar files.
         self.args = example_utils.ExampleArgumentParser().parse_args()
         example_utils.config_logging(self.args)
@@ -123,7 +124,10 @@ class DataAcquisition(threading.Thread):
                 # put filtered data in output queue to send to SignalProcessing
                 #self.HR_filtered_queue.put(bandpass_filtered_data_HR)
                 self.RR_filtered_queue.put(bandpass_filtered_data_RR)
-                self.RTB_final_queue.put(bandpass_filtered_data_RR)
+                #self.RTB_final_queue.put(bandpass_filtered_data_RR)
+
+                # Send to app
+                self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
             try:
                 self.pg_process.put_data(tracked_data)  # plot data
             except PGProccessDiedException:

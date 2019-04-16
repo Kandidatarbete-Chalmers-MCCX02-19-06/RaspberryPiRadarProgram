@@ -9,13 +9,14 @@ import queue
 
 class SignalProcessing:
 
-    def __init__(self, list_of_variables_for_threads):
+    def __init__(self, list_of_variables_for_threads, bluetooth_server):
         self.list_of_variables_for_threads = list_of_variables_for_threads
         self.go = list_of_variables_for_threads["go"]
         self.HR_filtered_queue = list_of_variables_for_threads["HR_filtered_queue"]
         self.HR_final_queue = list_of_variables_for_threads["HR_final_queue"]
         self.index_fft = 0
         self.sample_freq = list_of_variables_for_threads["sample_freq"]
+        self.bluetooth_server = bluetooth_server
 
         # Variables for Schmitt Trigger
         self.RR_filtered_queue = list_of_variables_for_threads["RR_filtered_queue"]
@@ -146,7 +147,8 @@ class SignalProcessing:
                     freqArray[0] = self.sample_freq / count
                     # Take the mean value
                     # RR_final_queue is supposed to be the breathing rate queue that is sent to app
-                    self.RR_final_queue.put(self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR))
+                    #self.RR_final_queue.put(self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR))
+                    self.bluetooth_server.write_data_to_app(self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR), 'breath rate')
 
                     # TODO put getMeanOfFreqArray() into queue that connects to send bluetooth values instead
                     count = 0
