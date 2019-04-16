@@ -81,6 +81,7 @@ class DataAcquisition(threading.Thread):
         self.c = 2.998 * 100000000
         self.freq = 60 * 1000000000
         self.wave_length = self.c / self.freq
+        self.delta_distance = 0
 
         # Graphs
         self.pg_updater = PGUpdater(self.config)
@@ -111,7 +112,7 @@ class DataAcquisition(threading.Thread):
             #print("Amplitude phase: ", str(tracked_data["tracked phase"]))
             # Test with acconeer filter for schmitt.
             if tracked_data is not None:
-                #self.RTB_final_queue.put(tracked_data["relative distance"])
+                self.RTB_final_queue.put(tracked_data["relative distance"])
                 # filter the data
                 highpass_filtered_data_HR = self.highpass_HR.filter(tracked_data["relative distance"])
                 bandpass_filtered_data_HR = self.lowpass_HR.filter(highpass_filtered_data_HR)
@@ -121,7 +122,7 @@ class DataAcquisition(threading.Thread):
                 # put filtered data in output queue to send to SignalProcessing
                 #self.HR_filtered_queue.put(bandpass_filtered_data_HR)
                 #self.RR_filtered_queue.put(bandpass_filtered_data_RR)
-                self.RTB_final_queue.put(bandpass_filtered_data_RR)
+                #self.RTB_final_queue.put(bandpass_filtered_data_RR)
             try:
                 self.pg_process.put_data(tracked_data)  # plot data
             except PGProccessDiedException:
@@ -231,7 +232,9 @@ class DataAcquisition(threading.Thread):
             else:
                 wrapped_phase = self.tracked_phase
             #_, wrapped_phase = np.unwrap([self.last_phase,self.tracked_phase])
-            self.relative_distance = self.relative_distance + self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi)
+            self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi) * self.low_pass_const + \
+                             (1 - self.low_pass_const) * self.delta_distance
+            self.relative_distance = self.relative_distance + self.delta_distance
             self.last_phase = self.tracked_phase
 
             # Tracked data to return and plot
