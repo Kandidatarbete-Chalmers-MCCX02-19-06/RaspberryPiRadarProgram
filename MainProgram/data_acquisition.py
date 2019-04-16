@@ -116,10 +116,10 @@ class DataAcquisition(threading.Thread):
             if tracked_data is not None:
                 #self.RTB_final_queue.put(tracked_data["relative distance"])
                 # filter the data
-                highpass_filtered_data_HR = self.highpass_HR.filter(tracked_data["relative distance"])
+                highpass_filtered_data_HR = self.highpass_HR.filter(tracked_data["relative distance"]) 
                 bandpass_filtered_data_HR = self.lowpass_HR.filter(highpass_filtered_data_HR)
-                highpass_filtered_data_RR = self.highpass_RR.filter(tracked_data["relative distance"])
-                bandpass_filtered_data_RR = self.lowpass_RR.filter(highpass_filtered_data_RR)
+                bandpass_filtered_data_RR = self.highpass_RR.filter(tracked_data["relative distance"]) #TODO: Ändra till highpass_filtered
+                #bandpass_filtered_data_RR = self.lowpass_RR.filter(highpass_filtered_data_RR)
 
                 # put filtered data in output queue to send to SignalProcessing
                 #self.HR_filtered_queue.put(bandpass_filtered_data_HR)
