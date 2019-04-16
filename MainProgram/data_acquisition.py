@@ -107,10 +107,11 @@ class DataAcquisition(threading.Thread):
 
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
-        runtime = time.time()
+        runtimeold=time.time()
         while self.go:
-            runtime = time.time() - runtime
-            print('runtime: ',runtime*1000)
+            runtime = time.time()
+            print('runtime: ',(runtime-runtimeold)*1000)
+            runtimeold = runtime
             # This data is an 1D array in terminal print, not in Python script however....
             start = time.time()
             data = self.get_data()
