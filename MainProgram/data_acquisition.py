@@ -243,14 +243,14 @@ class DataAcquisition(threading.Thread):
             self.relative_distance = self.relative_distance + self.delta_distance
             print("real relative distance: ",self.relative_distance)
             self.last_phase = self.tracked_phase
-            self.old_relative_distance_values.append(self.relative_distance)
-            if len(self.old_relative_distance_values) > 100:
-                print('mean of old values: ',- np.mean(self.old_relative_distance_values))
-                self.relative_distance = self.relative_distance - np.mean(self.old_relative_distance_values)
-                print('new relative distance: ',self.relative_distance)
-
-            if len(self.old_relative_distance_values) > 1000:
-                self.old_relative_distance_values.pop(0)
+            # self.old_relative_distance_values.append(self.relative_distance)
+            # if len(self.old_relative_distance_values) > 100:
+            #     print('mean of old values: ',- np.mean(self.old_relative_distance_values))
+            #     self.relative_distance = self.relative_distance - np.mean(self.old_relative_distance_values)
+            #     print('new relative distance: ',self.relative_distance)
+            #
+            # if len(self.old_relative_distance_values) > 1000:
+            #     self.old_relative_distance_values.pop(0)
 
             # Tracked data to return and plot
             self.tracked_data = {"tracked distance": self.tracked_distance,
