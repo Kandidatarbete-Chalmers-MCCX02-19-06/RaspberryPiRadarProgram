@@ -242,10 +242,10 @@ class DataAcquisition(threading.Thread):
                              (1 - self.low_pass_const) * self.delta_distance
             self.relative_distance = self.relative_distance - self.delta_distance
             self.last_phase = self.tracked_phase
-            if len(self.old_relative_distance_values) > 10:
-                self.relative_distance = self.relative_distance - np.average(self.old_relative_distance_values)
+            if len(self.old_relative_distance_values) > 0:
+                self.relative_distance = self.relative_distance - np.mean(self.old_relative_distance_values)
             self.old_relative_distance_values.append(self.relative_distance)
-            if len(self.old_relative_distance_values) > 200:
+            if len(self.old_relative_distance_values) > 50:
                 self.old_relative_distance_values.pop(0)
 
             # Tracked data to return and plot
