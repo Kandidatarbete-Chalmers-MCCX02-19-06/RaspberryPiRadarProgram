@@ -28,6 +28,7 @@ class DataAcquisition(threading.Thread):
             self.client = JSONClient(self.args.socket_addr)
             print("RADAR Port = " + self.args.socket_addr)
         else:
+            print("Radar serial port: " + self.args.serial_port)
             port = self.args.serial_port or example_utils.autodetect_serial_port()
             self.client = RegClient(port)
         self.client.squeeze = False
