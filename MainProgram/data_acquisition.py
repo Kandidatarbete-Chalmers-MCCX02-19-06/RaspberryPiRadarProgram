@@ -107,16 +107,19 @@ class DataAcquisition(threading.Thread):
 
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
+        runtime = time.time()
         while self.go:
+            runtime = time.time() - runtime
+            print('runtime: ',runtime*1000)
             # This data is an 1D array in terminal print, not in Python script however....
             start = time.time()
             data = self.get_data()
             done = time.time()
-            print('get_data',done - start)
+            print('get_data',(done - start)*1000)
             start = time.time()
             tracked_data = self.tracking(data)  # processing data and tracking peaks
             done = time.time()
-            print('tracking', done - start)
+            print('tracking', (done - start)*1000)
             #print("Amplitude phase: ", str(tracked_data["tracked phase"]))
             # Test with acconeer filter for schmitt.
             if tracked_data is not None:
@@ -133,14 +136,14 @@ class DataAcquisition(threading.Thread):
                 self.RR_filtered_queue.put(bandpass_filtered_data_RR)
                 #self.RTB_final_queue.put(bandpass_filtered_data_RR)
                 done = time.time()
-                print('filter', done - start)
+                print('filter', (done - start)*1000)
                 start = time.time()
 
                 # Send to app
                 #self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
                 self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
                 done = time.time()
-                print('write to app', done - start)
+                print('write to app', (done - start)*1000)
             try:
                 self.pg_process.put_data(tracked_data)  # plot data
             except PGProccessDiedException:
