@@ -115,7 +115,7 @@ class DataAcquisition(threading.Thread):
                 # filter the data
                 highpass_filtered_data_HR = self.highpass_HR.filter(tracked_data["tracked phase"])
                 bandpass_filtered_data_HR = self.lowpass_HR.filter(highpass_filtered_data_HR)
-                highpass_filtered_data_RR = self.highpass_RR.filter(tracked_data["tracked phase"])
+                highpass_filtered_data_RR = self.highpass_RR.filter(tracked_data["relative distance"])
                 bandpass_filtered_data_RR = self.lowpass_RR.filter(highpass_filtered_data_RR)
 
                 # put filtered data in output queue to send to SignalProcessing
