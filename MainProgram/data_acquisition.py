@@ -24,13 +24,15 @@ class DataAcquisition(threading.Thread):
         # Setup for collecting data from acconeer's radar files.
         self.args = example_utils.ExampleArgumentParser().parse_args()
         example_utils.config_logging(self.args)
-        if self.args.socket_addr:
-            self.client = JSONClient(self.args.socket_addr)
-            print("RADAR Port = " + self.args.socket_addr)
-        else:
-            print("Radar serial port: " + self.args.serial_port)
-            port = self.args.serial_port or example_utils.autodetect_serial_port()
-            self.client = RegClient(port)
+        # if self.args.socket_addr:
+        #     self.client = JSONClient(self.args.socket_addr)
+        #     print("RADAR Port = " + self.args.socket_addr)
+        # else:
+        #     print("Radar serial port: " + self.args.serial_port)
+        #     port = self.args.serial_port or example_utils.autodetect_serial_port()
+        #     self.client = RegClient(port)
+        self.client = JSONClient('0.0.0.0')
+        print("args: " + str(self.args))
         self.client.squeeze = False
         self.config = configs.IQServiceConfig()
         self.config.sensor = self.args.sensors
