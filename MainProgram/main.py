@@ -69,7 +69,7 @@ def main():
     #bluetooth_server = None
     dataAcquisition = data_acquisition.DataAcquisition(list_of_variables_for_threads, bluetooth_server)
     dataAcquisition.start()
-    #signal_processings = signal_processing.SignalProcessing(list_of_variables_for_threads, bluetooth_server)
+    signal_processings = signal_processing.SignalProcessing(list_of_variables_for_threads, bluetooth_server)
 
     while list_of_variables_for_threads.get('go'):
         time.sleep(1)
