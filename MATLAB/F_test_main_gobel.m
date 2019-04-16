@@ -19,16 +19,19 @@ K = (f0_end-f0_start)/T_sample
 f0 = @(t) f0_start + t*K
 %f0 = @(t) f0_start - (f0_end-f0_start)/T_sample*2.*t.*(1-heaviside(t - T_sample/2))
 
+f1 = 0.5
 f2 = 1.3
 f3 = 0.9
 f4 = 2.3
 
-target_delta_distance = 5e-6*sin(2*pi.*(f0_start.*t + K/2.*t.^2));%base
-
-%target_delta_distance = target_delta_distance + 4e-6*cos(2*pi*2*f0(t).*t);% 2nd harmonic
-%target_delta_distance = target_delta_distance + 3e-6*cos(2*pi*3*f0(t).*t);% 3rd harmonic
-
+target_delta_distance = 1e-6*sin(2*pi.*(f0_start.*t + K/2.*t.^2));%base
 target_delta_distance = awgn(target_delta_distance,SNR,'measured');%noise
+
+target_delta_distance = target_delta_distance + 4e-6*cos(2*pi*1*f1.*t);% fundamental
+target_delta_distance = target_delta_distance + 0.8e-6*cos(2*pi*2*f1.*t);% 2nd harmonic
+target_delta_distance = target_delta_distance + 0.3e-6*cos(2*pi*3*f1.*t);% 3rd harmonic
+
+%target_delta_distance = awgn(target_delta_distance,SNR,'measured');%noise
 %target_delta_distance = target_delta_distance + 7e-6*cos(2*pi*f2*t);%Random tone
 %target_delta_distance = target_delta_distance + 3e-6*cos(2*pi*f3*t);%Random tone
 %target_delta_distance = target_delta_distance + 8e-6*cos(2*pi*f4*t);%Random tone
@@ -71,7 +74,7 @@ HpFilt = designfilt('highpassfir', ...
 
 
 
-FFT_resolution = 0.001%[Hz resolution]
+FFT_resolution = 0.1%[Hz resolution]
 beta = 0.1
 [f,target_delta_distance_fft] = smartFFT_abs(target_delta_distance,Fs,FFT_resolution,beta);
 
@@ -93,7 +96,7 @@ f_fine = f_fine
 
 
 %Test of pspectrum
-T_resolution = 20 % Time resolution[s]
+T_resolution = 30 % Time resolution[s]
 overlap = 90% overlap of slidiing frames [%]
 S_leakage = 0.6 % Leakge from tones 
 
@@ -103,14 +106,34 @@ S_leakage = 0.6 % Leakge from tones
 [P,F,T] = windowedFFT(target_delta_distance,Fs,T_resolution,overlap,S_leakage);
 
 figure(2)
-pcolor(T,F,P);
+pcolor(T,F,log10(P));
 colorbar
 xlabel('Time [s]')
 ylabel('Frequency [Hz]')
 hold on
-plot(T,f0(T),'r','LineWidth',1)
+plot(T,f0(T),'r','LineWidth',0.5)
+title('No notch filter')
+ylim([0 1.1*max(f0(t))])
 
 
+%figure(3)
+%test of harmonic filter
+Q = 10
+[S_o] = filter_BR(target_delta_distance_withnoise,Fs,Q);
+
+
+
+[P,F,T] = windowedFFT(S_o,Fs,T_resolution,overlap,S_leakage);
+
+figure(3)
+pcolor(T,F,log10(P));
+colorbar
+xlabel('Time [s]')
+ylabel('Frequency [Hz]')
+hold on
+plot(T,f0(T),'r','LineWidth',0.5)
+title('Notch filter used')
+ylim([0 1.1*max(f0(t))])
 
 %%
 figure(2)
@@ -146,6 +169,7 @@ plot(t,S_filtered)
 legend('Original','Restored')
 xlabel('Time [s]')
 ylabel('Signal [m]')
+
 
 
 

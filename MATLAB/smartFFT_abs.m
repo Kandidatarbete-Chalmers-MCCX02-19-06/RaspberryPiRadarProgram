@@ -5,9 +5,7 @@ function [f,S_o] = smartFFT_abs(S_i,Fs,F_resolution,beta)
 %   vector, for a given minimum frequency resolution.
 
 %Autocorr test
-A = S_i;
-B = flip(S_i);
-S_i = xcorr(A,B);
+S_i = xcorr(S_i,S_i);
 %S_i = S_i';
 %end of test
 
@@ -18,6 +16,7 @@ S_i = S_i .* w';
 
 %FFT
 L_fft = 2 * round (max(Fs/F_resolution,L_seq)/2 );%needed length of FFT, or orignial.
+%L_fft = L_seq;
 f = Fs*(0:(L_fft/2))/L_fft;
 
 Y = fft(S_i,L_fft);
