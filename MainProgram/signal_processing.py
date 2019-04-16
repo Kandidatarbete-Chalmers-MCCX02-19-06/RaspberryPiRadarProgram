@@ -147,8 +147,7 @@ class SignalProcessing:
                     # Take the mean value
                     # RR_final_queue is supposed to be the breathing rate queue that is sent to app
                     self.RR_final_queue.put(self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR))
-                    # print("Data added to schmitt should be sent to app")
-                    # print("Breathing rate: ", self.RR_final_queue.get())
+
                     # TODO put getMeanOfFreqArray() into queue that connects to send bluetooth values instead
                     count = 0
             # trackedRRvector[countHys-1] is the current data from filter
