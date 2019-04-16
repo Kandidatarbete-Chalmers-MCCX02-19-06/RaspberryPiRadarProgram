@@ -43,7 +43,7 @@ class DataAcquisition(threading.Thread):
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
-        self.config.sweep_rate = 30
+        self.config.sweep_rate = 20
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
@@ -109,7 +109,7 @@ class DataAcquisition(threading.Thread):
         self.client.start_streaming()  # Starts Acconeers streaming server
         #runtimeold=time.time()
         while self.go:
-            startstart = time.time()
+            #startstart = time.time()
             #runtime = time.time()
             #print('runtime',(runtime-runtimeold)*1000)
             #runtimeold = runtime
@@ -139,15 +139,16 @@ class DataAcquisition(threading.Thread):
                 #self.RTB_final_queue.put(bandpass_filtered_data_RR)
                 #done = time.time()
                 #print('filter', (done - start)*1000)
+
                 # Send to app
-                self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
-                #self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
+                #self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
+                self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
             try:
                 self.pg_process.put_data(tracked_data)  # plot data
             except PGProccessDiedException:
                 break
-            donedone = time.time()
-            print('while time',(donedone-startstart)*1000)
+            #donedone = time.time()
+            #print('while time',(donedone-startstart)*1000)
         print("out of while go in radar")
         self.client.disconnect()
         self.pg_process.close()
