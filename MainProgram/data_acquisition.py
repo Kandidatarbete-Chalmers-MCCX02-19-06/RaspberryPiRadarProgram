@@ -223,7 +223,7 @@ class DataAcquisition(threading.Thread):
             # self.RR_filtered_queue.put(plot_hist_pos[-1]*10)
 
             # Albins phase to distance
-            discount = 1
+            discount = 1.5
             if self.tracked_phase < -np.pi + discount and self.last_phase > np.pi - discount:
                 wrapped_phase = self.tracked_phase + 2 * np.pi
             elif self.tracked_phase > np.pi - discount and self.last_phase < -np.pi + discount:
