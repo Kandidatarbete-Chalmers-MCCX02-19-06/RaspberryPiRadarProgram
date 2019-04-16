@@ -6,7 +6,7 @@ import numpy as np
 import queue
 
 #import Radar
-import bluetooth_server        # import bluetooth class
+import bluetooth_server_class        # import bluetooth class
 import data_acquisition      # Import class which collects and filters relevant data.
 import signal_processing
 # import bluetooth_app
@@ -65,14 +65,16 @@ def main():
 
     # radar = Radar.Radar(radar_queue, go)
     # radar.start()
-    dataAcquisition = data_acquisition.DataAcquisition(list_of_variables_for_threads)
+    bluetooth_server = bluetooth_server_class.BluetoothServer(list_of_variables_for_threads)
+    dataAcquisition = data_acquisition.DataAcquisition(list_of_variables_for_threads, bluetooth_server)
     dataAcquisition.start()
-    signal_processings = signal_processing.SignalProcessing(list_of_variables_for_threads)
+    signal_processings = signal_processing.SignalProcessing(list_of_variables_for_threads, bluetooth_server)
 
-    bluetooth_servers = bluetooth_server.BluetoothServer(list_of_variables_for_threads)
+    while list_of_variables_for_threads.get('go'):
+        time.sleep(1)
     ##bluetooth_servers = bluetooth_app.bluetooth_app(go)
-    bluetooth_servers.app_data()
-    bluetooth_servers.connect_device_thread.join()
+    #bluetooth_servers.app_data()
+    bluetooth_server.connect_device_thread.join()
 
     print('Bluetooth server is closed')
     # time.sleep(300)

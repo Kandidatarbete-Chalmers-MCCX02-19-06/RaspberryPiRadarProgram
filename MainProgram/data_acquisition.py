@@ -17,10 +17,11 @@ from acconeer_utils.pg_process import PGProcess, PGProccessDiedException
 
 
 class DataAcquisition(threading.Thread):
-    def __init__(self, list_of_variables_for_threads):
+    def __init__(self, list_of_variables_for_threads, bluetooth_server):
         super(DataAcquisition, self).__init__()  # Inherit threading vitals
         self.go = list_of_variables_for_threads["go"]
         self.list_of_variables_for_threads = list_of_variables_for_threads
+        self.bluetooth_server = bluetooth_server
         # Setup for collecting data from acconeer's radar files.
         self.args = example_utils.ExampleArgumentParser().parse_args()
         example_utils.config_logging(self.args)
@@ -42,7 +43,7 @@ class DataAcquisition(threading.Thread):
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
-        self.config.sweep_rate = 20
+        self.config.sweep_rate = 80
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
@@ -78,6 +79,7 @@ class DataAcquisition(threading.Thread):
         self.track_peak_relative_position = None
         self.relative_distance = 0
         self.last_phase = 0
+        self.old_relative_distance_values = []
         self.c = 2.998 * 100000000
         self.freq = 60 * 1000000000
         self.wave_length = self.c / self.freq
@@ -112,7 +114,7 @@ class DataAcquisition(threading.Thread):
             #print("Amplitude phase: ", str(tracked_data["tracked phase"]))
             # Test with acconeer filter for schmitt.
             if tracked_data is not None:
-                self.RTB_final_queue.put(tracked_data["relative distance"])
+                #self.RTB_final_queue.put(tracked_data["relative distance"])
                 # filter the data
                 highpass_filtered_data_HR = self.highpass_HR.filter(tracked_data["relative distance"])
                 bandpass_filtered_data_HR = self.lowpass_HR.filter(highpass_filtered_data_HR)
@@ -121,8 +123,11 @@ class DataAcquisition(threading.Thread):
 
                 # put filtered data in output queue to send to SignalProcessing
                 #self.HR_filtered_queue.put(bandpass_filtered_data_HR)
-                #self.RR_filtered_queue.put(bandpass_filtered_data_RR)
+                self.RR_filtered_queue.put(bandpass_filtered_data_RR)
                 #self.RTB_final_queue.put(bandpass_filtered_data_RR)
+
+                # Send to app
+                self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
             try:
                 self.pg_process.put_data(tracked_data)  # plot data
             except PGProccessDiedException:
@@ -234,8 +239,13 @@ class DataAcquisition(threading.Thread):
             #_, wrapped_phase = np.unwrap([self.last_phase,self.tracked_phase])
             self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi) * self.low_pass_const + \
                              (1 - self.low_pass_const) * self.delta_distance
-            self.relative_distance = self.relative_distance + self.delta_distance
+            self.relative_distance = self.relative_distance - self.delta_distance
             self.last_phase = self.tracked_phase
+            if len(self.old_relative_distance_values) != 0:
+                self.delta_distance = self.delta_distance - np.average(self.old_relative_distance_values)
+            self.old_relative_distance_values.append(self.delta_distance)
+            if len(self.old_relative_distance_values) > 100:
+                self.old_relative_distance_values.pop(0)
 
             # Tracked data to return and plot
             self.tracked_data = {"tracked distance": self.tracked_distance,
