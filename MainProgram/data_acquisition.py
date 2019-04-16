@@ -22,8 +22,8 @@ class DataAcquisition(threading.Thread):
         self.go = list_of_variables_for_threads["go"]
         self.list_of_variables_for_threads = list_of_variables_for_threads
         # Setup for collecting data from acconeer's radar files.
-        # self.args = example_utils.ExampleArgumentParser().parse_args()
-        # example_utils.config_logging(self.args)
+        self.args = example_utils.ExampleArgumentParser().parse_args()
+        example_utils.config_logging(self.args)
         # if self.args.socket_addr:
         #     self.client = JSONClient(self.args.socket_addr)
         #     print("RADAR Port = " + self.args.socket_addr)
@@ -35,8 +35,9 @@ class DataAcquisition(threading.Thread):
         #print("args: " + str(self.args))
         self.client.squeeze = False
         self.config = configs.IQServiceConfig()
-        #self.config.sensor = self.args.sensors
-        self.config.sensor = 1
+        self.config.sensor = self.args.sensors
+        print(self.args.sensors)
+        #self.config.sensor = 1
 
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.4]  # Measurement interval
