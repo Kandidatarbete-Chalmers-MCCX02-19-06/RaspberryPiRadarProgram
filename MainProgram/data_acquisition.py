@@ -111,7 +111,7 @@ class DataAcquisition(threading.Thread):
             #print("Amplitude phase: ", str(tracked_data["tracked phase"]))
             # Test with acconeer filter for schmitt.
             if tracked_data is not None:
-                self.RTB_final_queue.put(tracked_data["tracked phase"])
+                self.RTB_final_queue.put(tracked_data["relative phase"])
                 # filter the data
                 highpass_filtered_data_HR = self.highpass_HR.filter(tracked_data["tracked phase"])
                 bandpass_filtered_data_HR = self.lowpass_HR.filter(highpass_filtered_data_HR)
