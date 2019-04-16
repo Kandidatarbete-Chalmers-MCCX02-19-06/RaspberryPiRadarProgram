@@ -107,12 +107,12 @@ class DataAcquisition(threading.Thread):
 
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
-        runtimeold=time.time()
+        #runtimeold=time.time()
         while self.go:
-            #startstart = time.time()
-            runtime = time.time()
-            print('runtime',(runtime-runtimeold)*1000)
-            runtimeold = runtime
+            startstart = time.time()
+            #runtime = time.time()
+            #print('runtime',(runtime-runtimeold)*1000)
+            #runtimeold = runtime
             # This data is an 1D array in terminal print, not in Python script however....
             #start = time.time()
             data = self.get_data()
@@ -146,8 +146,8 @@ class DataAcquisition(threading.Thread):
                 self.pg_process.put_data(tracked_data)  # plot data
             except PGProccessDiedException:
                 break
-            #donedone = time.time()
-            #print('while time',(donedone-startstart)*1000)
+            donedone = time.time()
+            print('while time',(donedone-startstart)*1000)
         print("out of while go in radar")
         self.client.disconnect()
         self.pg_process.close()
