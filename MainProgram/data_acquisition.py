@@ -60,7 +60,7 @@ class DataAcquisition(threading.Thread):
             0.25, self.dt)  # Constant for a small low-pass filter to
         # smooth the changes. tau changes the filter weight, lower tau means shorter delay. Usually tau = 0.25 is good.
         self.number_of_averages = 2  # number of averages for tracked peak
-        self.plot_time_length = 10  # length of plotted data
+        self.plot_time_length = 2  # length of plotted data
         # number of time samples when plotting
         self.number_of_time_samples = int(self.plot_time_length / self.dt)
         # distance over time
@@ -335,4 +335,4 @@ class PGUpdater:
         self.distance_plot.setYRange(0, self.smooth_max.update(np.amax(data["abs"])))
         self.distance_inf_line.setValue(data["tracked distance"])
         #self.distance_over_time_curve.setData(self.ts, data["tracked distance over time"])
-        #self.distance_over_time_curve2.setData(self.ts, data["tracked distance over time 2"])
+        self.distance_over_time_curve2.setData(self.ts, data["tracked distance over time 2"])
