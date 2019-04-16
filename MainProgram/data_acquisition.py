@@ -78,6 +78,7 @@ class DataAcquisition(threading.Thread):
         self.track_peak_relative_position = None
         self.relative_distance = 0
         self.last_phase = 0
+        self.old_relative_distance_values = []
         self.c = 2.998 * 100000000
         self.freq = 60 * 1000000000
         self.wave_length = self.c / self.freq
@@ -236,6 +237,11 @@ class DataAcquisition(threading.Thread):
                              (1 - self.low_pass_const) * self.delta_distance
             self.relative_distance = self.relative_distance + self.delta_distance
             self.last_phase = self.tracked_phase
+            if len(self.old_relative_distance_values) != 0:
+                self.delta_distance = self.delta_distance - np.average(self.old_relative_distance_values)
+            self.old_relative_distance_values.append(self.delta_distance)
+            if len(self.old_relative_distance_values) > 100:
+                self.old_relative_distance_values.pop(0)
 
             # Tracked data to return and plot
             self.tracked_data = {"tracked distance": self.tracked_distance,
