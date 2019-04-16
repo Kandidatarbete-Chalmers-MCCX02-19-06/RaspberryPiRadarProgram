@@ -76,6 +76,11 @@ class DataAcquisition(threading.Thread):
         self.low_pass_amplitude = None
         self.low_pass_track_peak = None
         self.track_peak_relative_position = None
+        self.relative_distance = 0
+        self.last_phase = 0
+        self.c = 2.998 * 100000000
+        self.freq = 60 * 1000000000
+        self.wave_length = self.c / self.freq
 
         # Graphs
         self.pg_updater = PGUpdater(self.config)
@@ -216,11 +221,23 @@ class DataAcquisition(threading.Thread):
             #self.RTB_final_queue.put(plot_hist_pos[-1]*10)  # Gets tracked breathing in mm
             # self.RR_filtered_queue.put(plot_hist_pos[-1]*10)
 
+            # Albins phase to distance
+            discount = 0.2
+            if self.tracked_phase < -np.pi + discount and self.last_phase > np.pi - discount:
+                wrapped_phase = self.tracked_phase + 2 * np.pi
+            elif self.tracked_phase > np.pi - discount and self.last_phase < -np.pi + discount:
+                wrapped_phase = self.tracked_phase - 2 * np.pi
+            else:
+                wrapped_phase = self.tracked_phase
+            #_, wrapped_phase = np.unwrap([self.last_phase,self.tracked_phase])
+            self.relative_distance = self.relative_distance + self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi)
+            self.last_phase = self.tracked_phase
+
             # Tracked data to return and plot
             self.tracked_data = {"tracked distance": self.tracked_distance,
                                  "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase,
                                  "abs": self.low_pass_amplitude, "tracked distance over time": plot_hist_pos,
-                                 "tracked distance over time 2": self.tracked_distance_over_time}
+                                 "tracked distance over time 2": self.tracked_distance_over_time, "relative distance": self.relative_distance}
         self.last_data = data
         self.first_data = False
         return self.tracked_data
