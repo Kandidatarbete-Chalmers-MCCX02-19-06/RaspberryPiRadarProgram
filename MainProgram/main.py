@@ -65,7 +65,8 @@ def main():
 
     # radar = Radar.Radar(radar_queue, go)
     # radar.start()
-    bluetooth_server = bluetooth_server_class.BluetoothServer(list_of_variables_for_threads)
+    #bluetooth_server = bluetooth_server_class.BluetoothServer(list_of_variables_for_threads)
+    bluetooth_server = None
     dataAcquisition = data_acquisition.DataAcquisition(list_of_variables_for_threads, bluetooth_server)
     dataAcquisition.start()
     #signal_processings = signal_processing.SignalProcessing(list_of_variables_for_threads, bluetooth_server)
