@@ -231,17 +231,17 @@ class DataAcquisition(threading.Thread):
             # - np.mean(self.tracked_distance_over_time)
             self.tracked_distance_over_time[-1] = self.tracked_distance
 
-            # com_idx = int(self.track_peak_relative_position * data_length)
-            # delta_angle = np.angle(data[com_idx] * np.conj(self.last_data[com_idx]))
-            # vel = self.f * 2.5 * delta_angle / (2 * np.pi)
-            # self.low_pass_vel = self.low_pass_const * vel + \
-            #     (1 - self.low_pass_const) * self.low_pass_vel
-            # dp = self.low_pass_vel / self.f
-            # self.hist_pos = np.roll(self.hist_pos, -1)
-            # self.hist_pos[-1] = self.hist_pos[-2] + dp
-            # plot_hist_pos = self.hist_pos - self.hist_pos.mean()
+            com_idx = int(self.track_peak_relative_position * data_length)
+            delta_angle = np.angle(data[com_idx] * np.conj(self.last_data[com_idx]))
+            vel = self.f * 2.5 * delta_angle / (2 * np.pi)
+            self.low_pass_vel = self.low_pass_const * vel + \
+                (1 - self.low_pass_const) * self.low_pass_vel
+            dp = self.low_pass_vel / self.f
+            self.hist_pos = np.roll(self.hist_pos, -1)
+            self.hist_pos[-1] = self.hist_pos[-2] + dp
+            plot_hist_pos = self.hist_pos - self.hist_pos.mean()
 
-            plot_hist_pos = None
+            #plot_hist_pos = None
 
             #print("Plot_hist_pos: ", plot_hist_pos)
             #self.RTB_final_queue.put(plot_hist_pos[-1]*10)  # Gets tracked breathing in mm
@@ -328,7 +328,7 @@ class PGUpdater:
     def update(self, data):
         if self.first:
             self.xs = np.linspace(*self.interval, len(data["abs"]))
-            #self.ts = np.linspace(-5, 0, len(data["tracked distance over time"]))
+            self.ts = np.linspace(-5, 0, len(data["tracked distance over time"]))
             self.first = False
 
         self.distance_curve.setData(self.xs, np.array(data["abs"]).flatten())
