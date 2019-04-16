@@ -304,7 +304,7 @@ class PGUpdater:
         self.distance_inf_line = pg.InfiniteLine(pen=pen)
         self.distance_plot.addItem(self.distance_inf_line)
 
-        Dynamic plot to show breath over time
+        # Dynamic plot to show breath over time
         self.distance_over_time_plot = win.addPlot(row=1, col=0)
         self.distance_over_time_plot.showGrid(x=True, y=True)
         self.distance_over_time_plot.setLabel("left", "Distance")
@@ -313,7 +313,7 @@ class PGUpdater:
             pen=example_utils.pg_pen_cycler(0))
         self.distance_over_time_plot.setYRange(-8, 8)
 
-        Plot for tracked distance over time
+        # Plot for tracked distance over time
         self.distance_over_time_plot2 = win.addPlot(row=1, col=1)
         self.distance_over_time_plot2.showGrid(x=True, y=True)
         self.distance_over_time_plot2.setLabel("left", "Distance")
