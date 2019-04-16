@@ -141,7 +141,7 @@ class DataAcquisition(threading.Thread):
                 #print('filter', (done - start)*1000)
                 # Send to app
                 #self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
-                self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
+                #self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
             try:
                 self.pg_process.put_data(tracked_data)  # plot data
             except PGProccessDiedException:
