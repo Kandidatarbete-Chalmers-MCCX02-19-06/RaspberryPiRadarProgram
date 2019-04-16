@@ -110,7 +110,7 @@ class DataAcquisition(threading.Thread):
         runtimeold=time.time()
         while self.go:
             runtime = time.time()
-            print('runtime: ',(runtime-runtimeold)*1000)
+            print('runtime',(runtime-runtimeold)*1000)
             runtimeold = runtime
             # This data is an 1D array in terminal print, not in Python script however....
             start = time.time()
@@ -146,7 +146,10 @@ class DataAcquisition(threading.Thread):
                 done = time.time()
                 print('write to app', (done - start)*1000)
             try:
+                start = time.time()
                 self.pg_process.put_data(tracked_data)  # plot data
+                done = time.time()
+                print('plot graph', (done - start) * 1000)
             except PGProccessDiedException:
                 break
         print("out of while go in radar")
