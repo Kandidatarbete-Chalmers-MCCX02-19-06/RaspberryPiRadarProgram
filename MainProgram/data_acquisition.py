@@ -42,7 +42,7 @@ class DataAcquisition(threading.Thread):
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
-        self.config.sweep_rate = 60
+        self.config.sweep_rate = 20
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
@@ -119,8 +119,8 @@ class DataAcquisition(threading.Thread):
                 bandpass_filtered_data_RR = self.lowpass_RR.filter(highpass_filtered_data_RR)
 
                 # put filtered data in output queue to send to SignalProcessing
-                self.HR_filtered_queue.put(bandpass_filtered_data_HR)
-                self.RR_filtered_queue.put(bandpass_filtered_data_RR)
+                #self.HR_filtered_queue.put(bandpass_filtered_data_HR)
+                #self.RR_filtered_queue.put(bandpass_filtered_data_RR)
                 self.RTB_final_queue.put(bandpass_filtered_data_RR)
             try:
                 self.pg_process.put_data(tracked_data)  # plot data
