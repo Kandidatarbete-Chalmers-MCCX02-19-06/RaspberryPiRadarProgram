@@ -13,7 +13,7 @@ class ExampleArgumentParser(ArgumentParser):
     def __init__(self, num_sens="+"):
         super().__init__()
 
-        server_group = self.add_mutually_exclusive_group(required=True)
+        server_group = self.add_mutually_exclusive_group(required=False)
         server_group.add_argument(
             "-u",
             "--uart",
