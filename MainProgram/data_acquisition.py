@@ -235,7 +235,7 @@ class DataAcquisition(threading.Thread):
             #_, wrapped_phase = np.unwrap([self.last_phase,self.tracked_phase])
             self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi) * self.low_pass_const + \
                              (1 - self.low_pass_const) * self.delta_distance
-            self.relative_distance = self.relative_distance + self.delta_distance
+            self.relative_distance = self.relative_distance - self.delta_distance
             self.last_phase = self.tracked_phase
             if len(self.old_relative_distance_values) != 0:
                 self.delta_distance = self.delta_distance - np.average(self.old_relative_distance_values)
