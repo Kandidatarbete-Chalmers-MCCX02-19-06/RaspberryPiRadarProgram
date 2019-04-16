@@ -79,7 +79,7 @@ class DataAcquisition(threading.Thread):
         self.track_peak_relative_position = None
         self.relative_distance = 0
         self.last_phase = 0
-        self.old_relative_distance_values = []
+        #self.old_relative_distance_values = []
         self.c = 2.998 * 100000000
         self.freq = 60 * 1000000000
         self.wave_length = self.c / self.freq
@@ -245,19 +245,19 @@ class DataAcquisition(threading.Thread):
             # self.RR_filtered_queue.put(plot_hist_pos[-1]*10)
 
             # Albins phase to distance and wraping
-            discount = 2
-            if self.tracked_phase < -np.pi + discount and self.last_phase > np.pi - discount:
-                wrapped_phase = self.tracked_phase + 2 * np.pi
-            elif self.tracked_phase > np.pi - discount and self.last_phase < -np.pi + discount:
-                wrapped_phase = self.tracked_phase - 2 * np.pi
-            else:
-                wrapped_phase = self.tracked_phase
-            #_, wrapped_phase = np.unwrap([self.last_phase,self.tracked_phase])
-            self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi) * self.low_pass_const + \
-                             (1 - self.low_pass_const) * self.delta_distance
-            self.relative_distance = self.relative_distance + self.delta_distance
-            #print("real relative distance: ",self.relative_distance)
-            self.last_phase = self.tracked_phase
+            # discount = 2
+            # if self.tracked_phase < -np.pi + discount and self.last_phase > np.pi - discount:
+            #     wrapped_phase = self.tracked_phase + 2 * np.pi
+            # elif self.tracked_phase > np.pi - discount and self.last_phase < -np.pi + discount:
+            #     wrapped_phase = self.tracked_phase - 2 * np.pi
+            # else:
+            #     wrapped_phase = self.tracked_phase
+            # self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi) * self.low_pass_const + \
+            #                  (1 - self.low_pass_const) * self.delta_distance
+            # self.relative_distance = self.relative_distance + self.delta_distance
+            # self.last_phase = self.tracked_phase
+
+
             # self.old_relative_distance_values.append(self.relative_distance)
             # if len(self.old_relative_distance_values) > 100:
             #     print('mean of old values: ',- np.mean(self.old_relative_distance_values))
