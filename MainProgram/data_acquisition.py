@@ -32,7 +32,7 @@ class DataAcquisition(threading.Thread):
         #     port = self.args.serial_port or example_utils.autodetect_serial_port()
         #     self.client = RegClient(port)
         self.client = JSONClient('0.0.0.0')
-        #print("args: " + str(self.args))
+        print("args: " + str(self.args))
         self.client.squeeze = False
         self.config = configs.IQServiceConfig()
         self.config.sensor = self.args.sensors
