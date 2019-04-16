@@ -123,11 +123,11 @@ class DataAcquisition(threading.Thread):
 
                 # put filtered data in output queue to send to SignalProcessing
                 #self.HR_filtered_queue.put(bandpass_filtered_data_HR)
-                self.RR_filtered_queue.put(bandpass_filtered_data_RR)
+                #self.RR_filtered_queue.put(bandpass_filtered_data_RR)
                 #self.RTB_final_queue.put(bandpass_filtered_data_RR)
 
                 # Send to app
-                self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
+                self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
             try:
                 self.pg_process.put_data(tracked_data)  # plot data
             except PGProccessDiedException:
