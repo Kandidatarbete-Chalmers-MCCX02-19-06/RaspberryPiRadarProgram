@@ -304,23 +304,23 @@ class PGUpdater:
         self.distance_inf_line = pg.InfiniteLine(pen=pen)
         self.distance_plot.addItem(self.distance_inf_line)
 
-        # Dynamic plot to show breath over time
-        # self.distance_over_time_plot = win.addPlot(row=1, col=0)
-        # self.distance_over_time_plot.showGrid(x=True, y=True)
-        # self.distance_over_time_plot.setLabel("left", "Distance")
-        # self.distance_over_time_plot.setLabel("bottom", "Time (s)")
-        # self.distance_over_time_curve = self.distance_over_time_plot.plot(
-        #     pen=example_utils.pg_pen_cycler(0))
-        # self.distance_over_time_plot.setYRange(-8, 8)
+        Dynamic plot to show breath over time
+        self.distance_over_time_plot = win.addPlot(row=1, col=0)
+        self.distance_over_time_plot.showGrid(x=True, y=True)
+        self.distance_over_time_plot.setLabel("left", "Distance")
+        self.distance_over_time_plot.setLabel("bottom", "Time (s)")
+        self.distance_over_time_curve = self.distance_over_time_plot.plot(
+            pen=example_utils.pg_pen_cycler(0))
+        self.distance_over_time_plot.setYRange(-8, 8)
 
-        # Plot for tracked distance over time
-        # self.distance_over_time_plot2 = win.addPlot(row=1, col=1)
-        # self.distance_over_time_plot2.showGrid(x=True, y=True)
-        # self.distance_over_time_plot2.setLabel("left", "Distance")
-        # self.distance_over_time_plot2.setLabel("bottom", "Time (s)")
-        # self.distance_over_time_curve2 = self.distance_over_time_plot2.plot(
-        #     pen=example_utils.pg_pen_cycler(0))
-        # self.distance_over_time_plot2.setYRange(0.4, 1.5)
+        Plot for tracked distance over time
+        self.distance_over_time_plot2 = win.addPlot(row=1, col=1)
+        self.distance_over_time_plot2.showGrid(x=True, y=True)
+        self.distance_over_time_plot2.setLabel("left", "Distance")
+        self.distance_over_time_plot2.setLabel("bottom", "Time (s)")
+        self.distance_over_time_curve2 = self.distance_over_time_plot2.plot(
+            pen=example_utils.pg_pen_cycler(0))
+        self.distance_over_time_plot2.setYRange(0.4, 1.5)
 
         self.smooth_max = example_utils.SmoothMax(self.config.sweep_rate)
         self.first = True
@@ -334,5 +334,5 @@ class PGUpdater:
         self.distance_curve.setData(self.xs, np.array(data["abs"]).flatten())
         self.distance_plot.setYRange(0, self.smooth_max.update(np.amax(data["abs"])))
         self.distance_inf_line.setValue(data["tracked distance"])
-        # self.distance_over_time_curve.setData(self.ts, data["tracked distance over time"])
-        # self.distance_over_time_curve2.setData(self.ts, data["tracked distance over time 2"])
+        self.distance_over_time_curve.setData(self.ts, data["tracked distance over time"])
+        self.distance_over_time_curve2.setData(self.ts, data["tracked distance over time 2"])
