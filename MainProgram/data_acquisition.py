@@ -328,7 +328,7 @@ class PGUpdater:
     def update(self, data):
         if self.first:
             self.xs = np.linspace(*self.interval, len(data["abs"]))
-            self.ts = np.linspace(-5, 0, len(data["tracked distance over time"]))
+            #self.ts = np.linspace(-5, 0, len(data["tracked distance over time"]))
             self.first = False
 
         self.distance_curve.setData(self.xs, np.array(data["abs"]).flatten())
