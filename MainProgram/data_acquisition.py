@@ -109,6 +109,7 @@ class DataAcquisition(threading.Thread):
         self.client.start_streaming()  # Starts Acconeers streaming server
         runtimeold=time.time()
         while self.go:
+            startstart = time.time()
             runtime = time.time()
             print('runtime',(runtime-runtimeold)*1000)
             runtimeold = runtime
@@ -152,6 +153,8 @@ class DataAcquisition(threading.Thread):
                 print('plot graph', (done - start) * 1000)
             except PGProccessDiedException:
                 break
+            donedone = time.time()
+            print('while time',(donedone-startstart)*1000)
         print("out of while go in radar")
         self.client.disconnect()
         self.pg_process.close()
