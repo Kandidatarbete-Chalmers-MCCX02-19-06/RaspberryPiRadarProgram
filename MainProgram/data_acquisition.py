@@ -43,7 +43,7 @@ class DataAcquisition(threading.Thread):
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
-        self.config.sweep_rate = 80
+        self.config.sweep_rate = 20
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
@@ -123,11 +123,12 @@ class DataAcquisition(threading.Thread):
 
                 # put filtered data in output queue to send to SignalProcessing
                 #self.HR_filtered_queue.put(bandpass_filtered_data_HR)
-                #self.RR_filtered_queue.put(bandpass_filtered_data_RR)
+                self.RR_filtered_queue.put(bandpass_filtered_data_RR)
                 #self.RTB_final_queue.put(bandpass_filtered_data_RR)
 
                 # Send to app
                 self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
+                #self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
             try:
                 self.pg_process.put_data(tracked_data)  # plot data
             except PGProccessDiedException:
@@ -241,8 +242,8 @@ class DataAcquisition(threading.Thread):
                              (1 - self.low_pass_const) * self.delta_distance
             self.relative_distance = self.relative_distance - self.delta_distance
             self.last_phase = self.tracked_phase
-            if len(self.old_relative_distance_values) != 0:
-                self.delta_distance = self.delta_distance - np.average(self.old_relative_distance_values)
+            #if len(self.old_relative_distance_values) != 0:
+            #    self.delta_distance = self.delta_distance - np.average(self.old_relative_distance_values)
             self.old_relative_distance_values.append(self.delta_distance)
             if len(self.old_relative_distance_values) > 100:
                 self.old_relative_distance_values.pop(0)
