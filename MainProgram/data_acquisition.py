@@ -43,7 +43,7 @@ class DataAcquisition(threading.Thread):
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
-        self.config.sweep_rate = 10
+        self.config.sweep_rate = 20
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
@@ -241,7 +241,7 @@ class DataAcquisition(threading.Thread):
             self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi) * self.low_pass_const + \
                              (1 - self.low_pass_const) * self.delta_distance
             self.relative_distance = self.relative_distance + self.delta_distance
-            print("real relative distance: ",self.relative_distance)
+            #print("real relative distance: ",self.relative_distance)
             self.last_phase = self.tracked_phase
             # self.old_relative_distance_values.append(self.relative_distance)
             # if len(self.old_relative_distance_values) > 100:
