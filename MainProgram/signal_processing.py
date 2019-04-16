@@ -120,7 +120,6 @@ class SignalProcessing:
         trackedRRvector = np.zeros(self.sample_freq * Tc)  # to save old values
 
         while self.go:
-            start = time.time()
             # to be able to use the same value in the whole loop
             trackedRRvector[countHys - 1] = self.RR_filtered_queue.get()
             # self.RTB_final_queue.put(trackedRRvector[countHys - 1])

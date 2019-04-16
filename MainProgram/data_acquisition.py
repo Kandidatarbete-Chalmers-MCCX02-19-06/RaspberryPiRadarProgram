@@ -109,11 +109,18 @@ class DataAcquisition(threading.Thread):
         self.client.start_streaming()  # Starts Acconeers streaming server
         while self.go:
             # This data is an 1D array in terminal print, not in Python script however....
+            start = time.time()
             data = self.get_data()
+            done = time.time()
+            print('get_data',done - start)
+            start = time.time()
             tracked_data = self.tracking(data)  # processing data and tracking peaks
+            done = time.time()
+            print('tracking', done - start)
             #print("Amplitude phase: ", str(tracked_data["tracked phase"]))
             # Test with acconeer filter for schmitt.
             if tracked_data is not None:
+                start = time.time()
                 #self.RTB_final_queue.put(tracked_data["relative distance"])
                 # filter the data
                 highpass_filtered_data_HR = self.highpass_HR.filter(tracked_data["relative distance"]) 
@@ -125,10 +132,15 @@ class DataAcquisition(threading.Thread):
                 #self.HR_filtered_queue.put(bandpass_filtered_data_HR)
                 self.RR_filtered_queue.put(bandpass_filtered_data_RR)
                 #self.RTB_final_queue.put(bandpass_filtered_data_RR)
+                done = time.time()
+                print('filter', done - start)
+                start = time.time()
 
                 # Send to app
                 #self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
                 self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
+                done = time.time()
+                print('write to app', done - start)
             try:
                 self.pg_process.put_data(tracked_data)  # plot data
             except PGProccessDiedException:
