@@ -335,4 +335,4 @@ class PGUpdater:
         self.distance_plot.setYRange(0, self.smooth_max.update(np.amax(data["abs"])))
         self.distance_inf_line.setValue(data["tracked distance"])
         #self.distance_over_time_curve.setData(self.ts, data["tracked distance over time"])
-        self.distance_over_time_curve2.setData(self.ts, data["tracked distance over time 2"])
+        #self.distance_over_time_curve2.setData(self.ts, data["tracked distance over time 2"])
