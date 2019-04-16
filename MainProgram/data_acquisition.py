@@ -231,17 +231,17 @@ class DataAcquisition(threading.Thread):
             # - np.mean(self.tracked_distance_over_time)
             self.tracked_distance_over_time[-1] = self.tracked_distance
 
-            # com_idx = int(self.track_peak_relative_position * data_length)
-            # delta_angle = np.angle(data[com_idx] * np.conj(self.last_data[com_idx]))
-            # vel = self.f * 2.5 * delta_angle / (2 * np.pi)
-            # self.low_pass_vel = self.low_pass_const * vel + \
-            #     (1 - self.low_pass_const) * self.low_pass_vel
-            # dp = self.low_pass_vel / self.f
-            # self.hist_pos = np.roll(self.hist_pos, -1)
-            # self.hist_pos[-1] = self.hist_pos[-2] + dp
-            # plot_hist_pos = self.hist_pos - self.hist_pos.mean()
+            com_idx = int(self.track_peak_relative_position * data_length)
+            delta_angle = np.angle(data[com_idx] * np.conj(self.last_data[com_idx]))
+            vel = self.f * 2.5 * delta_angle / (2 * np.pi)
+            self.low_pass_vel = self.low_pass_const * vel + \
+                (1 - self.low_pass_const) * self.low_pass_vel
+            dp = self.low_pass_vel / self.f
+            self.hist_pos = np.roll(self.hist_pos, -1)
+            self.hist_pos[-1] = self.hist_pos[-2] + dp
+            plot_hist_pos = self.hist_pos - self.hist_pos.mean()
 
-            plot_hist_pos = None
+            #plot_hist_pos = None
 
             #print("Plot_hist_pos: ", plot_hist_pos)
             #self.RTB_final_queue.put(plot_hist_pos[-1]*10)  # Gets tracked breathing in mm
@@ -305,22 +305,22 @@ class PGUpdater:
         self.distance_plot.addItem(self.distance_inf_line)
 
         # Dynamic plot to show breath over time
-        # self.distance_over_time_plot = win.addPlot(row=1, col=0)
-        # self.distance_over_time_plot.showGrid(x=True, y=True)
-        # self.distance_over_time_plot.setLabel("left", "Distance")
-        # self.distance_over_time_plot.setLabel("bottom", "Time (s)")
-        # self.distance_over_time_curve = self.distance_over_time_plot.plot(
-        #     pen=example_utils.pg_pen_cycler(0))
-        # self.distance_over_time_plot.setYRange(-8, 8)
+        self.distance_over_time_plot = win.addPlot(row=1, col=0)
+        self.distance_over_time_plot.showGrid(x=True, y=True)
+        self.distance_over_time_plot.setLabel("left", "Distance")
+        self.distance_over_time_plot.setLabel("bottom", "Time (s)")
+        self.distance_over_time_curve = self.distance_over_time_plot.plot(
+            pen=example_utils.pg_pen_cycler(0))
+        self.distance_over_time_plot.setYRange(-8, 8)
 
         # Plot for tracked distance over time
-        self.distance_over_time_plot2 = win.addPlot(row=1, col=1)
-        self.distance_over_time_plot2.showGrid(x=True, y=True)
-        self.distance_over_time_plot2.setLabel("left", "Distance")
-        self.distance_over_time_plot2.setLabel("bottom", "Time (s)")
-        self.distance_over_time_curve2 = self.distance_over_time_plot2.plot(
-            pen=example_utils.pg_pen_cycler(0))
-        self.distance_over_time_plot2.setYRange(0.4, 1.5)
+        # self.distance_over_time_plot2 = win.addPlot(row=1, col=1)
+        # self.distance_over_time_plot2.showGrid(x=True, y=True)
+        # self.distance_over_time_plot2.setLabel("left", "Distance")
+        # self.distance_over_time_plot2.setLabel("bottom", "Time (s)")
+        # self.distance_over_time_curve2 = self.distance_over_time_plot2.plot(
+        #     pen=example_utils.pg_pen_cycler(0))
+        # self.distance_over_time_plot2.setYRange(0.4, 1.5)
 
         self.smooth_max = example_utils.SmoothMax(self.config.sweep_rate)
         self.first = True
@@ -328,11 +328,11 @@ class PGUpdater:
     def update(self, data):
         if self.first:
             self.xs = np.linspace(*self.interval, len(data["abs"]))
-            self.ts = np.linspace(-5, 0, len(data["tracked distance over time 2"]))
+            self.ts = np.linspace(-5, 0, len(data["tracked distance over time"]))
             self.first = False
 
         self.distance_curve.setData(self.xs, np.array(data["abs"]).flatten())
         self.distance_plot.setYRange(0, self.smooth_max.update(np.amax(data["abs"])))
         self.distance_inf_line.setValue(data["tracked distance"])
-        #self.distance_over_time_curve.setData(self.ts, data["tracked distance over time"])
-        self.distance_over_time_curve2.setData(self.ts, data["tracked distance over time 2"])
+        self.distance_over_time_curve.setData(self.ts, data["tracked distance over time"])
+        #self.distance_over_time_curve2.setData(self.ts, data["tracked distance over time 2"])
