@@ -42,7 +42,7 @@ class DataAcquisition(threading.Thread):
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
-        self.config.sweep_rate = 20
+        self.config.sweep_rate = 60
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
@@ -222,8 +222,8 @@ class DataAcquisition(threading.Thread):
             #self.RTB_final_queue.put(plot_hist_pos[-1]*10)  # Gets tracked breathing in mm
             # self.RR_filtered_queue.put(plot_hist_pos[-1]*10)
 
-            # Albins phase to distance
-            discount = 1.5
+            # Albins phase to distance and wraping
+            discount = 2
             if self.tracked_phase < -np.pi + discount and self.last_phase > np.pi - discount:
                 wrapped_phase = self.tracked_phase + 2 * np.pi
             elif self.tracked_phase > np.pi - discount and self.last_phase < -np.pi + discount:
