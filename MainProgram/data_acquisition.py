@@ -91,7 +91,7 @@ class DataAcquisition(threading.Thread):
         self.run_times = 0  # number of times run in run
 
         # Graphs
-        self.plot_graphs = True
+        self.plot_graphs = False  # if plot the graphs or not
         if self.plot_graphs:
             self.pg_updater = PGUpdater(self.config)
             self.pg_process = PGProcess(self.pg_updater)
