@@ -69,7 +69,7 @@ class DataAcquisition(threading.Thread):
         self.local_peaks_index = []  # index of local peaks
         self.track_peak_index = []  # index of last tracked peaks
         self.track_peaks_average_index = None  # average of last tracked peaks
-        self.threshold = None  # threshold for removing small local peaks
+        self.threshold = 1  # threshold for removing small local peaks
         self.tracked_distance = None
         self.tracked_amplitude = None
         self.tracked_phase = None
