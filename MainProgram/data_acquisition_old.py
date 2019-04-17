@@ -126,7 +126,7 @@ class DataAcquisition(threading.Thread):
                 # put filtered data in output queue to send to SignalProcessing
                 # self.HR_filtered_queue.put(bandpass_filtered_data_HR)
                 self.RR_filtered_queue.put(bandpass_filtered_data_RR)
-                self.RTB_final_queue.put(bandpass_filtered_data_RR)
+                # self.RTB_final_queue.put(bandpass_filtered_data_RR)
 
                 # Send to app
                 # self.bluetooth_server.write_data_to_app(
@@ -229,7 +229,7 @@ class DataAcquisition(threading.Thread):
             self.hist_pos[-1] = self.hist_pos[-2] + dp
             plot_hist_pos = self.hist_pos - self.hist_pos.mean()
             #print("Plot_hist_pos: ", plot_hist_pos)
-            # self.RTB_final_queue.put(plot_hist_pos[-1]*10)  # Gets tracked breathing in mm
+            self.RTB_final_queue.put(plot_hist_pos[-1]*10)  # Gets tracked breathing in mm
             # self.RR_filtered_queue.put(plot_hist_pos[-1]*10)
 
             # Albins phase to distance and wraping
