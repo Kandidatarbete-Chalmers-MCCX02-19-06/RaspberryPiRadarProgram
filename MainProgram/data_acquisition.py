@@ -45,9 +45,6 @@ class DataAcquisition(threading.Thread):
         self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
         self.config.sweep_rate = 80  # probably 30 is the best
-        self.modulo_base = int(self.config.sweep_rate / 20)
-        print('modulo base',self.modulo_base)
-        self.run_times = 0  # number of times run in run
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
@@ -89,10 +86,16 @@ class DataAcquisition(threading.Thread):
         self.wave_length = self.c / self.freq
         self.delta_distance = 0
 
+        self.modulo_base = int(self.config.sweep_rate / 20)
+        print('modulo base', self.modulo_base)
+        self.run_times = 0  # number of times run in run
+
         # Graphs
-        self.pg_updater = PGUpdater(self.config)
-        self.pg_process = PGProcess(self.pg_updater)
-        self.pg_process.start()
+        self.plot_graphs = True
+        if self.plot_graphs:
+            self.pg_updater = PGUpdater(self.config)
+            self.pg_process = PGProcess(self.pg_updater)
+            self.pg_process.start()
         # acconeer graph
         self.low_pass_vel = 0
         self.hist_vel = np.zeros(self.number_of_time_samples)
@@ -155,7 +158,7 @@ class DataAcquisition(threading.Thread):
                         #self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
                     #done = time.time()
                     #print('send to app', (done - start)*1000)
-            if self.run_times % self.modulo_base == 0:
+            if self.plot_graphs and self.run_times % self.modulo_base == 0:
                 try:
                     self.pg_process.put_data(tracked_data)  # plot data
                 except PGProccessDiedException:
@@ -174,7 +177,7 @@ class DataAcquisition(threading.Thread):
             info, data = self.client.get_next()
         if info[-1]['sequence_number'] > self.run_times + 10:
             # to remove delay if handlig the data takes longer time than for the radar to get it
-            print("sequence diff over 10")
+            print("sequence diff over 10, removing difference")
             for i in range(0, 10):
                 self.client.get_next()
             info, data = self.client.get_next()
