@@ -147,10 +147,10 @@ class SignalProcessing:
                     # Take the mean value
                     # RR_final_queue is supposed to be the breathing rate queue that is sent to app
                     #self.RR_final_queue.put(self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR))
-                    start = time.time()
+                    #start = time.time()
                     self.bluetooth_server.write_data_to_app(self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR), 'breath rate')
-                    done = time.time()
-                    print('send to app', (done - start)*1000)
+                    #done = time.time() # verkar ta lite tid, troligtvis på grund av getMeanOfFrequency
+                    #print('send to app', (done - start)*1000)
 
                     # TODO put getMeanOfFreqArray() into queue that connects to send bluetooth values instead
                     count = 0
@@ -171,7 +171,7 @@ class SignalProcessing:
     # Used in schmittTrigger. Removes outliers and return mean value over last avOver values.
     def getMeanOfFreqArray(self, freqArray, FHighRR, FLowRR):  # remove all values > FHighRR and < FLowRR
         self.time = time.time()
-        print("Since last time {}".format(self.time - self.last_time))
+        #print("Since last time {}".format(self.time - self.last_time))
         self.last_time = self.time
         start = time.time()
         # freqArrayTemp = [x for x in freqArray if (x < FHighRR and x > FLowRR)]
