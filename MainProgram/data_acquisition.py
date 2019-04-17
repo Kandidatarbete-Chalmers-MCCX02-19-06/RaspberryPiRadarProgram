@@ -43,7 +43,7 @@ class DataAcquisition(threading.Thread):
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
-        self.config.sweep_rate = 80  # probably 30 is the best
+        self.config.sweep_rate = 30  # probably 30 is the best
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
@@ -143,8 +143,11 @@ class DataAcquisition(threading.Thread):
                 #print('filter', (done - start)*1000)
 
                 # Send to app
+                start = time.time()
                 self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
                 #self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
+                done = time.time()
+                print('send to app', (done - start)*1000)
             try:
                 self.pg_process.put_data(tracked_data)  # plot data
             except PGProccessDiedException:
@@ -170,7 +173,7 @@ class DataAcquisition(threading.Thread):
         power = amplitude * amplitude
 
         # Find and track peaks
-        if np.sum(power) > 1e-6:
+        if np.sum(power) > 1e-6: # TODO lägre värde?
             max_peak_index = np.argmax(power)
             if self.first_data:  # first time
                 self.track_peak_index.append(max_peak_index)  # global max peak
