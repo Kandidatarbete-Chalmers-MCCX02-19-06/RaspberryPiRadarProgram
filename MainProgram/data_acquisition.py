@@ -173,7 +173,7 @@ class DataAcquisition(threading.Thread):
         power = amplitude * amplitude
 
         # Find and track peaks
-        if np.sum(power) > 1e-2: # TODO lägre värde? Ursprunligen 1e-6
+        if np.sum(amplitude) > 1e-2: # TODO lägre värde? Ursprunligen 1e-6
             max_peak_index = np.argmax(power)
             if self.first_data:  # first time
                 self.track_peak_index.append(max_peak_index)  # global max peak
