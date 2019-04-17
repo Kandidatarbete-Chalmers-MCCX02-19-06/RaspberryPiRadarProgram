@@ -22,6 +22,7 @@ class DataAcquisition(threading.Thread):
         self.go = list_of_variables_for_threads["go"]
         self.list_of_variables_for_threads = list_of_variables_for_threads
         self.bluetooth_server = bluetooth_server
+        self.run_measurement = self.list_of_variables_for_threads['run_measurement']
         # Setup for collecting data from acconeer's radar files.
         self.args = example_utils.ExampleArgumentParser().parse_args()
         example_utils.config_logging(self.args)
@@ -137,17 +138,18 @@ class DataAcquisition(threading.Thread):
 
                 # put filtered data in output queue to send to SignalProcessing
                 # self.HR_filtered_queue.put(bandpass_filtered_data_HR)
-                self.RR_filtered_queue.put(bandpass_filtered_data_RR)
-                # self.RTB_final_queue.put(bandpass_filtered_data_RR)
-                #done = time.time()
-                #print('filter', (done - start)*1000)
+                if (self.run_measurement):
+                    self.RR_filtered_queue.put(bandpass_filtered_data_RR)
+                    # self.RTB_final_queue.put(bandpass_filtered_data_RR)
+                    #done = time.time()
+                    #print('filter', (done - start)*1000)
 
-                # Send to app
-                #start = time.time()
-                #self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
-                self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
-                #done = time.time()
-                #print('send to app', (done - start)*1000)
+                    # Send to app
+                    #start = time.time()
+                    #self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
+                    self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
+                    #done = time.time()
+                    #print('send to app', (done - start)*1000)
             try:
                 self.pg_process.put_data(tracked_data)  # plot data
             except PGProccessDiedException:
