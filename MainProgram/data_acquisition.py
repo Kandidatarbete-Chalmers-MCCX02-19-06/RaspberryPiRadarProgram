@@ -86,6 +86,8 @@ class DataAcquisition(threading.Thread):
         self.wave_length = self.c / self.freq
         self.delta_distance = 0
 
+        self.run_times = 0
+
         # Graphs
         self.pg_updater = PGUpdater(self.config)
         self.pg_process = PGProcess(self.pg_updater)
@@ -147,13 +149,16 @@ class DataAcquisition(threading.Thread):
                     # Send to app
                     #start = time.time()
                     #self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
-                    self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
+                    if self.run_times < 1:
+                        self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
                     #done = time.time()
                     #print('send to app', (done - start)*1000)
-            try:
-                self.pg_process.put_data(tracked_data)  # plot data
-            except PGProccessDiedException:
-                break
+            if self.run_times < 1:
+                try:
+                    self.pg_process.put_data(tracked_data)  # plot data
+                except PGProccessDiedException:
+                    break
+            self.run_times = (self.run_times + 1) % 2
             #donedone = time.time()
             #print('while time',(donedone-startstart)*1000)
         print("out of while go in radar")
