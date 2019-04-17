@@ -3,7 +3,7 @@ import threading
 import numpy as np
 from scipy import signal
 import queue
-
+#EMIL
 import pyqtgraph as pg
 from PyQt5 import QtCore
 
