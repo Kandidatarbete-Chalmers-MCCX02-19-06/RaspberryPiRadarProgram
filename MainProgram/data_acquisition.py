@@ -144,8 +144,8 @@ class DataAcquisition(threading.Thread):
 
                 # Send to app
                 #start = time.time()
-                #self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
-                self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
+                self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
+                #self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
                 #done = time.time()
                 #print('send to app', (done - start)*1000)
             try:
@@ -255,7 +255,7 @@ class DataAcquisition(threading.Thread):
             # self.RR_filtered_queue.put(plot_hist_pos[-1]*10)
 
             # Phase to distance and wraping
-            discount = 2
+            discount = 2 # TODO optimize for movements
             if self.tracked_phase < -np.pi + discount and self.last_phase > np.pi - discount:
                 wrapped_phase = self.tracked_phase + 2 * np.pi
             elif self.tracked_phase > np.pi - discount and self.last_phase < -np.pi + discount:
