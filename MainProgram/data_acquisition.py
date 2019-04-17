@@ -45,8 +45,9 @@ class DataAcquisition(threading.Thread):
         self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
         self.config.sweep_rate = 80  # probably 30 is the best
-        self.modulo_base = np.floor(self.config.sweep_rate / 20)
-        print(self.modulo_base)
+        self.modulo_base = int(self.config.sweep_rate / 20)
+        print('modulo base',self.modulo_base)
+        self.run_times = 0  # number of times run in run
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
@@ -87,9 +88,6 @@ class DataAcquisition(threading.Thread):
         self.freq = 60 * 1000000000
         self.wave_length = self.c / self.freq
         self.delta_distance = 0
-
-        self.run_times_modulo = 0
-        self.run_times = 0
 
         # Graphs
         self.pg_updater = PGUpdater(self.config)
@@ -175,8 +173,9 @@ class DataAcquisition(threading.Thread):
         else:
             info, data = self.client.get_next()
         if info[-1]['sequence_number'] > self.run_times + 10:
+            # to remove delay if handlig the data takes longer time than for the radar to get it
             print("sequence diff over 10")
-            for i in range(0,10):
+            for i in range(0, 10):
                 self.client.get_next()
             info, data = self.client.get_next()
             self.run_times = info[-1]['sequence_number']
