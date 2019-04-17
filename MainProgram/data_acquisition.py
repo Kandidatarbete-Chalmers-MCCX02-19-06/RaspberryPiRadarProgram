@@ -175,7 +175,7 @@ class DataAcquisition(threading.Thread):
         else:
             info, data = self.client.get_next()
         print(type(info[-1]))
-        if info[-1] > self.run_times + 50:
+        if info[-1]['sequence_number'] > self.run_times + 50:
             print("seqcuence doff over 50")
 
         return data
