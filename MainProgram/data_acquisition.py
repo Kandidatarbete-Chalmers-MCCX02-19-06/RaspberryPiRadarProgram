@@ -281,7 +281,7 @@ class DataAcquisition(threading.Thread):
                 #self.relative_distance = self.relative_distance - self.old_relative_distance_values.mean()/100
                 #print('new relative distance: ',self.relative_distance)
 
-            if len(self.old_relative_distance_values) > 300:
+            if len(self.old_relative_distance_values) > 1000:
                 self.old_relative_distance_values.pop(0)
 
             # Tracked data to return and plot
