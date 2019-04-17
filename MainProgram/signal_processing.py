@@ -123,13 +123,14 @@ class SignalProcessing:
             # to be able to use the same value in the whole loop
             trackedRRvector[countHys - 1] = self.RR_filtered_queue.get()
             # self.RTB_final_queue.put(trackedRRvector[countHys - 1])
+            print('smitt loop')
 
             if countHys == self.sample_freq * Tc:
                 Hcut = np.sqrt(np.mean(np.square(trackedRRvector)))*0.7  # rms of trackedRRvector
                 #Hcut = 0.002
                 Lcut = -Hcut
-                print("Hcut: ", Hcut)       # se vad hysteres blir
-                print("The last value of vector {}".format(trackedRRvector[countHys-1]))
+                #print("Hcut: ", Hcut)       # se vad hysteres blir
+                #print("The last value of vector {}".format(trackedRRvector[countHys-1]))
                 # TODO Hinder så att insvängningstiden för filtret hanteras
                 countHys = 0
 
