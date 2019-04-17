@@ -268,10 +268,10 @@ class DataAcquisition(threading.Thread):
             self.last_phase = self.tracked_phase
 
             self.old_relative_distance_values.append(self.relative_distance)
-            if len(self.old_relative_distance_values) > 100:
-                print('mean of old values: ',- np.mean(self.old_relative_distance_values))
+            if len(self.old_relative_distance_values) > 1000:
+                #print('mean of old values: ',- np.mean(self.old_relative_distance_values))
                 self.relative_distance = self.relative_distance - np.mean(self.old_relative_distance_values)
-                print('new relative distance: ',self.relative_distance)
+                #print('new relative distance: ',self.relative_distance)
 
             if len(self.old_relative_distance_values) > 1000:
                 self.old_relative_distance_values.pop(0)
