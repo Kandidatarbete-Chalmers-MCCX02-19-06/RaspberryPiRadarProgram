@@ -176,10 +176,11 @@ class DataAcquisition(threading.Thread):
             info, data = self.client.get_next()
         if info[-1]['sequence_number'] > self.run_times + 50:
             print("sequence diff over 50")
-            for i in range(1,50):
+            for i in range(0,50):
                 print(i)
                 self.client.get_next()
-            self.run_times , data = self.client.get_next()
+            info, data = self.client.get_next()
+            self.run_times = info[-1]['sequence_number']
 
 
         return data
