@@ -152,17 +152,17 @@ class DataAcquisition(threading.Thread):
 
                     # Send to app
                     #start = time.time()
-                    if self.run_times_modulo < 1:
+                    if self.run_times % self.modulo_base == 0:
                         self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
                         #self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
                     #done = time.time()
                     #print('send to app', (done - start)*1000)
-            if self.run_times_modulo < 1:
+            if self.run_times % self.modulo_base == 0:
                 try:
                     self.pg_process.put_data(tracked_data)  # plot data
                 except PGProccessDiedException:
                     break
-            self.run_times_modulo = (self.run_times_modulo + 1) % self.modulo_base
+            #self.run_times_modulo = (self.run_times_modulo + 1) % self.modulo_base
             #donedone = time.time()
             #print('while time',(donedone-startstart)*1000)
         print("out of while go in radar")
@@ -174,7 +174,8 @@ class DataAcquisition(threading.Thread):
             info, data = self.client.get_next()
         else:
             info, data = self.client.get_next()
-        print(info)
+        if info["sequence_number"] > self.run_times + 50:
+            print("seqcuence doff over 50")
 
         return data
 
