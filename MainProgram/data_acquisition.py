@@ -271,7 +271,7 @@ class DataAcquisition(threading.Thread):
             self.old_relative_distance_values.append(self.relative_distance)
             if len(self.old_relative_distance_values) > 0:
                 #self.relative_distance = self.relative_distance - np.mean(self.old_relative_distance_values)/1000
-                self.old_relative_distance_values[:] = self.old_relative_distance_values[:] - np.mean(self.old_relative_distance_values)*100
+                self.old_relative_distance_values[:] = self.old_relative_distance_values[:] - np.mean(self.old_relative_distance_values)
                 self.relative_distance = self.old_relative_distance_values[-1]
             if len(self.old_relative_distance_values) > 1000:
                 self.old_relative_distance_values.pop(0)
