@@ -222,7 +222,7 @@ class DataAcquisition(threading.Thread):
             self.tracked_phase = np.angle(data[self.track_peaks_average_index])
         else:
             #track_peak_relative_position = 0
-            self.tracked_distance = None
+            self.tracked_distance = 0
             self.tracked_phase = 0
             self.tracked_amplitude = 0
 
@@ -341,6 +341,7 @@ class PGUpdater:
 
         self.distance_curve.setData(self.xs, np.array(data["abs"]).flatten())
         self.distance_plot.setYRange(0, self.smooth_max.update(np.amax(data["abs"])))
-        self.distance_inf_line.setValue(data["tracked distance"])
+        if data["tracked distance"] != 0:
+            self.distance_inf_line.setValue(data["tracked distance"])
         #self.distance_over_time_curve.setData(self.ts, data["tracked distance over time"])
         #self.distance_over_time_curve2.setData(self.ts, data["tracked distance over time 2"])
