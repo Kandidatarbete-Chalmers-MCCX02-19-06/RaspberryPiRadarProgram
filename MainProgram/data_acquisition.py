@@ -44,7 +44,7 @@ class DataAcquisition(threading.Thread):
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
-        self.config.sweep_rate = 60  # probably 30 is the best
+        self.config.sweep_rate = 80  # probably 30 is the best
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
@@ -158,7 +158,7 @@ class DataAcquisition(threading.Thread):
                     self.pg_process.put_data(tracked_data)  # plot data
                 except PGProccessDiedException:
                     break
-            self.run_times = (self.run_times + 1) % 2
+            self.run_times = (self.run_times + 1) % 4
             #donedone = time.time()
             #print('while time',(donedone-startstart)*1000)
         print("out of while go in radar")
