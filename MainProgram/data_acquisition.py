@@ -44,7 +44,7 @@ class DataAcquisition(threading.Thread):
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
-        self.config.sweep_rate = 100  # probably 30 is the best
+        self.config.sweep_rate = 20  # probably 30 is the best, can go up to 100 without graph
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
@@ -91,7 +91,7 @@ class DataAcquisition(threading.Thread):
         self.run_times = 0  # number of times run in run
 
         # Graphs
-        self.plot_graphs = False  # if plot the graphs or not
+        self.plot_graphs = True  # if plot the graphs or not
         if self.plot_graphs:
             self.pg_updater = PGUpdater(self.config)
             self.pg_process = PGProcess(self.pg_updater)
@@ -300,7 +300,7 @@ class DataAcquisition(threading.Thread):
             if len(self.old_relative_distance_values) > 1000:
                 self.old_relative_distance_values.pop(0)
 
-            if self.tracked_amplitude < 1e-2:  # don't use the data if only noise were found
+            if self.tracked_amplitude < 1.5e-2:  # don't use the data if only noise were found TODO improve
                 self.relative_distance = 0
 
             # Tracked data to return and plot
