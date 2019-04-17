@@ -30,7 +30,7 @@ class SignalProcessing:
         # self.heart_rate_thread.start()
         # Starta schmitt
         self.schmittTrigger_thread = threading.Thread(target=self.schmittTrigger)
-        #self.schmittTrigger_thread.start()
+        self.schmittTrigger_thread.start()
 
         self.last_time = time.time()
         self.time = time.time()

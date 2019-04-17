@@ -220,6 +220,8 @@ class DataAcquisition(threading.Thread):
                 0] + self.track_peaks_average_index / len(data) * self.config.range_interval[1]
             # Tracked amplitude is absolute value of data for the tracked index
             self.tracked_amplitude = np.abs(data[self.track_peaks_average_index])
+            if self.tracked_amplitude < 1e-2:
+                self.tracked_amplitude = 0
             # Tracked phase is the angle between I and Q in data for tracked index
             self.tracked_phase = np.angle(data[self.track_peaks_average_index])
         else:
