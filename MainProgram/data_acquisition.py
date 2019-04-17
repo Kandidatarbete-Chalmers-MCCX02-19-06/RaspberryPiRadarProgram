@@ -44,7 +44,9 @@ class DataAcquisition(threading.Thread):
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
-        self.config.sweep_rate = 10  # probably 30 is the best
+        self.config.sweep_rate = 80  # probably 30 is the best
+        self.modulo_base = np.floor(self.config.sweep_rate / 20)
+        print(self.modulo_base)
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
@@ -86,6 +88,7 @@ class DataAcquisition(threading.Thread):
         self.wave_length = self.c / self.freq
         self.delta_distance = 0
 
+        self.run_times_modulo = 0
         self.run_times = 0
 
         # Graphs
@@ -112,6 +115,7 @@ class DataAcquisition(threading.Thread):
         self.client.start_streaming()  # Starts Acconeers streaming server
         # runtimeold=time.time()
         while self.go:
+            self.run_times = self.run_times + 1
             #startstart = time.time()
             #runtime = time.time()
             # print('runtime',(runtime-runtimeold)*1000)
@@ -148,17 +152,17 @@ class DataAcquisition(threading.Thread):
 
                     # Send to app
                     #start = time.time()
-                    if self.run_times < 1:
+                    if self.run_times_modulo < 1:
                         self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
                         #self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
                     #done = time.time()
                     #print('send to app', (done - start)*1000)
-            if self.run_times < 1:
+            if self.run_times_modulo < 1:
                 try:
                     self.pg_process.put_data(tracked_data)  # plot data
                 except PGProccessDiedException:
                     break
-            self.run_times = (self.run_times + 1) % 4
+            self.run_times_modulo = (self.run_times_modulo + 1) % self.modulo_base
             #donedone = time.time()
             #print('while time',(donedone-startstart)*1000)
         print("out of while go in radar")
