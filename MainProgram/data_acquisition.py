@@ -259,7 +259,7 @@ class DataAcquisition(threading.Thread):
             # self.RR_filtered_queue.put(plot_hist_pos[-1]*10)
 
             # Phase to distance and wraping
-            discount = 2 # TODO optimize for movements
+            discount = 1 # TODO optimize for movements
             if self.tracked_phase < -np.pi + discount and self.last_phase > np.pi - discount:
                 wrapped_phase = self.tracked_phase + 2 * np.pi
             elif self.tracked_phase > np.pi - discount and self.last_phase < -np.pi + discount:
