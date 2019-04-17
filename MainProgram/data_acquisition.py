@@ -225,6 +225,8 @@ class DataAcquisition(threading.Thread):
             self.tracked_distance = 0
             self.tracked_phase = 0
             self.tracked_amplitude = 0
+            if self.first_data:  # first time
+                self.track_peaks_average_index = 0
 
         # Plots
         if self.first_data:
