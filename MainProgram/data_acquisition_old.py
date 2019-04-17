@@ -43,7 +43,7 @@ class DataAcquisition(threading.Thread):
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
-        self.config.sweep_rate = 20  # probably 30 is the best
+        self.config.sweep_rate = 20
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
@@ -79,7 +79,7 @@ class DataAcquisition(threading.Thread):
         self.track_peak_relative_position = None
         self.relative_distance = 0
         self.last_phase = 0
-        #self.old_relative_distance_values = []
+        self.old_relative_distance_values = []
         self.c = 2.998 * 100000000
         self.freq = 60 * 1000000000
         self.wave_length = self.c / self.freq
@@ -107,51 +107,35 @@ class DataAcquisition(threading.Thread):
 
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
-        # runtimeold=time.time()
         while self.go:
-            #startstart = time.time()
-            #runtime = time.time()
-            # print('runtime',(runtime-runtimeold)*1000)
-            #runtimeold = runtime
             # This data is an 1D array in terminal print, not in Python script however....
-            #start = time.time()
             data = self.get_data()
-            #done = time.time()
-            #print('get_data',(done - start)*1000)
-            #start = time.time()
             tracked_data = self.tracking(data)  # processing data and tracking peaks
-            #done = time.time()
-            #print('tracking', (done - start)*1000)
             #print("Amplitude phase: ", str(tracked_data["tracked phase"]))
             # Test with acconeer filter for schmitt.
             if tracked_data is not None:
-                #start = time.time()
                 #self.RTB_final_queue.put(tracked_data["relative distance"])
                 # filter the data
-                highpass_filtered_data_HR = self.highpass_HR.filter(
-                    tracked_data["relative distance"])
-                bandpass_filtered_data_HR = self.lowpass_HR.filter(highpass_filtered_data_HR)
+                # highpass_filtered_data_HR = self.highpass_HR.filter(
+                #    tracked_data["relative distance"])
+                #bandpass_filtered_data_HR = self.lowpass_HR.filter(highpass_filtered_data_HR)
                 highpass_filtered_data_RR = self.highpass_RR.filter(
-                    tracked_data["relative distance"])  # TODO: Ändra till highpass_filtered
+                    tracked_data["relative distance"])
                 bandpass_filtered_data_RR = self.lowpass_RR.filter(highpass_filtered_data_RR)
 
                 # put filtered data in output queue to send to SignalProcessing
                 # self.HR_filtered_queue.put(bandpass_filtered_data_HR)
                 self.RR_filtered_queue.put(bandpass_filtered_data_RR)
-                # self.RTB_final_queue.put(bandpass_filtered_data_RR)
-                #done = time.time()
-                #print('filter', (done - start)*1000)
+                self.RTB_final_queue.put(bandpass_filtered_data_RR)
 
                 # Send to app
-                #self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
-                self.bluetooth_server.write_data_to_app(
-                    bandpass_filtered_data_RR, 'real time breath')
+                # self.bluetooth_server.write_data_to_app(
+                #    tracked_data["relative distance"], 'real time breath')
+                #self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
             try:
                 self.pg_process.put_data(tracked_data)  # plot data
             except PGProccessDiedException:
                 break
-            #donedone = time.time()
-            #print('while time',(donedone-startstart)*1000)
         print("out of while go in radar")
         self.client.disconnect()
         self.pg_process.close()
@@ -235,50 +219,44 @@ class DataAcquisition(threading.Thread):
             # - np.mean(self.tracked_distance_over_time)
             self.tracked_distance_over_time[-1] = self.tracked_distance
 
-            # com_idx = int(self.track_peak_relative_position * data_length)
-            # delta_angle = np.angle(data[com_idx] * np.conj(self.last_data[com_idx]))
-            # vel = self.f * 2.5 * delta_angle / (2 * np.pi)
-            # self.low_pass_vel = self.low_pass_const * vel + \
-            #     (1 - self.low_pass_const) * self.low_pass_vel
-            # dp = self.low_pass_vel / self.f
-            # self.hist_pos = np.roll(self.hist_pos, -1)
-            # self.hist_pos[-1] = self.hist_pos[-2] + dp
-            # plot_hist_pos = self.hist_pos - self.hist_pos.mean()
-
-            plot_hist_pos = None
-            # Idio
-
+            com_idx = int(self.track_peak_relative_position * data_length)
+            delta_angle = np.angle(data[com_idx] * np.conj(self.last_data[com_idx]))
+            vel = self.f * 2.5 * delta_angle / (2 * np.pi)
+            self.low_pass_vel = self.low_pass_const * vel + \
+                (1 - self.low_pass_const) * self.low_pass_vel
+            dp = self.low_pass_vel / self.f
+            self.hist_pos = np.roll(self.hist_pos, -1)
+            self.hist_pos[-1] = self.hist_pos[-2] + dp
+            plot_hist_pos = self.hist_pos - self.hist_pos.mean()
             #print("Plot_hist_pos: ", plot_hist_pos)
             # self.RTB_final_queue.put(plot_hist_pos[-1]*10)  # Gets tracked breathing in mm
             # self.RR_filtered_queue.put(plot_hist_pos[-1]*10)
 
             # Albins phase to distance and wraping
-            # discount = 2
-            # if self.tracked_phase < -np.pi + discount and self.last_phase > np.pi - discount:
-            #     wrapped_phase = self.tracked_phase + 2 * np.pi
-            # elif self.tracked_phase > np.pi - discount and self.last_phase < -np.pi + discount:
-            #     wrapped_phase = self.tracked_phase - 2 * np.pi
-            # else:
-            #     wrapped_phase = self.tracked_phase
-            # self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi) * self.low_pass_const + \
-            #                  (1 - self.low_pass_const) * self.delta_distance
-            # self.relative_distance = self.relative_distance + self.delta_distance
-            # self.last_phase = self.tracked_phase
+            discount = 2
+            if self.tracked_phase < -np.pi + discount and self.last_phase > np.pi - discount:
+                wrapped_phase = self.tracked_phase + 2 * np.pi
+            elif self.tracked_phase > np.pi - discount and self.last_phase < -np.pi + discount:
+                wrapped_phase = self.tracked_phase - 2 * np.pi
+            else:
+                wrapped_phase = self.tracked_phase
+            #_, wrapped_phase = np.unwrap([self.last_phase,self.tracked_phase])
+            self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi) * self.low_pass_const + \
+                (1 - self.low_pass_const) * self.delta_distance
 
-            # self.old_relative_distance_values.append(self.relative_distance)
+            #self.relative_distance = self.relative_distance - self.delta_distance
+            #self.last_phase = self.tracked_phase
+            # if len(self.old_relative_distance_values) != 0:
+            #    self.delta_distance = self.delta_distance - np.average(self.old_relative_distance_values)
+            # self.old_relative_distance_values.append(self.delta_distance)
             # if len(self.old_relative_distance_values) > 100:
-            #     print('mean of old values: ',- np.mean(self.old_relative_distance_values))
-            #     self.relative_distance = self.relative_distance - np.mean(self.old_relative_distance_values)
-            #     print('new relative distance: ',self.relative_distance)
-            #
-            # if len(self.old_relative_distance_values) > 1000:
-            #     self.old_relative_distance_values.pop(0)
+            #    self.old_relative_distance_values.pop(0)
 
             # Tracked data to return and plot
             self.tracked_data = {"tracked distance": self.tracked_distance,
                                  "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase,
                                  "abs": self.low_pass_amplitude, "tracked distance over time": plot_hist_pos,
-                                 "tracked distance over time 2": self.tracked_distance_over_time, "relative distance": -self.relative_distance*1000}
+                                 "tracked distance over time 2": self.tracked_distance_over_time, "relative distance": self.relative_distance*1000}
         self.last_data = data
         self.first_data = False
         return self.tracked_data
@@ -309,22 +287,22 @@ class PGUpdater:
         self.distance_plot.addItem(self.distance_inf_line)
 
         # Dynamic plot to show breath over time
-        # self.distance_over_time_plot = win.addPlot(row=1, col=0)
-        # self.distance_over_time_plot.showGrid(x=True, y=True)
-        # self.distance_over_time_plot.setLabel("left", "Distance")
-        # self.distance_over_time_plot.setLabel("bottom", "Time (s)")
-        # self.distance_over_time_curve = self.distance_over_time_plot.plot(
-        #     pen=example_utils.pg_pen_cycler(0))
-        # self.distance_over_time_plot.setYRange(-8, 8)
+        self.distance_over_time_plot = win.addPlot(row=1, col=0)
+        self.distance_over_time_plot.showGrid(x=True, y=True)
+        self.distance_over_time_plot.setLabel("left", "Distance")
+        self.distance_over_time_plot.setLabel("bottom", "Time (s)")
+        self.distance_over_time_curve = self.distance_over_time_plot.plot(
+            pen=example_utils.pg_pen_cycler(0))
+        self.distance_over_time_plot.setYRange(-8, 8)
 
         # Plot for tracked distance over time
-        # self.distance_over_time_plot2 = win.addPlot(row=1, col=1)
-        # self.distance_over_time_plot2.showGrid(x=True, y=True)
-        # self.distance_over_time_plot2.setLabel("left", "Distance")
-        # self.distance_over_time_plot2.setLabel("bottom", "Time (s)")
-        # self.distance_over_time_curve2 = self.distance_over_time_plot2.plot(
-        #     pen=example_utils.pg_pen_cycler(0))
-        # self.distance_over_time_plot2.setYRange(0.4, 1.5)
+        self.distance_over_time_plot2 = win.addPlot(row=1, col=1)
+        self.distance_over_time_plot2.showGrid(x=True, y=True)
+        self.distance_over_time_plot2.setLabel("left", "Distance")
+        self.distance_over_time_plot2.setLabel("bottom", "Time (s)")
+        self.distance_over_time_curve2 = self.distance_over_time_plot2.plot(
+            pen=example_utils.pg_pen_cycler(0))
+        self.distance_over_time_plot2.setYRange(0.4, 1.5)
 
         self.smooth_max = example_utils.SmoothMax(self.config.sweep_rate)
         self.first = True
@@ -332,11 +310,11 @@ class PGUpdater:
     def update(self, data):
         if self.first:
             self.xs = np.linspace(*self.interval, len(data["abs"]))
-            #self.ts = np.linspace(-5, 0, len(data["tracked distance over time"]))
+            self.ts = np.linspace(-5, 0, len(data["tracked distance over time"]))
             self.first = False
 
         self.distance_curve.setData(self.xs, np.array(data["abs"]).flatten())
         self.distance_plot.setYRange(0, self.smooth_max.update(np.amax(data["abs"])))
         self.distance_inf_line.setValue(data["tracked distance"])
-        #self.distance_over_time_curve.setData(self.ts, data["tracked distance over time"])
-        #self.distance_over_time_curve2.setData(self.ts, data["tracked distance over time 2"])
+        self.distance_over_time_curve.setData(self.ts, data["tracked distance over time"])
+        self.distance_over_time_curve2.setData(self.ts, data["tracked distance over time 2"])

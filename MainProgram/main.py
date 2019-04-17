@@ -7,7 +7,7 @@ import queue
 
 #import Radar
 import bluetooth_server_class        # import bluetooth class
-import data_acquisition      # Import class which collects and filters relevant data.
+import data_acquisition_old      # Import class which collects and filters relevant data.
 import signal_processing
 # import bluetooth_app
 
@@ -26,10 +26,10 @@ def main():
     #os.system('gnome-terminal -x ./evk_service_linux_armv7l_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c')
 
     #p = os.popen('sudo /home/pi/Documents ls')
-    #print(p.read()) # fungerar
+    # print(p.read()) # fungerar
 
     #p = os.popen('sudo lxterminal -e ./home/pi/Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c')
-    #print(p.read())
+    # print(p.read())
 
     # process = subprocess.Popen(
     #     'lxterminal -e "./home/pi/Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c"',
@@ -37,7 +37,7 @@ def main():
     #     stderr=None,
     #     shell=True
     # )
-    #subprocess.call(["./home/pi/Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c"],shell=True)
+    # subprocess.call(["./home/pi/Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c"],shell=True)
 
     # process = subprocess.Popen(
     #     'lxterminal -e "ls -ls"',
@@ -67,14 +67,16 @@ def main():
     # radar.start()
     bluetooth_server = bluetooth_server_class.BluetoothServer(list_of_variables_for_threads)
     #bluetooth_server = None
-    dataAcquisition = data_acquisition.DataAcquisition(list_of_variables_for_threads, bluetooth_server)
+    dataAcquisition = data_acquisition_old.DataAcquisition(
+        list_of_variables_for_threads, bluetooth_server)
     dataAcquisition.start()
-    signal_processings = signal_processing.SignalProcessing(list_of_variables_for_threads, bluetooth_server)
+    signal_processings = signal_processing.SignalProcessing(
+        list_of_variables_for_threads, bluetooth_server)
 
     while list_of_variables_for_threads.get('go'):
         time.sleep(1)
     ##bluetooth_servers = bluetooth_app.bluetooth_app(go)
-    #bluetooth_servers.app_data()
+    # bluetooth_servers.app_data()
     bluetooth_server.connect_device_thread.join()
 
     print('Bluetooth server is closed')
