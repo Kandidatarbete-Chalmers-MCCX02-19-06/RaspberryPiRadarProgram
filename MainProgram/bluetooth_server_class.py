@@ -45,11 +45,11 @@ class BluetoothServer:
 
     def app_data(self):  # The main loop which takes data from processing and sends data to all clients
         while self.go:
-            #while len(self.client_list) == 0:
-                time.sleep(1)
+            # while len(self.client_list) == 0:
+            #    time.sleep(1)
             #    continue
-            #self.schmitt_to_app()
-            #self.real_time_breating_to_app()
+            # self.schmitt_to_app()
+            self.real_time_breating_to_app()
             # data = self.add_data(2)  # TEMP: Makes random data for testing of communication
             # data_pulse, data_breath = data.split(' ')  # Splits data in pulse and heart rate
             # self.write_data_to_app(data_pulse, 'heart rate')  # Sends pulse to app
@@ -72,8 +72,8 @@ class BluetoothServer:
 
     def real_time_breating_to_app(self):
         try:
-            while self.RTB_final_queue.empty() and self.go:
-                time.sleep(0.005)
+            # while self.RTB_final_queue.empty() and self.go:
+            #    time.sleep(0.005)
             # TEMP: Takes data from filtered resp.rate
             real_time_breating_to_app = self.RTB_final_queue.get_nowait()
             #print("Real time breathing to app {}".format(real_time_breating_to_app))
@@ -86,7 +86,7 @@ class BluetoothServer:
             print(len(self.RR_final_queue))
 
     def connect_device(self):
-        #os.system("echo 'power on\nquit' | bluetoothctl")  # Startup for bluetooth on rpi TODO
+        # os.system("echo 'power on\nquit' | bluetoothctl")  # Startup for bluetooth on rpi TODO
         thread_list = []  # List which adds devices
         self.server.listen(7)  # Amount of devices that can simultaniously recive data.
         while self.go:
@@ -141,7 +141,7 @@ class BluetoothServer:
                                   str(self.address_list[self.client_list.index(client)]))
                         self.server.close()
                         print("server is now closed")
-                        #os.system("echo 'power off\nquit' | bluetoothctl") TODO
+                        # os.system("echo 'power off\nquit' | bluetoothctl") TODO
                     except Exception as error:
                         print("exception in for-loop in read_device: " + str(error))
 
