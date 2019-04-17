@@ -35,6 +35,8 @@ class SignalProcessing:
         self.last_time = time.time()
         self.time = time.time()
 
+        self.time_when_sent_last_value = None
+
     def heart_rate(self):
         T_resolution = 30
         overlap = 90
@@ -121,6 +123,9 @@ class SignalProcessing:
 
         while self.go:
             # to be able to use the same value in the whole loop
+            if self.time_when_sent_last_value is not None and (time.time() - self.time_when_sent_last_value > 10):
+                self.bluetooth_server.write_data_to_app(0,'breath rate')
+                self.time_when_sent_last_value = time.time()
             trackedRRvector[countHys - 1] = self.RR_filtered_queue.get()
             # self.RTB_final_queue.put(trackedRRvector[countHys - 1])
 
@@ -149,6 +154,7 @@ class SignalProcessing:
                     #self.RR_final_queue.put(self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR))
                     #start = time.time()
                     self.bluetooth_server.write_data_to_app(self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR), 'breath rate')
+                    self.time_when_sent_last_value = time.time()
                     #done = time.time() # verkar ta lite tid, troligtvis på grund av getMeanOfFrequency
                     #print('send to app', (done - start)*1000)
 
