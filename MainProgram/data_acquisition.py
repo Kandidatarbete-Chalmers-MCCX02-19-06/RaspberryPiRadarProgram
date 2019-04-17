@@ -79,7 +79,7 @@ class DataAcquisition(threading.Thread):
         self.track_peak_relative_position = None
         self.relative_distance = 0
         self.last_phase = 0
-        self.old_relative_distance_values = np.zeros(1000)
+        self.old_relative_distance_values = []
         self.c = 2.998 * 100000000
         self.freq = 60 * 1000000000
         self.wave_length = self.c / self.freq
@@ -267,22 +267,22 @@ class DataAcquisition(threading.Thread):
 
             self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi) * self.low_pass_const + \
                              (1 - self.low_pass_const) * self.delta_distance
-            #self.relative_distance = self.relative_distance - self.delta_distance
+            self.relative_distance = self.relative_distance - self.delta_distance
             self.last_phase = self.tracked_phase
 
 
-            self.old_relative_distance_values = np.roll(self.old_relative_distance_values,-1)
-            self.old_relative_distance_values[-1] = self.old_relative_distance_values[-2] + self.delta_distance
+            #self.old_relative_distance_values = np.roll(self.old_relative_distance_values,-1)
+            #self.old_relative_distance_values[-1] = self.old_relative_distance_values[-2] + self.delta_distance
 
-            #self.old_relative_distance_values.append(self.relative_distance)
-            if len(self.old_relative_distance_values) > 100:
+            self.old_relative_distance_values.append(self.relative_distance)
+            if len(self.old_relative_distance_values) > 1000:
                 #print('mean of old values: ',- np.mean(self.old_relative_distance_values))
-                #self.relative_distance = self.relative_distance - np.mean(self.old_relative_distance_values)
-                self.relative_distance = self.relative_distance - self.old_relative_distance_values.mean()/100
+                self.relative_distance = self.relative_distance - np.mean(self.old_relative_distance_values)/100
+                #self.relative_distance = self.relative_distance - self.old_relative_distance_values.mean()/100
                 #print('new relative distance: ',self.relative_distance)
 
-            #if len(self.old_relative_distance_values) > 2000:
-            #    self.old_relative_distance_values.pop(0)
+            if len(self.old_relative_distance_values) > 2000:
+                self.old_relative_distance_values.pop(0)
 
             # Tracked data to return and plot
             self.tracked_data = {"tracked distance": self.tracked_distance,
