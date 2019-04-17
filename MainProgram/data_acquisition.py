@@ -279,7 +279,7 @@ class DataAcquisition(threading.Thread):
                 #print('mean of old values: ',- np.mean(self.old_relative_distance_values))
                 #self.relative_distance = self.relative_distance - np.mean(self.old_relative_distance_values)/1000
                 self.old_relative_distance_values = self.old_relative_distance_values - np.mean(self.old_relative_distance_values)
-                self.relative_distance = self.old_relative_distance_values(-1)
+                self.relative_distance = self.old_relative_distance_values[-1]
 
 
                 #self.relative_distance = self.relative_distance - self.old_relative_distance_values.mean()/100
