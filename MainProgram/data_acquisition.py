@@ -282,6 +282,9 @@ class DataAcquisition(threading.Thread):
             if len(self.old_relative_distance_values) > 1000:
                 self.old_relative_distance_values.pop(0)
 
+            if self.tracked_distance == 0:  # don't use the data if only noise were found
+                self.relative_distance = 0
+
             # Tracked data to return and plot
             self.tracked_data = {"tracked distance": self.tracked_distance,
                                  "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase,

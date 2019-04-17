@@ -35,7 +35,7 @@ class SignalProcessing:
         self.last_time = time.time()
         self.time = time.time()
 
-        self.time_when_sent_last_value = None
+        self.time_when_sent_last_value = None  # to check time passed after sent a value
 
     def heart_rate(self):
         T_resolution = 30
@@ -124,6 +124,7 @@ class SignalProcessing:
         while self.go:
             # to be able to use the same value in the whole loop
             if self.time_when_sent_last_value is not None and (time.time() - self.time_when_sent_last_value > 10):
+                # sends zero as breath rate if no value was found the last ten seconds
                 self.bluetooth_server.write_data_to_app(0,'breath rate')
                 self.time_when_sent_last_value = time.time()
             trackedRRvector[countHys - 1] = self.RR_filtered_queue.get()
