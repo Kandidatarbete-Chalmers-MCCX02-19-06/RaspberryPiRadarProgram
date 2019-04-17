@@ -223,6 +223,8 @@ class DataAcquisition(threading.Thread):
         else:
             #track_peak_relative_position = 0
             self.tracked_distance = 0
+            self.tracked_phase = 0
+            self.tracked_amplitude = 0
 
         # Plots
         if self.first_data:
