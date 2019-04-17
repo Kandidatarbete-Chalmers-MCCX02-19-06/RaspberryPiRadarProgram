@@ -158,7 +158,7 @@ class DataAcquisition(threading.Thread):
                     self.pg_process.put_data(tracked_data)  # plot data
                 except PGProccessDiedException:
                     break
-            self.run_times = (self.run_times + 1) % 2
+            self.run_times = (self.run_times + 1) % 5
             #donedone = time.time()
             #print('while time',(donedone-startstart)*1000)
         print("out of while go in radar")
