@@ -147,7 +147,10 @@ class SignalProcessing:
                     # Take the mean value
                     # RR_final_queue is supposed to be the breathing rate queue that is sent to app
                     #self.RR_final_queue.put(self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR))
+                    start = time.time()
                     self.bluetooth_server.write_data_to_app(self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR), 'breath rate')
+                    done = time.time()
+                    print('send to app', (done - start)*1000)
 
                     # TODO put getMeanOfFreqArray() into queue that connects to send bluetooth values instead
                     count = 0
