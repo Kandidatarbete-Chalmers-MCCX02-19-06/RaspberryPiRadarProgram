@@ -222,7 +222,7 @@ class DataAcquisition(threading.Thread):
             self.tracked_phase = np.angle(data[self.track_peaks_average_index])
         else:
             #track_peak_relative_position = 0
-            self.tracked_distance = 0
+            self.tracked_distance = None
             self.tracked_phase = 0
             self.tracked_amplitude = 0
 
