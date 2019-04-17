@@ -7,7 +7,7 @@ import queue
 
 #import Radar
 import bluetooth_server_class        # import bluetooth class
-import data_acquisition_old      # Import class which collects and filters relevant data.
+import data_acquisition      # Import class which collects and filters relevant data.
 import signal_processing
 # import bluetooth_app
 
@@ -67,7 +67,7 @@ def main():
     # radar.start()
     bluetooth_server = bluetooth_server_class.BluetoothServer(list_of_variables_for_threads)
     #bluetooth_server = None
-    dataAcquisition = data_acquisition_old.DataAcquisition(
+    dataAcquisition = data_acquisition.DataAcquisition(
         list_of_variables_for_threads, bluetooth_server)
     dataAcquisition.start()
     signal_processings = signal_processing.SignalProcessing(
