@@ -79,7 +79,8 @@ class DataAcquisition(threading.Thread):
         self.track_peak_relative_position = None  # used for plotting
         self.relative_distance = 0  # the relative distance that is measured from phase differences (m)
         self.last_phase = 0  # tracked phase from previous loop
-        self.old_relative_distance_values = []  # saves old values to remove bias in real time breathing plot
+        #self.old_relative_distance_values = []  # saves old values to remove bias in real time breathing plot
+        self.old_relative_distance_values = np.zeros(1000)
         self.c = 2.998e8  # light speed (m/s)
         self.freq = 60e9  # radar frequency (Hz)
         self.wave_length = self.c / self.freq  # wave length of the radar
@@ -296,21 +297,27 @@ class DataAcquisition(threading.Thread):
             self.last_phase = self.tracked_phase
 
             # list
-            start = time.time()
-            # Averaging # TODO array instead of list?
-            self.old_relative_distance_values.append(self.relative_distance)
-            if len(self.old_relative_distance_values) > 0:
-                #self.relative_distance = self.relative_distance - np.mean(self.old_relative_distance_values)/1000
-                self.old_relative_distance_values[:] = self.old_relative_distance_values[:] - np.mean(
-                    self.old_relative_distance_values)
-                self.relative_distance = self.old_relative_distance_values[-1]
-            if len(self.old_relative_distance_values) > 1000:
-                self.old_relative_distance_values.pop(0)
-            end = time.time()
-            print('time diff for list/array',(end-start)*1000)
+            # start = time.time()
+            # # Averaging # TODO array instead of list?
+            # self.old_relative_distance_values.append(self.relative_distance)
+            # if len(self.old_relative_distance_values) > 0:
+            #     #self.relative_distance = self.relative_distance - np.mean(self.old_relative_distance_values)/1000
+            #     self.old_relative_distance_values[:] = self.old_relative_distance_values[:] - np.mean(
+            #         self.old_relative_distance_values)
+            #     self.relative_distance = self.old_relative_distance_values[-1]
+            # if len(self.old_relative_distance_values) > 1000:
+            #     self.old_relative_distance_values.pop(0)
+            # end = time.time()
+            # print('time diff for list/array',(end-start)*1000)
 
             # array
-            #self.old_relative_distance_values
+            start = time.time()
+            self.old_relative_distance_values = np.roll(self.old_relative_distance_values,-1)
+            self.old_relative_distance_values[-1] = self.relative_distance
+            self.old_relative_distance_values = self.old_relative_distance_values - self.old_relative_distance_values.mean()
+            self.relative_distance = self.old_relative_distance_values[-1]
+            end = time.time()
+            print('time diff for list/array',(end-start)*1000)
 
             # don't use the data if only noise were found TODO improve
             if self.tracked_amplitude < 1.5e-2 and np.sum(amplitude)/data_length < 5e-3:
