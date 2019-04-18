@@ -121,6 +121,7 @@ class SignalProcessing:
         trackedRRvector = np.zeros(self.sample_freq * Tc)  # to save old values
 
         while self.go:
+            print('go in smitt',self.go)
             # to be able to use the same value in the whole loop
             if self.time_when_sent_last_value is not None and (time.time() - self.time_when_sent_last_value > 10):
                 # sends zero as breath rate if no value was found the last ten seconds
