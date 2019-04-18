@@ -208,7 +208,7 @@ class DataAcquisition(threading.Thread):
         power = amplitude * amplitude
 
         # Find and track peaks
-        if np.sum(amplitude)/data_length > 1e-2 and self.noise_run_time != 0:
+        if np.sum(amplitude)/data_length > 5e-3 and self.noise_run_time != 0:
             self.noise_run_time = 0
         elif self.noise_run_time < 10:
             self.noise_run_time = self.noise_run_time + 1
@@ -308,6 +308,11 @@ class DataAcquisition(threading.Thread):
                 wrapped_phase = self.tracked_phase
             self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi) * self.low_pass_const + \
                 (1 - self.low_pass_const) * self.delta_distance  # calculates the distance traveled from phase differences
+
+            # Don't use the data if only noise were found TODO improve
+            if self.tracked_amplitude < 1.5e-2 and np.sum(amplitude) / data_length < 5e-3 and self.noise_run_time == 10:
+                self.delta_distance = 0
+
             self.relative_distance = self.relative_distance - self.delta_distance * 1000  # relative distance in mm
             # The minus sign comes from changing coordinate system; what the radar think is outward is inward for the person that is measured on
             self.last_phase = self.tracked_phase
@@ -335,10 +340,6 @@ class DataAcquisition(threading.Thread):
             self.relative_distance = self.old_relative_distance_values[-1]
             #end = time.time()
             #print('time diff for list/array',(end-start)*1000)
-
-            # Don't use the data if only noise were found TODO improve
-            if self.tracked_amplitude < 1.5e-2 and np.sum(amplitude)/data_length < 5e-3 and self.noise_run_time == 10:
-                self.relative_distance = 0
 
             # Tracked data to return and plot
             self.tracked_data = {"tracked distance": self.tracked_distance,
