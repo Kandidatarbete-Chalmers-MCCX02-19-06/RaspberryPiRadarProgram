@@ -77,9 +77,6 @@ class DataAcquisition(threading.Thread):
 
         # Returned variables
         self.tracked_distance = None
-        self.config.gain = 0.7  # Gain between 0 and 1. Larger gain increase the SNR, but come at a cost
-        # with more instability. Optimally is around 0.7
-        self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
         self.data_length = self.info["data_length"]  # Length of data per sampel
         self.calibrating_time = 5  # Time sleep for passing through filters. Used for Real time breathing
         # Inputs for tracking
