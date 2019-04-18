@@ -40,7 +40,6 @@ class DataAcquisition(threading.Thread):
         self.config.sensor = self.args.sensors
         print(self.args.sensors)
         #self.config.sensor = 1
-
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
@@ -52,7 +51,7 @@ class DataAcquisition(threading.Thread):
         # with more instability. Optimally is around 0.7
         self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
         self.data_length = self.info["data_length"]  # Length of data per sampel
-
+        self.calibrating_time = time.time() + 25
         # Inputs for tracking
         self.first_data = True  # first time data is processed
         self.f = self.config.sweep_rate  # frequency
@@ -153,15 +152,18 @@ class DataAcquisition(threading.Thread):
 
                     # Send to app
                     #start = time.time()
-                    if self.run_times % self.modulo_base == 0:
-                        #self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
-                        self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
-                    #done = time.time()
-                    #print('send to app', (done - start)*1000)
+                    if time.time() > self.calibrating_time:
+                        if self.run_times % self.modulo_base == 0:
+                            #self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
+                            self.bluetooth_server.write_data_to_app(
+                                bandpass_filtered_data_RR, 'real time breath')
+                        #done = time.time()
+                        #print('send to app', (done - start)*1000)
             if self.plot_graphs and self.run_times % self.modulo_base == 0:
                 try:
                     self.pg_process.put_data(tracked_data)  # plot data
                 except PGProccessDiedException:
+                    self.go.pop(0)
                     break
             #self.run_times_modulo = (self.run_times_modulo + 1) % self.modulo_base
             #donedone = time.time()
@@ -184,7 +186,6 @@ class DataAcquisition(threading.Thread):
             info, data = self.client.get_next()
             self.run_times = info[-1]['sequence_number']
 
-
         return data
 
     def tracking(self, data):
@@ -194,7 +195,7 @@ class DataAcquisition(threading.Thread):
         power = amplitude * amplitude
 
         # Find and track peaks
-        if np.sum(amplitude)/data_length > 5e-3: # TODO lägre värde? Ursprunligen 1e-6
+        if np.sum(amplitude)/data_length > 5e-3:  # TODO lägre värde? Ursprunligen 1e-6
             max_peak_index = np.argmax(power)
             if self.first_data:  # first time
                 self.track_peak_index.append(max_peak_index)  # global max peak
@@ -280,7 +281,7 @@ class DataAcquisition(threading.Thread):
             # self.RR_filtered_queue.put(plot_hist_pos[-1]*10)
 
             # Phase to distance and wraping
-            discount = 2 # TODO optimize for movements
+            discount = 2  # TODO optimize for movements
             if self.tracked_phase < -np.pi + discount and self.last_phase > np.pi - discount:
                 wrapped_phase = self.tracked_phase + 2 * np.pi
             elif self.tracked_phase > np.pi - discount and self.last_phase < -np.pi + discount:
@@ -288,7 +289,7 @@ class DataAcquisition(threading.Thread):
             else:
                 wrapped_phase = self.tracked_phase
             self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi) * self.low_pass_const + \
-                             (1 - self.low_pass_const) * self.delta_distance
+                (1 - self.low_pass_const) * self.delta_distance
             self.relative_distance = self.relative_distance - self.delta_distance
             self.last_phase = self.tracked_phase
 
@@ -296,12 +297,14 @@ class DataAcquisition(threading.Thread):
             self.old_relative_distance_values.append(self.relative_distance)
             if len(self.old_relative_distance_values) > 0:
                 #self.relative_distance = self.relative_distance - np.mean(self.old_relative_distance_values)/1000
-                self.old_relative_distance_values[:] = self.old_relative_distance_values[:] - np.mean(self.old_relative_distance_values)
+                self.old_relative_distance_values[:] = self.old_relative_distance_values[:] - np.mean(
+                    self.old_relative_distance_values)
                 self.relative_distance = self.old_relative_distance_values[-1]
             if len(self.old_relative_distance_values) > 1000:
                 self.old_relative_distance_values.pop(0)
 
-            if self.tracked_amplitude < 1.5e-2 and np.sum(amplitude)/data_length < 5e-3:  # don't use the data if only noise were found TODO improve
+            # don't use the data if only noise were found TODO improve
+            if self.tracked_amplitude < 1.5e-2 and np.sum(amplitude)/data_length < 5e-3:
                 self.relative_distance = 0
 
             # Tracked data to return and plot
@@ -369,7 +372,7 @@ class PGUpdater:
         self.distance_plot.setYRange(0, self.smooth_max.update(np.amax(data["abs"])))
         if data["tracked distance"] != 0:
             self.distance_inf_line.setValue(data["tracked distance"])
-        #else:
+        # else:
         #    self.distance_inf_line.setValue(0.4)
         #self.distance_over_time_curve.setData(self.ts, data["tracked distance over time"])
         #self.distance_over_time_curve2.setData(self.ts, data["tracked distance over time 2"])
