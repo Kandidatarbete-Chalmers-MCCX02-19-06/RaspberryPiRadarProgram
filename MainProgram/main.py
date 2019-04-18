@@ -10,7 +10,9 @@ import numpy as np
 # Import our own classes used in main
 import bluetooth_server_module          # Import bluetooth class for managing connections with devices
 import data_acquisition_module          # Import class which collects and filters relevant data from radar
-import signal_processing_module         # Import signal processing class for Schmitt Trigger and Pulse detection
+# Import signal processing class for Schmitt Trigger and Pulse detection
+import signal_processing_module
+
 
 def main():
     # subprocess.call("./Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c")
@@ -58,22 +60,30 @@ def main():
     FFTfreq = [1, 2, 3]
     FFTamplitude = [1, 2, 3]
 
-    bluetooth_server = bluetooth_server_module.BluetoothServer(list_of_variables_for_threads)       # BluetoothServer object sent to classes which sends data locally
+    # BluetoothServer object sent to classes which sends data locally
+    bluetooth_server = bluetooth_server_module.BluetoothServer(list_of_variables_for_threads)
 
     # Starts thread of run() method in DataAcquisition class
-    data_acquisition = data_acquisition_module.DataAcquisition(list_of_variables_for_threads, bluetooth_server)
+    data_acquisition = data_acquisition_module.DataAcquisition(
+        list_of_variables_for_threads, bluetooth_server)
     data_acquisition.start()
 
     # SignalProcessing object used below
-    signal_processing = signal_processing_module.SignalProcessing(list_of_variables_for_threads, bluetooth_server, FFTfreq, FFTamplitude)
+    signal_processing = signal_processing_module.SignalProcessing(
+        list_of_variables_for_threads, bluetooth_server, FFTfreq, FFTamplitude)
 
-    plt.plot(FFTfreq, FFTamplitude)
-    plt.show()
-    while list_of_variables_for_threads.get('go'):      # Lets threads and thereby program run while go is True. Go is set from app
+    plt.ion()
+    fig = plt.gcf()
+    fig.show()
+    fig.canvas.draw()
+    # Lets threads and thereby program run while go is True. Go is set from app
+    while list_of_variables_for_threads.get('go'):
         # Test of FFT, remove later
         FFTfreq, FFTamplitude = signal_processing.getFFTvalues()
-        plt.clf()
+        # plt.clf()
+
         plt.plot(FFTfreq, FFTamplitude)
+        fig.canvas.draw()
         time.sleep(1)
         print(FFTfreq, FFTamplitude)
 
@@ -87,7 +97,7 @@ def main():
     print("data_acquisition is closed")
 
     print('Shut down succeed')
-    #subprocess.call(["sudo", "shutdown", "-r", "now"])         # Terminal command for shutting down Raspberry Pi
+    # subprocess.call(["sudo", "shutdown", "-r", "now"])         # Terminal command for shutting down Raspberry Pi
 
 
 if __name__ == "__main__":      # Required for making main method the used main-method
