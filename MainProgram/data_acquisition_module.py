@@ -84,8 +84,7 @@ class DataAcquisition(threading.Thread):
         self.calibrating_time = 5  # Time sleep for passing through filters. Used for Real time breathing
         # Inputs for tracking
         self.first_data = True  # first time data is processed
-        self.f = self.config.sweep_rate  # frequency
-        self.dt = 1 / self.f
+        self.dt = 1 / self.list_of_variables_for_threads["sample_freq"]
         self.low_pass_const = self.low_pass_filter_constants_function(
             0.25, self.dt)  # Constant for a small low-pass filter to
         # smooth the changes. tau changes the filter weight, lower tau means shorter delay. Usually tau = 0.25 is good.
