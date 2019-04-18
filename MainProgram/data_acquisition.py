@@ -116,7 +116,7 @@ class DataAcquisition(threading.Thread):
         self.client.start_streaming()  # Starts Acconeers streaming server
         # runtimeold=time.time()
         while self.go:
-            print('go',self.go)
+            print('run measuremnt',self.run_measurement)
             self.run_times = self.run_times + 1
             #startstart = time.time()
             #runtime = time.time()
