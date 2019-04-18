@@ -310,7 +310,7 @@ class DataAcquisition(threading.Thread):
                 (1 - self.low_pass_const) * self.delta_distance  # calculates the distance traveled from phase differences
 
             # Don't use the data if only noise were found TODO improve
-            if self.tracked_amplitude < 1.5e-2 and np.sum(amplitude) / data_length < 5e-3 and self.noise_run_time == 10:
+            if self.tracked_amplitude < 1.8e-2 and np.sum(amplitude) / data_length < 8e-3 and self.noise_run_time == 10:
                 self.delta_distance = 0
 
             self.relative_distance = self.relative_distance - self.delta_distance * 1000  # relative distance in mm
