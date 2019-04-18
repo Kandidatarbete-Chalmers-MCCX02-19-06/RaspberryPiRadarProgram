@@ -62,7 +62,7 @@ class BluetoothServer:
             while len(self.RR_final_queue) == 0 and self.go:
                 time.sleep(0.001)
             schmitt_data = self.RR_final_queue.get_nowait()
-            #print("got data from queue")
+            # print("got data from queue")
             self.write_data_to_app(schmitt_data, 'breath rate')
         # schmitt_data = ' BR ' + schmitt_data + ' '      # TODO ändra till RR istället för BR i appen också
         # print("made string")
@@ -77,7 +77,7 @@ class BluetoothServer:
             #    time.sleep(0.005)
             # TEMP: Takes data from filtered resp.rate
             real_time_breating_to_app = self.RTB_final_queue.get_nowait()
-            #print("Real time breathing to app {}".format(real_time_breating_to_app))
+            # print("Real time breathing to app {}".format(real_time_breating_to_app))
             self.write_data_to_app(real_time_breating_to_app, 'real time breath')
             if not self.RR_final_queue.empty():
                 schmitt_data = self.RR_final_queue.get_nowait()
@@ -98,7 +98,7 @@ class BluetoothServer:
             except:
                 if self.go == False:
                     break
-                #print("Still accepting new phones" + str(error))
+                # print("Still accepting new phones" + str(error))
                 continue
             self.client_list.append(c)
             self.address_list.append(a)
@@ -131,7 +131,7 @@ class BluetoothServer:
                 if data == 'poweroff':
                     print("Shutdown starting")
                     try:
-                        self.go = False
+                        self.go = []
                         self.list_of_variables_for_threads["go"] = []
                         print("go= " + str(self.go))
                         for client in self.client_list:

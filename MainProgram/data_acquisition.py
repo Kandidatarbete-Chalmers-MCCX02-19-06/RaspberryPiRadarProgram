@@ -115,8 +115,8 @@ class DataAcquisition(threading.Thread):
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
         # runtimeold=time.time()
-        while self.go:
-            print('go',self.go)
+        while self.list_of_variables_for_threads["go"]:
+            print('go', self.go)
             self.run_times = self.run_times + 1
             #startstart = time.time()
             #runtime = time.time()
@@ -156,7 +156,8 @@ class DataAcquisition(threading.Thread):
                     #start = time.time()
                     if self.run_times % self.modulo_base == 0:
                         #self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
-                        self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
+                        self.bluetooth_server.write_data_to_app(
+                            bandpass_filtered_data_RR, 'real time breath')
                     #done = time.time()
                     #print('send to app', (done - start)*1000)
             if self.plot_graphs and self.run_times % self.modulo_base == 0:
@@ -184,7 +185,6 @@ class DataAcquisition(threading.Thread):
             info, data = self.client.get_next()
             self.run_times = info[-1]['sequence_number']
 
-
         return data
 
     def tracking(self, data):
@@ -194,7 +194,7 @@ class DataAcquisition(threading.Thread):
         power = amplitude * amplitude
 
         # Find and track peaks
-        if np.sum(amplitude)/data_length > 5e-3: # TODO lägre värde? Ursprunligen 1e-6
+        if np.sum(amplitude)/data_length > 5e-3:  # TODO lägre värde? Ursprunligen 1e-6
             max_peak_index = np.argmax(power)
             if self.first_data:  # first time
                 self.track_peak_index.append(max_peak_index)  # global max peak
@@ -280,7 +280,7 @@ class DataAcquisition(threading.Thread):
             # self.RR_filtered_queue.put(plot_hist_pos[-1]*10)
 
             # Phase to distance and wraping
-            discount = 2 # TODO optimize for movements
+            discount = 2  # TODO optimize for movements
             if self.tracked_phase < -np.pi + discount and self.last_phase > np.pi - discount:
                 wrapped_phase = self.tracked_phase + 2 * np.pi
             elif self.tracked_phase > np.pi - discount and self.last_phase < -np.pi + discount:
@@ -288,7 +288,7 @@ class DataAcquisition(threading.Thread):
             else:
                 wrapped_phase = self.tracked_phase
             self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi) * self.low_pass_const + \
-                             (1 - self.low_pass_const) * self.delta_distance
+                (1 - self.low_pass_const) * self.delta_distance
             self.relative_distance = self.relative_distance - self.delta_distance
             self.last_phase = self.tracked_phase
 
@@ -296,12 +296,14 @@ class DataAcquisition(threading.Thread):
             self.old_relative_distance_values.append(self.relative_distance)
             if len(self.old_relative_distance_values) > 0:
                 #self.relative_distance = self.relative_distance - np.mean(self.old_relative_distance_values)/1000
-                self.old_relative_distance_values[:] = self.old_relative_distance_values[:] - np.mean(self.old_relative_distance_values)
+                self.old_relative_distance_values[:] = self.old_relative_distance_values[:] - np.mean(
+                    self.old_relative_distance_values)
                 self.relative_distance = self.old_relative_distance_values[-1]
             if len(self.old_relative_distance_values) > 1000:
                 self.old_relative_distance_values.pop(0)
 
-            if self.tracked_amplitude < 1.5e-2 and np.sum(amplitude)/data_length < 5e-3:  # don't use the data if only noise were found TODO improve
+            # don't use the data if only noise were found TODO improve
+            if self.tracked_amplitude < 1.5e-2 and np.sum(amplitude)/data_length < 5e-3:
                 self.relative_distance = 0
 
             # Tracked data to return and plot
@@ -369,7 +371,7 @@ class PGUpdater:
         self.distance_plot.setYRange(0, self.smooth_max.update(np.amax(data["abs"])))
         if data["tracked distance"] != 0:
             self.distance_inf_line.setValue(data["tracked distance"])
-        #else:
+        # else:
         #    self.distance_inf_line.setValue(0.4)
         #self.distance_over_time_curve.setData(self.ts, data["tracked distance over time"])
         #self.distance_over_time_curve2.setData(self.ts, data["tracked distance over time 2"])
