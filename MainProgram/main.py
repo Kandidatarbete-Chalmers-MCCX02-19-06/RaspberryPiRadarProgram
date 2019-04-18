@@ -6,9 +6,9 @@ import numpy as np
 import queue
 
 #import Radar
-import bluetooth_server_class        # import bluetooth class
-import data_acquisition      # Import class which collects and filters relevant data.
-import signal_processing
+import bluetooth_server_module       # import bluetooth class
+import data_acquisition_module      # Import class which collects and filters relevant data.
+import signal_processing_module
 # import bluetooth_app
 
 # Bluetooth imports
@@ -65,12 +65,12 @@ def main():
 
     # radar = Radar.Radar(radar_queue, go)
     # radar.start()
-    bluetooth_server = bluetooth_server_class.BluetoothServer(list_of_variables_for_threads)
+    bluetooth_server = bluetooth_server_module.BluetoothServer(list_of_variables_for_threads)
     #bluetooth_server = None
-    dataAcquisition = data_acquisition.DataAcquisition(
+    data_acquisition = data_acquisition_module.DataAcquisition(
         list_of_variables_for_threads, bluetooth_server)
-    dataAcquisition.start()
-    signal_processings = signal_processing.SignalProcessing(
+    data_acquisition.start()
+    signal_processing = signal_processing_module.SignalProcessing(
         list_of_variables_for_threads, bluetooth_server)
 
     while list_of_variables_for_threads.get('go'):
@@ -84,10 +84,10 @@ def main():
     #list_of_variables_for_threads["go"] = go.pop(0)
     # radar.join()
     # signal_processings.heart_rate_thread.join()
-    signal_processings.schmittTrigger_thread.join()
+    signal_processing.schmittTrigger_thread.join()
     #print("signal_processing is closed")
     time.sleep(1 / 20)  # Making sure signal processing have data in queue before radar quits.
-    dataAcquisition.join()
+    data_acquisition.join()
     print("radar is closed")
 
     #print("connect_device is closed")

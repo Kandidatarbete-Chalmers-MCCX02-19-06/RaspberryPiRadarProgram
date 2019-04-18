@@ -24,7 +24,7 @@ class SignalProcessing:
         self.freqArrayTemp_last = []  # If no breathing rate is found use last value
         # print(list(self.RR_final_queue.queue))
         self.RTB_final_queue = list_of_variables_for_threads["RTB_final_queue"]
-        self.time_when_sent_last_value = time.time()  # to check time passed after sent a value
+        self.time_when_sent_last_value = None  # to check time passed after sent a value
 
         # Starta heart_rate
         # self.heart_rate_thread = threading.Thread(target=self.heart_rate)
