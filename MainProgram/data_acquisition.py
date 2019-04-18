@@ -164,6 +164,7 @@ class DataAcquisition(threading.Thread):
                 try:
                     self.pg_process.put_data(tracked_data)  # plot data
                 except PGProccessDiedException:
+                    self.go.pop(0)
                     break
             #self.run_times_modulo = (self.run_times_modulo + 1) % self.modulo_base
             #donedone = time.time()
