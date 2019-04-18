@@ -49,59 +49,39 @@ class DataAcquisition(threading.Thread):
         print(self.args.sensors)
         #self.config.sensor = 1
         # Settings for radar setup
-        self.config.range_interval = [0.4, 1.4]         # Measurement interval
+        self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
-        self.config.sweep_rate = 20         # Probably 30 is the best, can go up to 100 without graph
+        self.config.sweep_rate = 20  # Probably 30 is the best, can go up to 100 without graph
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
-        self.config.gain = 0.7         # Gain between 0 and 1. Larger gain increase the SNR, but come at a cost with more instability. Optimally is around 0.7
-        self.info = self.client.setup_session(self.config)         # Setup acconeer radar session
-
-        self.data_length = self.info["data_length"]         # Length of data per sample
-        self.calibrating_time = 5       # Time sleep for passing through filters. Used for Real time breathing
+        self.config.gain = 0.7  # Gain between 0 and 1. Larger gain increase the SNR, but come at a cost
+        # with more instability. Optimally is around 0.7
+        self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
+        self.data_length = self.info["data_length"]  # Length of data per sample
 
         # Variables for tracking method
         self.first_data = True      # first time data is processed
         self.dt = 1 / self.list_of_variables_for_threads["sample_freq"]
-        self.low_pass_const = self.low_pass_filter_constants_function(0.25, self.dt)        # Constant for a small low-pass filter to smooth the changes. tau changes the filter weight, lower tau means shorter delay. Usually tau = 0.25 is good.
-        self.number_of_averages = 2         # Number of averages for tracked peak
-
-        self.plot_time_length = 10          # Length of plotted data
-        self.number_of_time_samples = int(self.plot_time_length / self.dt)          # Number of time samples when plotting
-        self.tracked_distance_over_time = np.zeros(self.number_of_time_samples)     # Array for distance over time plot
-        self.local_peaks_index = []         # Index of local peaks
-        self.track_peak_index = []          # Index of last tracked peaks
-        self.track_peaks_average_index = None       # Average of last tracked peaks
-        self.threshold = 1          # Threshold for removing small local peaks. Start value not important
+        self.low_pass_const = self.low_pass_filter_constants_function(0.25, self.dt)  # Constant for a small
+        # low-pass filter to smooth the changes. tau changes the filter weight, lower tau means shorter delay.
+        # Usually tau = 0.25 is good.
+        self.number_of_averages = 2  # Number of averages for tracked peak
+        self.plot_time_length = 10  # Length of plotted data
+        self.number_of_time_samples = int(self.plot_time_length / self.dt)  # Number of time samples when plotting
+        self.tracked_distance_over_time = np.zeros(self.number_of_time_samples)  # Array for distance over time plot
+        self.local_peaks_index = []  # Index of local peaks
+        self.track_peak_index = []  # Index of last tracked peaks
+        self.track_peaks_average_index = None  # Average of last tracked peaks
+        self.threshold = 1  # Threshold for removing small local peaks. Start value not important
 
         # Returned variables
-        self.tracked_distance = None
-        self.data_length = self.info["data_length"]  # Length of data per sampel
-        self.calibrating_time = 5  # Time sleep for passing through filters. Used for Real time breathing
-        # Inputs for tracking
-        self.first_data = True  # first time data is processed
-        self.dt = 1 / self.list_of_variables_for_threads["sample_freq"]
-        self.low_pass_const = self.low_pass_filter_constants_function(
-            0.25, self.dt)  # Constant for a small low-pass filter to
-        # smooth the changes. tau changes the filter weight, lower tau means shorter delay. Usually tau = 0.25 is good.
-        self.number_of_averages = 2  # number of averages for tracked peak
-        self.plot_time_length = 10  # length of plotted data
-        # number of time samples when plotting
-        self.number_of_time_samples = int(self.plot_time_length / self.dt)
-        # distance over time
-        self.tracked_distance_over_time = np.zeros(
-            self.number_of_time_samples)  # array for distance over time plot
-        self.local_peaks_index = []  # index of local peaks
-        self.track_peak_index = []  # index of last tracked peaks
-        self.track_peaks_average_index = None  # average of last tracked peaks
-        self.threshold = 1  # threshold for removing small local peaks
         self.tracked_distance = None  # distance to the tracked peak (m)
         self.tracked_amplitude = None
         self.tracked_phase = None
         self.tracked_data = None  # the final tracked data that is returned
 
-        # Variables used in tracking method
+        # Variables for phase to distance
         self.low_pass_amplitude = None  # low pass filtered amplitude
         self.low_pass_track_peak = None
         self.track_peak_relative_position = None  # used for plotting
@@ -113,6 +93,8 @@ class DataAcquisition(threading.Thread):
         self.freq = 60e9  # radar frequency (Hz)
         self.wave_length = self.c / self.freq  # wave length of the radar
         self.delta_distance = 0  # difference in distance between the last two phases (m)
+
+        # annat
         self.modulo_base = int(self.list_of_variables_for_threads["sample_freq"] / 20)  # how often values are plotted and sent to the app
         if self.modulo_base == 0:
             self.modulo_base = 1
@@ -136,6 +118,8 @@ class DataAcquisition(threading.Thread):
         self.lowpass_HR = filter.Filter('lowpass_HR')
         self.highpass_RR = filter.Filter('highpass_RR')
         self.lowpass_RR = filter.Filter('lowpass_RR')
+
+        self.calibrating_time = 5  # Time sleep for passing through filters. Used for Real time breathing
 
         self.HR_filtered_queue = list_of_variables_for_threads["HR_filtered_queue"]
         self.RR_filtered_queue = list_of_variables_for_threads["RR_filtered_queue"]
@@ -336,13 +320,13 @@ class DataAcquisition(threading.Thread):
             # print('time diff for list/array',(end-start)*1000)
 
             # array
-            start = time.time()
+            #start = time.time()
             self.old_relative_distance_values = np.roll(self.old_relative_distance_values,-1)
             self.old_relative_distance_values[-1] = self.relative_distance
             self.old_relative_distance_values = self.old_relative_distance_values - self.old_relative_distance_values.mean()
             self.relative_distance = self.old_relative_distance_values[-1]
-            end = time.time()
-            print('time diff for list/array',(end-start)*1000)
+            #end = time.time()
+            #print('time diff for list/array',(end-start)*1000)
 
             # don't use the data if only noise were found TODO improve
             if self.tracked_amplitude < 1.5e-2 and np.sum(amplitude)/data_length < 5e-3:
