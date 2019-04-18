@@ -322,7 +322,7 @@ class DataAcquisition(threading.Thread):
                 if self.relative_distance == 0:
                     self.old_relative_distance_values = np.zeros(1000)
 
-            if self.not_noise_run_time > 5:
+            if self.not_noise_run_time < 5:
                 self.delta_distance = 0
 
             self.relative_distance = self.relative_distance - self.delta_distance * 1000  # relative distance in mm
