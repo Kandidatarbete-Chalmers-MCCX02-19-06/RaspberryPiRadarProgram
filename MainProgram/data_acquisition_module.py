@@ -51,7 +51,7 @@ class DataAcquisition(threading.Thread):
         # with more instability. Optimally is around 0.7
         self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
         self.data_length = self.info["data_length"]  # Length of data per sampel
-        self.calibrating_time = time.time() + 25
+        self.calibrating_time = 5  # Time sleep for passing through filters. Used for Real time breathing
         # Inputs for tracking
         self.first_data = True  # first time data is processed
         self.f = self.config.sweep_rate  # frequency
@@ -144,6 +144,8 @@ class DataAcquisition(threading.Thread):
 
                 # put filtered data in output queue to send to SignalProcessing
                 # self.HR_filtered_queue.put(bandpass_filtered_data_HR)
+                if not self.run_measurement:
+                    calibrating_time = time.time() + self.calibrating_time
                 if (self.run_measurement):
                     self.RR_filtered_queue.put(bandpass_filtered_data_RR)
                     # self.RTB_final_queue.put(bandpass_filtered_data_RR)
@@ -152,7 +154,7 @@ class DataAcquisition(threading.Thread):
 
                     # Send to app
                     #start = time.time()
-                    if time.time() > self.calibrating_time:
+                    if time.time() > calibrating_time:
                         if self.run_times % self.modulo_base == 0:
                             #self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
                             self.bluetooth_server.write_data_to_app(
