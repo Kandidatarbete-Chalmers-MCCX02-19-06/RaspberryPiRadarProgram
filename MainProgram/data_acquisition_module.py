@@ -123,7 +123,7 @@ class DataAcquisition(threading.Thread):
 
         self.HR_filtered_queue = list_of_variables_for_threads["HR_filtered_queue"]
         self.RR_filtered_queue = list_of_variables_for_threads["RR_filtered_queue"]
-        self.RTB_final_queue = list_of_variables_for_threads["RTB_final_queue"]
+        self.RTB_final_queue = list_of_variables_for_threads["RTB_final_queue"]         # TODO remove
 
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
@@ -156,10 +156,11 @@ class DataAcquisition(threading.Thread):
                     tracked_data["relative distance"])  # TODO: Ändra till highpass_filtered
                 bandpass_filtered_data_RR = self.lowpass_RR.filter(highpass_filtered_data_RR)
 
-                # self.HR_filtered_queue.put(bandpass_filtered_data_HR)         # Put filtered data in output queue to send to SignalProcessing
                 if not self.run_measurement:
                     calibrating_time = time.time() + self.calibrating_time
                 if (self.run_measurement):
+                    self.HR_filtered_queue.put(
+                        bandpass_filtered_data_HR)  # Put filtered data in output queue to send to SignalProcessing
                     self.RR_filtered_queue.put(bandpass_filtered_data_RR)
                     # self.RTB_final_queue.put(bandpass_filtered_data_RR)
                     #done = time.time()

@@ -13,7 +13,7 @@ class SignalProcessing:
         self.list_of_variables_for_threads = list_of_variables_for_threads
         self.go = list_of_variables_for_threads["go"]
         self.HR_filtered_queue = list_of_variables_for_threads["HR_filtered_queue"]
-        self.HR_final_queue = list_of_variables_for_threads["HR_final_queue"]
+        self.HR_final_queue = list_of_variables_for_threads["HR_final_queue"]       # TODO ta bort
         self.sample_freq = list_of_variables_for_threads["sample_freq"]
         self.bluetooth_server = bluetooth_server
 
@@ -29,13 +29,12 @@ class SignalProcessing:
         self.index_fft = 0
 
         # Starta heart_rate
-        # self.heart_rate_thread = threading.Thread(target=self.heart_rate)
-        # self.heart_rate_thread.start()
+        self.heart_rate_thread = threading.Thread(target=self.heart_rate)
+        self.heart_rate_thread.start()
+        print("Start thread heart_rate")
         # Starta schmitt
         self.schmittTrigger_thread = threading.Thread(target=self.schmittTrigger)
         self.schmittTrigger_thread.start()
-        self.heart_rate_thread = threading.Thread(target=self.heart_rate)
-        self.heart_rate_thread.start()
 
         self.last_time = time.time()
         self.time = time.time()
@@ -50,10 +49,10 @@ class SignalProcessing:
         #i = 0
         while self.go:
             print("in while loop heart_rate")
-            freq, fft_signal_out = self.windowedFFT(fft_window, overlap, beta)
+            [freq, fft_signal_out] = self.windowedFFT(fft_window, overlap, beta)
         #     print(i) TODO: ta bort sen. Ta fram pulsen här
         #     i += 1
-            plt.clf()
+            #plt.clf()
             plt.plot(freq, 20*np.log10(fft_signal_out))
             plt.grid()
             plt.show()
@@ -109,6 +108,7 @@ class SignalProcessing:
         return freq, signal_out
 
     def schmittTrigger(self):
+        print("SchmittTrigger started")
         # Test for time
         Inside = True
         # variable declaration
