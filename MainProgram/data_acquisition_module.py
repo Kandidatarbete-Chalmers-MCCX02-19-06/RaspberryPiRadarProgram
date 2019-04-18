@@ -310,8 +310,10 @@ class DataAcquisition(threading.Thread):
                 (1 - self.low_pass_const) * self.delta_distance  # calculates the distance traveled from phase differences
 
             # Don't use the data if only noise were found TODO improve
-            if self.tracked_amplitude < 1.8e-2 and np.sum(amplitude) / data_length < 8e-3 and self.noise_run_time == 10:
+            if self.tracked_amplitude < 2e-2 and np.sum(amplitude) / data_length < 1e-2 and self.noise_run_time == 10:
                 self.delta_distance = 0
+                if self.relative_distance == 0:
+                    self.old_relative_distance_values = np.zeros(1000)
 
             self.relative_distance = self.relative_distance - self.delta_distance * 1000  # relative distance in mm
             # The minus sign comes from changing coordinate system; what the radar think is outward is inward for the person that is measured on
