@@ -81,7 +81,7 @@ class DataAcquisition(threading.Thread):
         self.tracked_phase = None
         self.tracked_data = None  # the final tracked data that is returned
 
-        # Variables for phase to distance
+        # Variables for phase to distance and plotting
         self.low_pass_amplitude = None  # low pass filtered amplitude
         self.low_pass_track_peak = None
         self.track_peak_relative_position = None  # used for plotting
@@ -94,12 +94,13 @@ class DataAcquisition(threading.Thread):
         self.wave_length = self.c / self.freq  # wave length of the radar
         self.delta_distance = 0  # difference in distance between the last two phases (m)
 
-        # annat
+        # other
         self.modulo_base = int(self.list_of_variables_for_threads["sample_freq"] / 20)  # how often values are plotted and sent to the app
         if self.modulo_base == 0:
             self.modulo_base = 1
         print('modulo base', self.modulo_base)
         self.run_times = 0  # number of times run in run
+        self.calibrating_time = 5  # Time sleep for passing through filters. Used for Real time breathing
 
         # Graphs
         self.plot_graphs = True  # if plot the graphs or not
@@ -118,8 +119,6 @@ class DataAcquisition(threading.Thread):
         self.lowpass_HR = filter.Filter('lowpass_HR')
         self.highpass_RR = filter.Filter('highpass_RR')
         self.lowpass_RR = filter.Filter('lowpass_RR')
-
-        self.calibrating_time = 5  # Time sleep for passing through filters. Used for Real time breathing
 
         self.HR_filtered_queue = list_of_variables_for_threads["HR_filtered_queue"]
         self.RR_filtered_queue = list_of_variables_for_threads["RR_filtered_queue"]
