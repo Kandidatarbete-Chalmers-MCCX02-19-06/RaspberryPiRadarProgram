@@ -70,22 +70,23 @@ class DataAcquisition(threading.Thread):
         self.track_peak_index = []  # index of last tracked peaks
         self.track_peaks_average_index = None  # average of last tracked peaks
         self.threshold = 1  # threshold for removing small local peaks
-        self.tracked_distance = None
+        self.tracked_distance = None  # distance to the tracked peak (m)
         self.tracked_amplitude = None
         self.tracked_phase = None
         self.tracked_data = None  # the final tracked data that is returned
-        self.low_pass_amplitude = None
+        self.low_pass_amplitude = None  # low pass filtered amplitude
         self.low_pass_track_peak = None
-        self.track_peak_relative_position = None
-        self.relative_distance = 0
-        self.last_phase = 0
-        self.old_relative_distance_values = []
-        self.c = 2.998 * 100000000
-        self.freq = 60 * 1000000000
-        self.wave_length = self.c / self.freq
-        self.delta_distance = 0
-
-        self.modulo_base = int(self.config.sweep_rate / 20)
+        self.track_peak_relative_position = None  # used for plotting
+        self.relative_distance = 0  # the relative distance that is measured from phase differences (m)
+        self.last_phase = 0  # tracked phase from previous loop
+        self.old_relative_distance_values = []  # saves old values to remove bias in real time breathing plot
+        self.c = 2.998e8  # light speed (m/s)
+        self.freq = 60e9  # radar frequency (Hz)
+        self.wave_length = self.c / self.freq  # wave length of the radar
+        self.delta_distance = 0  # difference in distance between the last two phases (m)
+        self.modulo_base = int(self.config.sweep_rate / 20)  # how often values are plotted and sent to the app
+        if self.modulo_base == 0:
+            self.modulo_base = 1
         print('modulo base', self.modulo_base)
         self.run_times = 0  # number of times run in run
 
@@ -150,19 +151,21 @@ class DataAcquisition(threading.Thread):
                 #     starting_time = time.time()
 
                 if (self.run_measurement):
+                    # send the data to signal processing
                     self.RR_filtered_queue.put(bandpass_filtered_data_RR)
                     # self.RTB_final_queue.put(bandpass_filtered_data_RR)
                     #done = time.time()
                     #print('filter', (done - start)*1000)
-                    # Send to app
                     #start = time.time()
                     if self.run_times % self.modulo_base == 0:
-                        #self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
-                        self.bluetooth_server.write_data_to_app(
-                            bandpass_filtered_data_RR, 'real time breath')
+                        # Send real time breathing amplitude to the app
+                        self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
+                        #self.bluetooth_server.write_data_to_app(
+                        #    bandpass_filtered_data_RR, 'real time breath')
                     #done = time.time()
                     #print('send to app', (done - start)*1000)
             if self.plot_graphs and self.run_times % self.modulo_base == 0:
+                # plot data
                 try:
                     self.pg_process.put_data(tracked_data)  # plot data
                 except PGProccessDiedException:
@@ -177,15 +180,14 @@ class DataAcquisition(threading.Thread):
         self.pg_process.close()
 
     def get_data(self):
-        info, data = self.client.get_next()
+        info, data = self.client.get_next()  # get the next data from the radar
         if info[-1]['sequence_number'] > self.run_times + 10:
-            # to remove delay if handlig the data takes longer time than for the radar to get it
+            # to remove delay if handling the data takes longer time than for the radar to get it
             print("sequence diff over 10, removing difference")
             for i in range(0, 10):
-                self.client.get_next()
+                self.client.get_next()  # getting the data without using it
             info, data = self.client.get_next()
             self.run_times = info[-1]['sequence_number']
-
         return data
 
     def tracking(self, data):
@@ -258,11 +260,13 @@ class DataAcquisition(threading.Thread):
             # Amplitude of data for plotting
             self.low_pass_amplitude = self.low_pass_const * amplitude + \
                 (1 - self.low_pass_const) * self.low_pass_amplitude
-            self.tracked_distance_over_time = np.roll(
-                self.tracked_distance_over_time, -1)  # Distance over time
-            # - np.mean(self.tracked_distance_over_time)
-            self.tracked_distance_over_time[-1] = self.tracked_distance
 
+            # real time graph over the whole range
+            # self.tracked_distance_over_time = np.roll(
+            #     self.tracked_distance_over_time, -1)  # Distance over time
+            # self.tracked_distance_over_time[-1] = self.tracked_distance
+
+            # real time graph zoomed in
             # com_idx = int(self.track_peak_relative_position * data_length)
             # delta_angle = np.angle(data[com_idx] * np.conj(self.last_data[com_idx]))
             # vel = self.f * 2.5 * delta_angle / (2 * np.pi)
@@ -274,9 +278,7 @@ class DataAcquisition(threading.Thread):
             # plot_hist_pos = self.hist_pos - self.hist_pos.mean()
 
             plot_hist_pos = None
-            # Idio
 
-            #print("Plot_hist_pos: ", plot_hist_pos)
             # self.RTB_final_queue.put(plot_hist_pos[-1]*10)  # Gets tracked breathing in mm
             # self.RR_filtered_queue.put(plot_hist_pos[-1]*10)
 
@@ -293,6 +295,8 @@ class DataAcquisition(threading.Thread):
             self.relative_distance = self.relative_distance - self.delta_distance
             self.last_phase = self.tracked_phase
 
+            # list
+            start = time.time()
             # Averaging # TODO array instead of list?
             self.old_relative_distance_values.append(self.relative_distance)
             if len(self.old_relative_distance_values) > 0:
@@ -302,6 +306,11 @@ class DataAcquisition(threading.Thread):
                 self.relative_distance = self.old_relative_distance_values[-1]
             if len(self.old_relative_distance_values) > 1000:
                 self.old_relative_distance_values.pop(0)
+            end = time.time()
+            print('time diff for list/array',(end-start)*1000)
+
+            # array
+            #self.old_relative_distance_values
 
             # don't use the data if only noise were found TODO improve
             if self.tracked_amplitude < 1.5e-2 and np.sum(amplitude)/data_length < 5e-3:
