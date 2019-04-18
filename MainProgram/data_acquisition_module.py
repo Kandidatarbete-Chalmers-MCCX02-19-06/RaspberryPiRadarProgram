@@ -101,6 +101,7 @@ class DataAcquisition(threading.Thread):
         print('modulo base', self.modulo_base)
         self.run_times = 0  # number of times run in run
         self.calibrating_time = 5  # Time sleep for passing through filters. Used for Real time breathing
+        self.noise_run_time = 0
 
         # Graphs
         self.plot_graphs = True  # if plot the graphs or not
@@ -206,7 +207,12 @@ class DataAcquisition(threading.Thread):
         power = amplitude * amplitude
 
         # Find and track peaks
-        if np.sum(amplitude)/data_length > 5e-3:  # TODO lägre värde? Ursprunligen 1e-6
+        if np.sum(amplitude)/data_length > 1e-2 and self.noise_run_time != 0:
+            self.noise_run_time = 0
+        elif self.noise_run_time < 10:
+            self.noise_run_time = self.noise_run_time + 1
+
+        if self.noise_run_time < 10 :  # TODO lägre värde? Ursprunligen 1e-6
             max_peak_index = np.argmax(power)
             if self.first_data:  # first time
                 self.track_peak_index.append(max_peak_index)  # global max peak
@@ -330,7 +336,7 @@ class DataAcquisition(threading.Thread):
             #print('time diff for list/array',(end-start)*1000)
 
             # Don't use the data if only noise were found TODO improve
-            if self.tracked_amplitude < 1.8e-2 and np.sum(amplitude)/data_length < 5e-3:
+            if self.tracked_amplitude < 1.5e-2 and np.sum(amplitude)/data_length < 5e-3 and self.noise_run_time < 10:
                 self.relative_distance = 0
 
             # Tracked data to return and plot
