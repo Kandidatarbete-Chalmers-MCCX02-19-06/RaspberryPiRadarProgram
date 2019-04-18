@@ -144,11 +144,12 @@ class DataAcquisition(threading.Thread):
 
                 # put filtered data in output queue to send to SignalProcessing
                 # self.HR_filtered_queue.put(bandpass_filtered_data_HR)
-                if not self.run_measurement:
-                    calibrating_time = time.time() + self.calibrating_time
-                    starting_time = time.time()
+                # Because it takes some time to go through filter, we have to delay breathing rate
+                # if not self.run_measurement:
+                #     calibrating_time = time.time() + self.calibrating_time
+                #     starting_time = time.time()
 
-                if (self.run_measurement) and time.time() > calibrating_time:
+                if (self.run_measurement):
                     self.RR_filtered_queue.put(bandpass_filtered_data_RR)
                     # self.RTB_final_queue.put(bandpass_filtered_data_RR)
                     #done = time.time()
