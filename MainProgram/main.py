@@ -55,8 +55,8 @@ def main():
                                      "RR_filtered_queue": RR_filtered_queue, "RR_final_queue": RR_final_queue,
                                      "RTB_final_queue": RTB_final_queue, "go": go, "run_measurement": run_measurement,
                                      "sample_freq": sample_freq}
-    FFTfreq = np.zeros(10)
-    FFTamplitude = np.zeros(10)
+    FFTfreq = [1, 2, 3]
+    FFTamplitude = [1, 2, 3]
 
     bluetooth_server = bluetooth_server_module.BluetoothServer(list_of_variables_for_threads)       # BluetoothServer object sent to classes which sends data locally
 
@@ -67,15 +67,13 @@ def main():
     # SignalProcessing object used below
     signal_processing = signal_processing_module.SignalProcessing(list_of_variables_for_threads, bluetooth_server, FFTfreq, FFTamplitude)
 
-    fig = plt.figure()
-    ax = fig.add_subplot(1,1,1)
+    plt.plot(FFTfreq, FFTamplitude)
     plt.show()
     while list_of_variables_for_threads.get('go'):      # Lets threads and thereby program run while go is True. Go is set from app
         # Test of FFT, remove later
         FFTfreq, FFTamplitude = signal_processing.getFFTvalues()
-        ax.clear()
-        ax.plot(FFTfreq, FFTamplitude)
-        ax.show()
+        plt.clf()
+        plt.plot(FFTfreq, FFTamplitude)
         time.sleep(1)
         print(FFTfreq, FFTamplitude)
 
