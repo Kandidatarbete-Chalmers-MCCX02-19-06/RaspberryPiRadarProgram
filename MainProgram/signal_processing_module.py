@@ -14,7 +14,6 @@ class SignalProcessing:
         self.go = list_of_variables_for_threads["go"]
         self.HR_filtered_queue = list_of_variables_for_threads["HR_filtered_queue"]
         self.HR_final_queue = list_of_variables_for_threads["HR_final_queue"]
-        self.index_fft = 0
         self.sample_freq = list_of_variables_for_threads["sample_freq"]
         self.bluetooth_server = bluetooth_server
 
@@ -25,6 +24,9 @@ class SignalProcessing:
         # print(list(self.RR_final_queue.queue))
         self.RTB_final_queue = list_of_variables_for_threads["RTB_final_queue"]
         self.time_when_sent_last_value = None  # to check time passed after sent a value
+
+        # Variables for Pulse detection
+        self.index_fft = 0
 
         # Starta heart_rate
         # self.heart_rate_thread = threading.Thread(target=self.heart_rate)
@@ -45,7 +47,7 @@ class SignalProcessing:
         #i = 0
         while self.go:
             [freq, fft_signal_out] = self.windowedFFT(fft_window, overlap, beta)
-        #     print(i) TODO: ta bort sen
+        #     print(i) TODO: ta bort sen. Ta fram pulsen här
         #     i += 1
 
         # plt.plot(freq, fft_signal_out)

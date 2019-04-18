@@ -1,23 +1,14 @@
-from typing import Any, Union
 
+# Import available classes used in main
 import time
-import threading
-import numpy as np
 import queue
+import subprocess       # For Raspberry Pi shutdown
+import os               # For using terminal commands
 
-#import Radar
-import bluetooth_server_module       # import bluetooth class
-import data_acquisition_module      # Import class which collects and filters relevant data.
-import signal_processing_module
-# import bluetooth_app
-
-# Bluetooth imports
-import bluetooth
-import math
-import random
-import subprocess       # for Raspberry Pi shutdown
-import os
-
+# Import our own classes used in main
+import bluetooth_server_module          # Import bluetooth class for managing connections with devices
+import data_acquisition_module          # Import class which collects and filters relevant data from radar
+import signal_processing_module         # Import signal processing class for Schmitt Trigger and Pulse detection
 
 def main():
     # subprocess.call("./Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c")
@@ -47,54 +38,46 @@ def main():
     # )
     # print(process.stdout)
 
-    radar_queue = queue.Queue()  # Not used right now?
+    # Queues used for accessing data from different threads
     HR_filtered_queue = queue.Queue()
     HR_final_queue = queue.Queue()
     RR_filtered_queue = queue.Queue()
     RR_final_queue = queue.Queue()
     RTB_final_queue = queue.Queue()  # Real time breating final queue
-    go = ["True"]
-    run_measurement = []
-    sample_freq = 0
+
+    # List of arguments and data sent between classes
+    go = ["True"]       # Used for closing threads before shutdown of Raspberry Pi
+    run_measurement = []        # Determines if data is being sent to devices or not
+    sample_freq = 0         # Value is updated in DataAcquisition. Needs to be the same in the whole program
     list_of_variables_for_threads = {"HR_filtered_queue": HR_filtered_queue, "HR_final_queue": HR_final_queue,
                                      "RR_filtered_queue": RR_filtered_queue, "RR_final_queue": RR_final_queue,
                                      "RTB_final_queue": RTB_final_queue, "go": go, "run_measurement": run_measurement,
                                      "sample_freq": sample_freq}
-    # heart_rate_queue = queue.Queue()
-    # resp_rate_queue = queue.Queue()
 
-    # radar = Radar.Radar(radar_queue, go)
-    # radar.start()
-    bluetooth_server = bluetooth_server_module.BluetoothServer(list_of_variables_for_threads)
-    #bluetooth_server = None
-    data_acquisition = data_acquisition_module.DataAcquisition(
-        list_of_variables_for_threads, bluetooth_server)
+    bluetooth_server = bluetooth_server_module.BluetoothServer(list_of_variables_for_threads)       # BluetoothServer object sent to classes which sends data locally
+
+    # Starts thread of run() method in DataAcquisition class
+    data_acquisition = data_acquisition_module.DataAcquisition(list_of_variables_for_threads, bluetooth_server)
     data_acquisition.start()
-    signal_processing = signal_processing_module.SignalProcessing(
-        list_of_variables_for_threads, bluetooth_server)
 
-    while list_of_variables_for_threads.get('go'):
+    # SignalProcessing object used below
+    signal_processing = signal_processing_module.SignalProcessing(list_of_variables_for_threads, bluetooth_server)
+
+    while list_of_variables_for_threads.get('go'):      # Lets threads and thereby program run while go is True. Go is set from app
         time.sleep(1)
-    ##bluetooth_servers = bluetooth_app.bluetooth_app(go)
-    # bluetooth_servers.app_data()
-    bluetooth_server.connect_device_thread.join()
 
-    print('Bluetooth server is closed')
-    # time.sleep(300)
-    #list_of_variables_for_threads["go"] = go.pop(0)
-    # radar.join()
+    # Waits for running threads to finish their loops
+    bluetooth_server.connect_device_thread.join()
+    print("bluetooth_server is closed")
     # signal_processings.heart_rate_thread.join()
     signal_processing.schmittTrigger_thread.join()
-    #print("signal_processing is closed")
-    time.sleep(1 / 20)  # Making sure signal processing have data in queue before radar quits.
+    print("signal_processing is closed")
     data_acquisition.join()
-    print("radar is closed")
-
-    #print("connect_device is closed")
+    print("data_acquisition is closed")
 
     print('Shut down succeed')
-    #subprocess.call(["sudo", "shutdown", "-r", "now"])
+    #subprocess.call(["sudo", "shutdown", "-r", "now"])         # Terminal command for shutting down Raspberry Pi
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":      # Required for making main method the used main-method
     main()
