@@ -34,11 +34,14 @@ class SignalProcessing:
         # Starta schmitt
         self.schmittTrigger_thread = threading.Thread(target=self.schmittTrigger)
         self.schmittTrigger_thread.start()
+        self.heart_rate_thread = threading.Thread(target=self.heart_rate)
+        self.heart_rate_thread.start()
 
         self.last_time = time.time()
         self.time = time.time()
 
     def heart_rate(self):
+        print("heart_rate thread started")
         T_resolution = 30
         overlap = 90
         beta = 1
@@ -46,13 +49,15 @@ class SignalProcessing:
         fft_window = np.zeros(T_resolution*self.sample_freq)
         #i = 0
         while self.go:
-            [freq, fft_signal_out] = self.windowedFFT(fft_window, overlap, beta)
+            print("in while loop heart_rate")
+            freq, fft_signal_out = self.windowedFFT(fft_window, overlap, beta)
         #     print(i) TODO: ta bort sen. Ta fram pulsen här
         #     i += 1
-
-        # plt.plot(freq, fft_signal_out)
-        # plt.grid()
-        # plt.show()
+            plt.clf()
+            plt.plot(freq, 20*np.log10(fft_signal_out))
+            plt.grid()
+            plt.show()
+            print("past plot heart rate")
 
     ### windowedFFT ###
     # input:
