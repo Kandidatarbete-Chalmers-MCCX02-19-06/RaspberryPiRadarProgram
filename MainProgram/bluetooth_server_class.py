@@ -131,8 +131,10 @@ class BluetoothServer:
                 if data == 'poweroff':
                     print("Shutdown starting")
                     try:
-                        self.go = []
-                        self.list_of_variables_for_threads["go"] = []
+                        #self.go = []
+                        #self.list_of_variables_for_threads["go"] = self.go.pop(0)
+                        #list_of_variables_for_threads["go"] = go.pop(0)
+                        self.go.pop(0)
                         print("go= " + str(self.go))
                         for client in self.client_list:
                             print('try to remove client ' +
