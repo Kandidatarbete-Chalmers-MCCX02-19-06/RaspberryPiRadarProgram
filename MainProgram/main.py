@@ -77,7 +77,7 @@ def main():
         ax.plot(FFTfreq, FFTamplitude)
         ax.show()
         time.sleep(1)
-        print(plt.plot(FFTfreq, FFTamplitude))
+        print(FFTfreq, FFTamplitude)
 
     # Waits for running threads to finish their loops
     bluetooth_server.connect_device_thread.join()
