@@ -102,6 +102,7 @@ class DataAcquisition(threading.Thread):
         self.run_times = 0  # number of times run in run
         self.calibrating_time = 5  # Time sleep for passing through filters. Used for Real time breathing
         self.noise_run_time = 0
+        self.not_noise_run_time = 0
 
         # Graphs
         self.plot_graphs = True  # if plot the graphs or not
@@ -208,12 +209,13 @@ class DataAcquisition(threading.Thread):
         power = amplitude * amplitude
 
         # Find and track peaks
-        if np.sum(amplitude)/data_length > 5e-3 and self.noise_run_time != 0:
+        if np.sum(amplitude)/data_length > 8e-3:
             self.noise_run_time = 0
+            self.not_noise_run_time = self.not_noise_run_time + 1
         elif self.noise_run_time < 10:
             self.noise_run_time = self.noise_run_time + 1
 
-        if self.noise_run_time < 10 :  # TODO lägre värde? Ursprunligen 1e-6
+        if self.noise_run_time < 10:  # TODO lägre värde? Ursprunligen 1e-6
             max_peak_index = np.argmax(power)
             if self.first_data:  # first time
                 self.track_peak_index.append(max_peak_index)  # global max peak
@@ -262,6 +264,7 @@ class DataAcquisition(threading.Thread):
             self.tracked_phase = np.angle(data[self.track_peaks_average_index])
         else:
             #track_peak_relative_position = 0
+            self.not_noise_run_time = 0
             self.tracked_distance = 0
             self.tracked_phase = 0
             self.tracked_amplitude = 0
@@ -314,14 +317,13 @@ class DataAcquisition(threading.Thread):
                 self.delta_distance = 0
                 if self.relative_distance == 0:
                     self.old_relative_distance_values = np.zeros(1000)
-            elif self.tracked_amplitude < 1.5e-2 and np.sum(amplitude) / data_length < 1e-2 and self.noise_run_time > 5:
+            elif self.tracked_amplitude < 1.5e-2 and np.sum(amplitude) / data_length < 1e-2:
                 self.delta_distance = 0
                 if self.relative_distance == 0:
                     self.old_relative_distance_values = np.zeros(1000)
-            elif self.tracked_amplitude < 1e-2 and np.sum(amplitude) / data_length < 1e-2:
+
+            if self.not_noise_run_time != 0:
                 self.delta_distance = 0
-                if self.relative_distance == 0:
-                    self.old_relative_distance_values = np.zeros(1000)
 
             self.relative_distance = self.relative_distance - self.delta_distance * 1000  # relative distance in mm
             # The minus sign comes from changing coordinate system; what the radar think is outward is inward for the person that is measured on
