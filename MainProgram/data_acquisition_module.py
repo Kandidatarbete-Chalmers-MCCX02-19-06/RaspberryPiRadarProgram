@@ -146,21 +146,21 @@ class DataAcquisition(threading.Thread):
                 # self.HR_filtered_queue.put(bandpass_filtered_data_HR)
                 if not self.run_measurement:
                     calibrating_time = time.time() + self.calibrating_time
-                if (self.run_measurement):
+                    starting_time = time.time()
+
+                if (self.run_measurement) and time.time() > calibrating_time:
                     self.RR_filtered_queue.put(bandpass_filtered_data_RR)
                     # self.RTB_final_queue.put(bandpass_filtered_data_RR)
                     #done = time.time()
                     #print('filter', (done - start)*1000)
-
                     # Send to app
                     #start = time.time()
-                    if time.time() > calibrating_time:
-                        if self.run_times % self.modulo_base == 0:
-                            #self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
-                            self.bluetooth_server.write_data_to_app(
-                                bandpass_filtered_data_RR, 'real time breath')
-                        #done = time.time()
-                        #print('send to app', (done - start)*1000)
+                    if self.run_times % self.modulo_base == 0:
+                        #self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
+                        self.bluetooth_server.write_data_to_app(
+                            bandpass_filtered_data_RR, 'real time breath')
+                    #done = time.time()
+                    #print('send to app', (done - start)*1000)
             if self.plot_graphs and self.run_times % self.modulo_base == 0:
                 try:
                     self.pg_process.put_data(tracked_data)  # plot data
@@ -176,10 +176,7 @@ class DataAcquisition(threading.Thread):
         self.pg_process.close()
 
     def get_data(self):
-        if self.list_of_variables_for_threads["run_measurement"]:
-            info, data = self.client.get_next()
-        else:
-            info, data = self.client.get_next()
+        info, data = self.client.get_next()
         if info[-1]['sequence_number'] > self.run_times + 10:
             # to remove delay if handlig the data takes longer time than for the radar to get it
             print("sequence diff over 10, removing difference")
