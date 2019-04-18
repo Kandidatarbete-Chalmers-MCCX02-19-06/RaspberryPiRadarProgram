@@ -154,8 +154,8 @@ class DataAcquisition(threading.Thread):
                     # Send to app
                     #start = time.time()
                     if self.run_times % self.modulo_base == 0:
-                        self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
-                        #self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
+                        #self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
+                        self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
                     #done = time.time()
                     #print('send to app', (done - start)*1000)
             if self.plot_graphs and self.run_times % self.modulo_base == 0:
@@ -300,7 +300,7 @@ class DataAcquisition(threading.Thread):
             if len(self.old_relative_distance_values) > 1000:
                 self.old_relative_distance_values.pop(0)
 
-            if self.tracked_amplitude < 1.5e-2:  # don't use the data if only noise were found TODO improve
+            if self.tracked_amplitude < 1.5e-2 and np.sum(amplitude)/data_length < 5e-3:  # don't use the data if only noise were found TODO improve
                 self.relative_distance = 0
 
             # Tracked data to return and plot
