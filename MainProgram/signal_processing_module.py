@@ -70,6 +70,7 @@ class SignalProcessing:
         window_width = len(fft_window)  # size of each window
         window_slide = int(np.round(window_width*(1-overlap/100)))  # number of overlapping points
 
+        print("Window slide: ", window_slide)
         for i in range(window_slide):  # fills the fft_window array with window_slide values from filtered queue
             fft_window[self.index_fft] = self.HR_filtered_queue.get()
             self.index_fft += 1
@@ -93,6 +94,7 @@ class SignalProcessing:
     # signal_out: fft of the in signal as an array
 
     def smartFFT(self, signal_in, beta):
+        print("In smartFFT")
         length_seq = len(signal_in)  # number of sequences
         window = np.kaiser(length_seq, beta)  # beta: shape factor
         signal_in = np.multiply(signal_in, window)
