@@ -1,14 +1,19 @@
+
+# Imports of existing libraries
 import time
 import threading
 import numpy as np
 from scipy import signal
 import queue
 
+# Import for graphs
 import pyqtgraph as pg
 from PyQt5 import QtCore
 
+# Imports of our own classes
 import filter
 
+# Imports from Acconeer for radar data acquisition
 from acconeer_utils.clients.reg.client import RegClient
 from acconeer_utils.clients.json.client import JSONClient
 from acconeer_utils.clients import configs
@@ -18,12 +23,15 @@ from acconeer_utils.pg_process import PGProcess, PGProccessDiedException
 
 class DataAcquisition(threading.Thread):
     def __init__(self, list_of_variables_for_threads, bluetooth_server):
-        super(DataAcquisition, self).__init__()  # Inherit threading vitals
+        super(DataAcquisition, self).__init__()         # Inherit threading vitals
+
+        # Declaration of global variables
         self.go = list_of_variables_for_threads["go"]
         self.list_of_variables_for_threads = list_of_variables_for_threads
         self.bluetooth_server = bluetooth_server
         self.run_measurement = self.list_of_variables_for_threads['run_measurement']
-        # Setup for collecting data from acconeer's radar files.
+
+        # Setup for collecting data from Acconeer's radar files
         self.args = example_utils.ExampleArgumentParser().parse_args()
         example_utils.config_logging(self.args)
         # if self.args.socket_addr:
@@ -41,39 +49,39 @@ class DataAcquisition(threading.Thread):
         print(self.args.sensors)
         #self.config.sensor = 1
         # Settings for radar setup
-        self.config.range_interval = [0.4, 1.4]  # Measurement interval
+        self.config.range_interval = [0.4, 1.4]         # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
-        self.config.sweep_rate = 20  # probably 30 is the best, can go up to 100 without graph
+        self.config.sweep_rate = 20         # Probably 30 is the best, can go up to 100 without graph
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
-        self.config.gain = 0.7  # Gain between 0 and 1. Larger gain increase the SNR, but come at a cost
-        # with more instability. Optimally is around 0.7
-        self.info = self.client.setup_session(self.config)  # Setup acconeer radar session
-        self.data_length = self.info["data_length"]  # Length of data per sampel
-        self.calibrating_time = 5  # Time sleep for passing through filters. Used for Real time breathing
-        # Inputs for tracking
-        self.first_data = True  # first time data is processed
-        self.f = self.config.sweep_rate  # frequency
-        self.dt = 1 / self.f
-        self.low_pass_const = self.low_pass_filter_constants_function(
-            0.25, self.dt)  # Constant for a small low-pass filter to
-        # smooth the changes. tau changes the filter weight, lower tau means shorter delay. Usually tau = 0.25 is good.
-        self.number_of_averages = 2  # number of averages for tracked peak
-        self.plot_time_length = 10  # length of plotted data
-        # number of time samples when plotting
-        self.number_of_time_samples = int(self.plot_time_length / self.dt)
-        # distance over time
-        self.tracked_distance_over_time = np.zeros(
-            self.number_of_time_samples)  # array for distance over time plot
-        self.local_peaks_index = []  # index of local peaks
-        self.track_peak_index = []  # index of last tracked peaks
-        self.track_peaks_average_index = None  # average of last tracked peaks
-        self.threshold = 1  # threshold for removing small local peaks
+        self.config.gain = 0.7         # Gain between 0 and 1. Larger gain increase the SNR, but come at a cost with more instability. Optimally is around 0.7
+        self.info = self.client.setup_session(self.config)         # Setup acconeer radar session
+
+        self.data_length = self.info["data_length"]         # Length of data per sample
+        self.calibrating_time = 5       # Time sleep for passing through filters. Used for Real time breathing
+
+        # Variables for tracking method
+        self.first_data = True      # first time data is processed
+        self.dt = 1 / self.list_of_variables_for_threads["sample_freq"]
+        self.low_pass_const = self.low_pass_filter_constants_function(0.25, self.dt)        # Constant for a small low-pass filter to smooth the changes. tau changes the filter weight, lower tau means shorter delay. Usually tau = 0.25 is good.
+        self.number_of_averages = 2         # Number of averages for tracked peak
+
+        self.plot_time_length = 10          # Length of plotted data
+        self.number_of_time_samples = int(self.plot_time_length / self.dt)          # Number of time samples when plotting
+        self.tracked_distance_over_time = np.zeros(self.number_of_time_samples)     # Array for distance over time plot
+        self.local_peaks_index = []         # Index of local peaks
+        self.track_peak_index = []          # Index of last tracked peaks
+        self.track_peaks_average_index = None       # Average of last tracked peaks
+        self.threshold = 1          # Threshold for removing small local peaks. Start value not important
+
+        # Returned variables
         self.tracked_distance = None
         self.tracked_amplitude = None
         self.tracked_phase = None
-        self.tracked_data = None  # the final tracked data that is returned
+        self.tracked_data = None        # The final tracked data that is returned
+
+        # Variables used in tracking method
         self.low_pass_amplitude = None
         self.low_pass_track_peak = None
         self.track_peak_relative_position = None
@@ -83,11 +91,11 @@ class DataAcquisition(threading.Thread):
         self.c = 2.998 * 100000000
         self.freq = 60 * 1000000000
         self.wave_length = self.c / self.freq
-        self.delta_distance = 0
+        self.delta_distance = 0         # Calculated moved distance from phase data
 
-        self.modulo_base = int(self.config.sweep_rate / 20)
+        self.modulo_base = int(self.list_of_variables_for_threads["sample_freq"] / 20)      # TODO 20 may need to be changed
         print('modulo base', self.modulo_base)
-        self.run_times = 0  # number of times run in run
+        self.run_times = 0         # Number of times run in run
 
         # Graphs
         self.plot_graphs = True  # if plot the graphs or not
@@ -95,38 +103,38 @@ class DataAcquisition(threading.Thread):
             self.pg_updater = PGUpdater(self.config)
             self.pg_process = PGProcess(self.pg_updater)
             self.pg_process.start()
-        # acconeer graph
+        # Acconeer graph
         self.low_pass_vel = 0
         self.hist_vel = np.zeros(self.number_of_time_samples)
         self.hist_pos = np.zeros(self.number_of_time_samples)
         self.last_data = None  # saved old data
 
-        # filter
+        # Definition of filters
         self.highpass_HR = filter.Filter('highpass_HR')
         self.lowpass_HR = filter.Filter('lowpass_HR')
         self.highpass_RR = filter.Filter('highpass_RR')
         self.lowpass_RR = filter.Filter('lowpass_RR')
 
+        # Queues passed by reference
         self.HR_filtered_queue = list_of_variables_for_threads["HR_filtered_queue"]
         self.RR_filtered_queue = list_of_variables_for_threads["RR_filtered_queue"]
-        self.RTB_final_queue = list_of_variables_for_threads["RTB_final_queue"]
 
-    def run(self):
-        self.client.start_streaming()  # Starts Acconeers streaming server
+    def run(self):      # Run method used when thread is started
+        self.client.start_streaming()       # Starts Acconeers streaming server
         # runtimeold=time.time()
         while self.go:
             self.run_times = self.run_times + 1
-            #startstart = time.time()
-            #runtime = time.time()
+            # startstart = time.time()
+            # runtime = time.time()
             # print('runtime',(runtime-runtimeold)*1000)
-            #runtimeold = runtime
+            # runtimeold = runtime
             # This data is an 1D array in terminal print, not in Python script however....
-            #start = time.time()
-            data = self.get_data()
+            # start = time.time()
+            data = self.get_data()          # Gets data from radar
             #done = time.time()
             #print('get_data',(done - start)*1000)
             #start = time.time()
-            tracked_data = self.tracking(data)  # processing data and tracking peaks
+            tracked_data = self.tracking(data)      # Processing data and tracking peaks
             #done = time.time()
             #print('tracking', (done - start)*1000)
             #print("Amplitude phase: ", str(tracked_data["tracked phase"]))
@@ -134,21 +142,17 @@ class DataAcquisition(threading.Thread):
             if tracked_data is not None:
                 #start = time.time()
                 #self.RTB_final_queue.put(tracked_data["relative distance"])
-                # filter the data
-                highpass_filtered_data_HR = self.highpass_HR.filter(
-                    tracked_data["relative distance"])
+                # Filter the data
+                highpass_filtered_data_HR = self.highpass_HR.filter(tracked_data["relative distance"])
                 bandpass_filtered_data_HR = self.lowpass_HR.filter(highpass_filtered_data_HR)
-                highpass_filtered_data_RR = self.highpass_RR.filter(
-                    tracked_data["relative distance"])  # TODO: Ändra till highpass_filtered
+                highpass_filtered_data_RR = self.highpass_RR.filter(tracked_data["relative distance"])
                 bandpass_filtered_data_RR = self.lowpass_RR.filter(highpass_filtered_data_RR)
 
-                # put filtered data in output queue to send to SignalProcessing
-                # self.HR_filtered_queue.put(bandpass_filtered_data_HR)
+                # self.HR_filtered_queue.put(bandpass_filtered_data_HR)         # Put filtered data in output queue to send to SignalProcessing
                 if not self.run_measurement:
                     calibrating_time = time.time() + self.calibrating_time
                 if (self.run_measurement):
                     self.RR_filtered_queue.put(bandpass_filtered_data_RR)
-                    # self.RTB_final_queue.put(bandpass_filtered_data_RR)
                     #done = time.time()
                     #print('filter', (done - start)*1000)
 
@@ -157,40 +161,35 @@ class DataAcquisition(threading.Thread):
                     if time.time() > calibrating_time:
                         if self.run_times % self.modulo_base == 0:
                             #self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
-                            self.bluetooth_server.write_data_to_app(
-                                bandpass_filtered_data_RR, 'real time breath')
+                            self.bluetooth_server.write_data_to_app(bandpass_filtered_data_RR, 'real time breath')
                         #done = time.time()
                         #print('send to app', (done - start)*1000)
+            # Plot graphs
             if self.plot_graphs and self.run_times % self.modulo_base == 0:
                 try:
-                    self.pg_process.put_data(tracked_data)  # plot data
+                    self.pg_process.put_data(tracked_data)      # Plot data
                 except PGProccessDiedException:
                     self.go.pop(0)
                     break
             #self.run_times_modulo = (self.run_times_modulo + 1) % self.modulo_base
             #donedone = time.time()
             #print('while time',(donedone-startstart)*1000)
-        self.RR_filtered_queue.put(0)  # to quit the signal processing thread
+        self.RR_filtered_queue.put(0)        # To quit the signal processing thread
         print("out of while go in radar")
         self.client.disconnect()
         self.pg_process.close()
 
-    def get_data(self):
-        if self.list_of_variables_for_threads["run_measurement"]:
-            info, data = self.client.get_next()
-        else:
-            info, data = self.client.get_next()
-        if info[-1]['sequence_number'] > self.run_times + 10:
-            # to remove delay if handlig the data takes longer time than for the radar to get it
+    def get_data(self):         # Get data from radar
+        info, data = self.client.get_next()         # Gets data from radar
+        if info[-1]['sequence_number'] > self.run_times + 10:       # To remove delay if handling the data takes longer time than for the radar to get it
             print("sequence diff over 10, removing difference")
-            for i in range(0, 10):
+            for i in range(0, 10):          # Compensating delay
                 self.client.get_next()
             info, data = self.client.get_next()
             self.run_times = info[-1]['sequence_number']
-
         return data
 
-    def tracking(self, data):
+    def tracking(self, data):       # Tracks peak and processes data
         data = np.array(data).flatten()
         data_length = len(data)
         amplitude = np.abs(data)
@@ -199,44 +198,38 @@ class DataAcquisition(threading.Thread):
         # Find and track peaks
         if np.sum(amplitude)/data_length > 5e-3:  # TODO lägre värde? Ursprunligen 1e-6
             max_peak_index = np.argmax(power)
-            if self.first_data:  # first time
-                self.track_peak_index.append(max_peak_index)  # global max peak
+            if self.first_data:         # First time tracking is done
+                self.track_peak_index.append(max_peak_index)        # Global max peak
                 self.track_peaks_average_index = max_peak_index
             else:
-                self.local_peaks_index, _ = signal.find_peaks(power)  # find local max in data
+                self.local_peaks_index, _ = signal.find_peaks(power)        # Find index to local max in data
                 index = 0
                 index_list = []
-                for peak in self.local_peaks_index:
+                for peak in self.local_peaks_index:         # Select found peaks larger than threshold value
                     if np.abs(amplitude[peak]) < self.threshold:
                         index_list.append(index)
                         index += 1
-                # deletes all indexes with amplitude < threshold
-                np.delete(self.local_peaks_index, index_list)
-                if len(self.local_peaks_index) == 0:  # if no large peaks were found, use the latest value instead
-                    print("No local peak found")
+                np.delete(self.local_peaks_index, index_list)       # Deletes all indexes with amplitude < threshold
+
+                if len(self.local_peaks_index) == 0:        # If no large peaks were found, use the last value instead
                     self.track_peak_index.append(self.track_peak_index[-1])
+                    print("No local peak found")
                 else:
                     # Difference between found local peaks and last tracked peak
-                    peak_difference_index = np.subtract(
-                        self.local_peaks_index, self.track_peaks_average_index)
+                    peak_difference_index = np.subtract(self.local_peaks_index, self.track_peaks_average_index)
                     # The tracked peak is expected to be the closest local peak found
-                    self.track_peak_index.append(
-                        self.local_peaks_index[np.argmin(np.abs(peak_difference_index))])
+                    self.track_peak_index.append(self.local_peaks_index[np.argmin(np.abs(peak_difference_index))])
+
                 if len(self.track_peak_index) > self.number_of_averages:
                     self.track_peak_index.pop(0)  # remove oldest value
-                if amplitude[self.track_peak_index[-1]] < 0.5 * amplitude[
-                        max_peak_index]:  # if there is a much larger peak
-                    self.track_peak_index.clear()  # reset the array
-                    self.track_peak_index.append(max_peak_index)  # new peak is global max
-                self.track_peaks_average_index = int(  # Average and smooth the movements of the tracked peak
-                    np.round(self.low_pass_const * (np.average(self.track_peak_index))
-                             + (1 - self.low_pass_const) * self.track_peaks_average_index))
-            # threshold for next peak
+                if amplitude[self.track_peak_index[-1]] < 0.5 * amplitude[max_peak_index]:          # If there is a much larger peak
+                    self.track_peak_index.clear()       # Reset the array
+                    self.track_peak_index.append(max_peak_index)        # New peak is global max
+                self.track_peaks_average_index = int(np.round(self.low_pass_const * (np.average(self.track_peak_index))
+                             + (1 - self.low_pass_const) * self.track_peaks_average_index))         # Average and smooth the movements of the tracked peak
+            # Calculate threshold for next peak so it won't follow a much smaller peak
             self.threshold = np.abs(amplitude[self.track_peaks_average_index]) * 0.8
-            # so it won't follow a much smaller peak
-            self.track_peak_relative_position = self.track_peaks_average_index / \
-                len(data)  # Position of the peak
-            # relative the range of the data
+            self.track_peak_relative_position = self.track_peaks_average_index / len(data)  # Position of the peak relative the range of the data
             # Converts relative distance to absolute distance
             self.tracked_distance = (1 - self.track_peaks_average_index / len(data)) * self.config.range_interval[
                 0] + self.track_peaks_average_index / len(data) * self.config.range_interval[1]
@@ -245,11 +238,11 @@ class DataAcquisition(threading.Thread):
             # Tracked phase is the angle between I and Q in data for tracked index
             self.tracked_phase = np.angle(data[self.track_peaks_average_index])
         else:
-            #track_peak_relative_position = 0
+            # track_peak_relative_position = 0      # TODO Remove line. Not used?
             self.tracked_distance = 0
             self.tracked_phase = 0
             self.tracked_amplitude = 0
-            if self.first_data:  # first time
+            if self.first_data:         # First time
                 self.track_peaks_average_index = 0
 
         # Plots
@@ -258,19 +251,16 @@ class DataAcquisition(threading.Thread):
             self.low_pass_amplitude = amplitude
         else:
             # Amplitude of data for plotting
-            self.low_pass_amplitude = self.low_pass_const * amplitude + \
-                (1 - self.low_pass_const) * self.low_pass_amplitude
-            self.tracked_distance_over_time = np.roll(
-                self.tracked_distance_over_time, -1)  # Distance over time
-            # - np.mean(self.tracked_distance_over_time)
+            self.low_pass_amplitude = self.low_pass_const * amplitude + (1 - self.low_pass_const) * self.low_pass_amplitude
+            self.tracked_distance_over_time = np.roll(self.tracked_distance_over_time, -1)      # Distance over time - np.mean(self.tracked_distance_over_time)
             self.tracked_distance_over_time[-1] = self.tracked_distance
 
             # com_idx = int(self.track_peak_relative_position * data_length)
             # delta_angle = np.angle(data[com_idx] * np.conj(self.last_data[com_idx]))
-            # vel = self.f * 2.5 * delta_angle / (2 * np.pi)
+            # vel = self.list_of_variables_for_threads["sample_freq"] * 2.5 * delta_angle / (2 * np.pi)
             # self.low_pass_vel = self.low_pass_const * vel + \
             #     (1 - self.low_pass_const) * self.low_pass_vel
-            # dp = self.low_pass_vel / self.f
+            # dp = self.low_pass_vel / self.list_of_variables_for_threads["sample_freq"]
             # self.hist_pos = np.roll(self.hist_pos, -1)
             # self.hist_pos[-1] = self.hist_pos[-2] + dp
             # plot_hist_pos = self.hist_pos - self.hist_pos.mean()
@@ -282,8 +272,8 @@ class DataAcquisition(threading.Thread):
             # self.RTB_final_queue.put(plot_hist_pos[-1]*10)  # Gets tracked breathing in mm
             # self.RR_filtered_queue.put(plot_hist_pos[-1]*10)
 
-            # Phase to distance and wraping
-            discount = 2  # TODO optimize for movements
+            # Phase to distance and unwrapping
+            discount = 2        # TODO optimize for movements
             if self.tracked_phase < -np.pi + discount and self.last_phase > np.pi - discount:
                 wrapped_phase = self.tracked_phase + 2 * np.pi
             elif self.tracked_phase > np.pi - discount and self.last_phase < -np.pi + discount:
@@ -295,7 +285,7 @@ class DataAcquisition(threading.Thread):
             self.relative_distance = self.relative_distance - self.delta_distance
             self.last_phase = self.tracked_phase
 
-            # Averaging # TODO array instead of list?
+            # Averaging         # TODO array instead of list?
             self.old_relative_distance_values.append(self.relative_distance)
             if len(self.old_relative_distance_values) > 0:
                 #self.relative_distance = self.relative_distance - np.mean(self.old_relative_distance_values)/1000
@@ -305,11 +295,11 @@ class DataAcquisition(threading.Thread):
             if len(self.old_relative_distance_values) > 1000:
                 self.old_relative_distance_values.pop(0)
 
-            # don't use the data if only noise were found TODO improve
+            # Don't use the data if only noise were found TODO improve
             if self.tracked_amplitude < 1.5e-2 and np.sum(amplitude)/data_length < 5e-3:
                 self.relative_distance = 0
 
-            # Tracked data to return and plot
+            # Tracked data to return and plot TODO What values do we use in the end? Can som ebe removed?
             self.tracked_data = {"tracked distance": self.tracked_distance,
                                  "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase,
                                  "abs": self.low_pass_amplitude, "tracked distance over time": plot_hist_pos,
