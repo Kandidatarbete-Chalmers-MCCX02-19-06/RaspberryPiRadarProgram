@@ -1,16 +1,9 @@
-from typing import Any, Union
 
 # Import available classes used in main
 import time
-# import threading
-# import numpy as np
 import queue
 import subprocess       # For Raspberry Pi shutdown
 import os               # For using terminal commands
-import bluetooth
-# import math
-# import random
-
 
 # Import our own classes used in main
 import bluetooth_server_module          # Import bluetooth class for managing connections with devices
