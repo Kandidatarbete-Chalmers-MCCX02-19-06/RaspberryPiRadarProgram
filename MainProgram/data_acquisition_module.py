@@ -314,6 +314,14 @@ class DataAcquisition(threading.Thread):
                 self.delta_distance = 0
                 if self.relative_distance == 0:
                     self.old_relative_distance_values = np.zeros(1000)
+            elif self.tracked_amplitude < 1.5e-2 and np.sum(amplitude) / data_length < 1e-2 and self.noise_run_time > 5:
+                self.delta_distance = 0
+                if self.relative_distance == 0:
+                    self.old_relative_distance_values = np.zeros(1000)
+            elif self.tracked_amplitude < 1e-2 and np.sum(amplitude) / data_length < 1e-2:
+                self.delta_distance = 0
+                if self.relative_distance == 0:
+                    self.old_relative_distance_values = np.zeros(1000)
 
             self.relative_distance = self.relative_distance - self.delta_distance * 1000  # relative distance in mm
             # The minus sign comes from changing coordinate system; what the radar think is outward is inward for the person that is measured on
