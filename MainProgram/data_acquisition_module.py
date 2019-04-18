@@ -85,7 +85,7 @@ class DataAcquisition(threading.Thread):
         self.low_pass_amplitude = None  # low pass filtered amplitude
         self.low_pass_track_peak = None
         self.track_peak_relative_position = None  # used for plotting
-        self.relative_distance = 0  # the relative distance that is measured from phase differences (m)
+        self.relative_distance = 0  # the relative distance that is measured from phase differences (mm)
         self.last_phase = 0  # tracked phase from previous loop
         #self.old_relative_distance_values = []  # saves old values to remove bias in real time breathing plot
         self.old_relative_distance_values = np.zeros(1000)
@@ -300,8 +300,9 @@ class DataAcquisition(threading.Thread):
             else:
                 wrapped_phase = self.tracked_phase
             self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi) * self.low_pass_const + \
-                (1 - self.low_pass_const) * self.delta_distance
-            self.relative_distance = self.relative_distance - self.delta_distance
+                (1 - self.low_pass_const) * self.delta_distance  # calculates the distance traveled from phase differences
+            self.relative_distance = self.relative_distance - self.delta_distance * 1000  # relative distance in mm
+            # The minus sign comes from changing coordinate system; what the radar think is outward is inward for the person that is measured on
             self.last_phase = self.tracked_phase
 
             # list
@@ -320,6 +321,7 @@ class DataAcquisition(threading.Thread):
 
             # array
             #start = time.time()
+            # Code to remove bias that comes from larger movements that is not completely captured by the radar.
             self.old_relative_distance_values = np.roll(self.old_relative_distance_values,-1)
             self.old_relative_distance_values[-1] = self.relative_distance
             self.old_relative_distance_values = self.old_relative_distance_values - self.old_relative_distance_values.mean()
@@ -327,15 +329,15 @@ class DataAcquisition(threading.Thread):
             #end = time.time()
             #print('time diff for list/array',(end-start)*1000)
 
-            # don't use the data if only noise were found TODO improve
-            if self.tracked_amplitude < 1.5e-2 and np.sum(amplitude)/data_length < 5e-3:
+            # Don't use the data if only noise were found TODO improve
+            if self.tracked_amplitude < 1.8e-2 and np.sum(amplitude)/data_length < 5e-3:
                 self.relative_distance = 0
 
             # Tracked data to return and plot
             self.tracked_data = {"tracked distance": self.tracked_distance,
                                  "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase,
                                  "abs": self.low_pass_amplitude, "tracked distance over time": plot_hist_pos,
-                                 "tracked distance over time 2": self.tracked_distance_over_time, "relative distance": self.relative_distance*1000}
+                                 "tracked distance over time 2": self.tracked_distance_over_time, "relative distance": self.relative_distance}
         self.last_data = data
         self.first_data = False
         return self.tracked_data
