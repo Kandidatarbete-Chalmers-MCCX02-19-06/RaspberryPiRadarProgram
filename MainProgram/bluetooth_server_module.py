@@ -144,7 +144,7 @@ class BluetoothServer:
                                   str(self.address_list[self.client_list.index(client)]))
                         self.server.close()
                         print("server is now closed")
-                        os.system("echo 'power off\nquit' | bluetoothctl") TODO
+                        os.system("echo 'power off\nquit' | bluetoothctl")  # TODO
                     except Exception as error:
                         print("exception in for-loop in read_device: " + str(error))
 
