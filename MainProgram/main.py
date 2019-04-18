@@ -5,6 +5,7 @@ import queue
 import subprocess       # For Raspberry Pi shutdown
 import os               # For using terminal commands
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Import our own classes used in main
 import bluetooth_server_module          # Import bluetooth class for managing connections with devices
@@ -54,8 +55,8 @@ def main():
                                      "RR_filtered_queue": RR_filtered_queue, "RR_final_queue": RR_final_queue,
                                      "RTB_final_queue": RTB_final_queue, "go": go, "run_measurement": run_measurement,
                                      "sample_freq": sample_freq}
-    FFTfreq = None
-    FFTamplitude = None
+    FFTfreq = np.zeros(10)
+    FFTamplitude = np.zeros(10)
 
     bluetooth_server = bluetooth_server_module.BluetoothServer(list_of_variables_for_threads)       # BluetoothServer object sent to classes which sends data locally
 
