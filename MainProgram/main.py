@@ -72,19 +72,15 @@ def main():
     signal_processing = signal_processing_module.SignalProcessing(
         list_of_variables_for_threads, bluetooth_server, FFTfreq, FFTamplitude)
 
-    plt.ion()
-    fig = plt.gcf()
-    fig.show()
-    fig.canvas.draw()
+    plt.plot(FFTfreq, FFTamplitude)
+    plt.pause(1)
     # Lets threads and thereby program run while go is True. Go is set from app
     while list_of_variables_for_threads.get('go'):
         # Test of FFT, remove later
         FFTfreq, FFTamplitude = signal_processing.getFFTvalues()
-        # plt.clf()
-
         plt.plot(FFTfreq, FFTamplitude)
-        fig.canvas.draw()
-        time.sleep(1)
+        plt.pause(1)
+        # time.sleep(1)
         print(FFTfreq, FFTamplitude)
 
     # Waits for running threads to finish their loops
