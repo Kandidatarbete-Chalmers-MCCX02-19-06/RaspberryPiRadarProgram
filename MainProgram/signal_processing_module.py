@@ -115,6 +115,9 @@ class SignalProcessing:
 
         return freq, signal_out
 
+    def getFFTvalues(self):
+        return self.FFTfreq, self.FFTamplitude
+
     def schmittTrigger(self):
         print("SchmittTrigger started")
         # Test for time
