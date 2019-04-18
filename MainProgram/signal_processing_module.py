@@ -9,7 +9,8 @@ import queue
 
 class SignalProcessing:
 
-    def __init__(self, list_of_variables_for_threads, bluetooth_server):
+    # FFTfreq and FFTamplitude are temporary for testing FFT. Remove later
+    def __init__(self, list_of_variables_for_threads, bluetooth_server, FFTfreq, FFTamplitude):
         self.list_of_variables_for_threads = list_of_variables_for_threads
         self.go = list_of_variables_for_threads["go"]
         self.HR_filtered_queue = list_of_variables_for_threads["HR_filtered_queue"]
@@ -39,6 +40,10 @@ class SignalProcessing:
         self.last_time = time.time()
         self.time = time.time()
 
+        # Temporary for test of FFT
+        self.FFTfreq = FFTfreq
+        self.FFTamplitude = FFTamplitude
+
     def heart_rate(self):
         print("heart_rate thread started")
         T_resolution = 30
@@ -46,17 +51,17 @@ class SignalProcessing:
         beta = 1
         # Data in vector with length of window
         fft_window = np.zeros(T_resolution*self.sample_freq)
-        i = 0
+        #i = 0
         while self.go:
             print("in while loop heart_rate")
             [freq, fft_signal_out] = self.windowedFFT(fft_window, overlap, beta)
         #     print(i) TODO: ta bort sen. Ta fram pulsen här
-            i += 1
+            #i += 1
             #plt.clf()
             #plt.plot(freq, 20*np.log10(fft_signal_out))
             #plt.grid()
-            plt.plot([1,2,3,4], [2,3,4,i])
-            plt.show()
+            self.FFTfreq = freq
+            self.FFTamplitude = 20*np.log10(fft_signal_out)
             print("past plot heart rate")
 
     ### windowedFFT ###
@@ -109,6 +114,9 @@ class SignalProcessing:
         freq = self.sample_freq*np.arange(length_seq/2)/length_seq
 
         return freq, signal_out
+
+    def getFFTvalues(self):
+        return self.FFTfreq, self.FFTamplitude
 
     def schmittTrigger(self):
         print("SchmittTrigger started")

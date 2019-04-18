@@ -4,6 +4,8 @@ import time
 import queue
 import subprocess       # For Raspberry Pi shutdown
 import os               # For using terminal commands
+import matplotlib.pyplot as plt
+import numpy as np
 
 # Import our own classes used in main
 import bluetooth_server_module          # Import bluetooth class for managing connections with devices
@@ -53,6 +55,8 @@ def main():
                                      "RR_filtered_queue": RR_filtered_queue, "RR_final_queue": RR_final_queue,
                                      "RTB_final_queue": RTB_final_queue, "go": go, "run_measurement": run_measurement,
                                      "sample_freq": sample_freq}
+    FFTfreq = [1, 2, 3]
+    FFTamplitude = [1, 2, 3]
 
     bluetooth_server = bluetooth_server_module.BluetoothServer(list_of_variables_for_threads)       # BluetoothServer object sent to classes which sends data locally
 
@@ -61,10 +65,18 @@ def main():
     data_acquisition.start()
 
     # SignalProcessing object used below
-    signal_processing = signal_processing_module.SignalProcessing(list_of_variables_for_threads, bluetooth_server)
+    signal_processing = signal_processing_module.SignalProcessing(list_of_variables_for_threads, bluetooth_server, FFTfreq, FFTamplitude)
 
+    plt.plot(FFTfreq, FFTamplitude)
+    plt.pause(1)
     while list_of_variables_for_threads.get('go'):      # Lets threads and thereby program run while go is True. Go is set from app
-        time.sleep(1)
+        # Test of FFT, remove later
+        plt.clf()
+        FFTfreq, FFTamplitude = signal_processing.getFFTvalues()
+        plt.plot(FFTfreq, FFTamplitude)
+        plt.pause(1)
+        #time.sleep(1)
+        print(FFTfreq, FFTamplitude)
 
     # Waits for running threads to finish their loops
     bluetooth_server.connect_device_thread.join()
