@@ -336,7 +336,7 @@ class DataAcquisition(threading.Thread):
             #print('time diff for list/array',(end-start)*1000)
 
             # Don't use the data if only noise were found TODO improve
-            if self.tracked_amplitude < 1.5e-2 and np.sum(amplitude)/data_length < 5e-3 and self.noise_run_time < 10:
+            if self.tracked_amplitude < 1.5e-2 and np.sum(amplitude)/data_length < 5e-3 and self.noise_run_time == 10:
                 self.relative_distance = 0
 
             # Tracked data to return and plot
