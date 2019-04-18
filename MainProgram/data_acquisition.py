@@ -166,6 +166,7 @@ class DataAcquisition(threading.Thread):
             #self.run_times_modulo = (self.run_times_modulo + 1) % self.modulo_base
             #donedone = time.time()
             #print('while time',(donedone-startstart)*1000)
+        self.RR_filtered_queue.put(0)
         print("out of while go in radar")
         self.client.disconnect()
         self.pg_process.close()
