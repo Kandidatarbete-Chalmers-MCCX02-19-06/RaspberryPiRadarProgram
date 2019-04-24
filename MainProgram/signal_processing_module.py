@@ -77,7 +77,8 @@ class SignalProcessing:
             F_scan_lower = 1
             F_scan_upper = 3
             test = FFT_averaged[freq < F_scan_upper]
-            test = test[freq > F_scan_lower]
+            freq2 = freq[freq < F_scan_upper]
+            test = test[freq2 > F_scan_lower]
 
             print("Test \n", test, "\n", len(test))
             print("FFT_avg \n", FFT_averaged, "\n", len(FFT_averaged))
