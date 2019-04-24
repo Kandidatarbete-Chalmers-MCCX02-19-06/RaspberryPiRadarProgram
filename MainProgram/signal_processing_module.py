@@ -44,7 +44,7 @@ class SignalProcessing:
         self.FFTfreq = FFTfreq
         self.FFTamplitude = FFTamplitude
 
-    def heart_rate(self):
+    def heart_rate(self):  # MAIN for finding pulse
         print("heart_rate thread started")
         T_resolution = 30
         overlap = 90  # Percentage of old values for the new FFT
@@ -52,17 +52,47 @@ class SignalProcessing:
         tau = 45  # TODO Beskriva alla variabler
         # Data in vector with length of window
         fft_window = np.zeros(T_resolution*self.sample_freq)
-        #i = 0
+        window_width = len(fft_window)
+
+        number_of_old_FFT = 5
+        FFT_old_values = np.zeros(number_of_old_FFT, window_width)  # Change to matrix instead
+        index_in_FFT_old_values = 0
+        FFT_counter = 1
         while self.go:
             print("in while loop heart_rate")
             freq, fft_signal_out, window_slide = self.windowedFFT(fft_window, overlap, beta)
+            fft_signal_out_dB = 20*np.log10(fft_signal_out)
+            FFT_old_values[index_in_FFT_old_values] = fft_signal_out_dB
             RBW = freq[1] - freq[0]
-            T_sample = window_slide / self.sample_freq
-        #     print(i) TODO: ta bort sen. Ta fram pulsen här
+            delta_T = window_slide / self.sample_freq
+            average_over = tau / delta_T
+
+            # Test av fft movemean
+            FFT_averaged = mean_of_old_values(
+                FFT_old_values, average_over, window_width, FFT_counter)
+
+        #   print(i) TODO: ta bort sen. Ta fram pulsen här
+
             self.FFTfreq = freq
             self.FFTamplitude = 20*np.log10(fft_signal_out)
             BPM_search = freq * 60
             print("past plot heart rate")
+
+            # increment counters in loop
+            if FFT_counter < number_of_old_FFT
+            FFT_counter += 1
+            index_in_FFT_old_values += 1
+            if index_in_FFT_old_values == number_of_old_FFT:
+                index_in_FFT_old_values = 0
+
+    def mean_of_old_values(self, FFT_old_values, average_over, window_width, FFT_counter):
+        FFT_average_out = np.zeros(window_width)
+
+        for j in range(0: window_width):
+            for i in range(0: len(FFT_old_values)):
+                FFT_average_out[j] = FFT_old_values[i][j] + FFT_average_out[j]
+
+        return FFT_average_out / FFT_counter
 
     ### windowedFFT ###
     # input:
@@ -72,6 +102,7 @@ class SignalProcessing:
     # returns:
     # freq: corresponding frequency array
     # fft_signal_out: fft:d array
+
     def windowedFFT(self, fft_window, overlap, beta):
         window_width = len(fft_window)  # size of each window
         window_slide = int(np.round(window_width*(1-overlap/100)))  # number of overlapping points
@@ -115,6 +146,9 @@ class SignalProcessing:
         freq = self.sample_freq*np.arange(length_seq/2)/length_seq
 
         return freq, signal_out
+
+    def findPeaks(self):
+        pass
 
     def getFFTvalues(self):
         return self.FFTfreq, self.FFTamplitude
