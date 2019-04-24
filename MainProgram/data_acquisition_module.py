@@ -325,7 +325,7 @@ class DataAcquisition(threading.Thread):
             if self.not_noise_run_time < 5:
                 self.delta_distance = 0
 
-            self.relative_distance = self.relative_distance - self.delta_distance * 1000  # relative distance in mm
+            self.relative_distance = self.relative_distance - self.delta_distance  # relative distance in mm
             # The minus sign comes from changing coordinate system; what the radar think is outward is inward for the person that is measured on
             self.last_phase = self.tracked_phase
 
@@ -357,7 +357,7 @@ class DataAcquisition(threading.Thread):
             self.tracked_data = {"tracked distance": self.tracked_distance,
                                  "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase,
                                  "abs": self.low_pass_amplitude, "tracked distance over time": plot_hist_pos,
-                                 "tracked distance over time 2": self.tracked_distance_over_time, "relative distance": self.relative_distance}
+                                 "tracked distance over time 2": self.tracked_distance_over_time, "relative distance": self.relative_distance * 1000}
         self.last_data = data
         self.first_data = False
         return self.tracked_data
