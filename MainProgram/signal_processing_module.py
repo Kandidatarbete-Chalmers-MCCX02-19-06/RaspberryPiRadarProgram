@@ -54,7 +54,9 @@ class SignalProcessing:
         fft_window = np.zeros(T_resolution*self.sample_freq)
         window_width = int(len(fft_window))
         window_width_half = int(window_width/2)
-        number_of_old_FFT = 5
+        window_slide = int(np.round(window_width*(1-overlap/100)))
+        delta_T = window_slide / self.sample_freq
+        number_of_old_FFT = int(round(tau / delta_T))  # Ta bort int?
         FFT_old_values = np.zeros((number_of_old_FFT, window_width_half))
         index_in_FFT_old_values = 0
         FFT_counter = 1
@@ -64,12 +66,11 @@ class SignalProcessing:
             fft_signal_out_dB = 20*np.log10(fft_signal_out)
             FFT_old_values[index_in_FFT_old_values][:] = fft_signal_out_dB
             RBW = freq[1] - freq[0]
-            delta_T = window_slide / self.sample_freq
-            average_over = int(round(tau / delta_T))  # Ta bort int?
 
             # Test av fft movemean
             FFT_averaged = self.mean_of_old_values(
-                FFT_old_values, average_over, window_width_half, FFT_counter)
+                FFT_old_values, number_of_old_FFT, window_width_half, FFT_counter)
+
             print("Old FFT \n {}".format(FFT_old_values[:, 0]))
            # print(FFT_old_values.shape)
             print("FFT_Avg \n {}".format(FFT_averaged[0]))
@@ -87,10 +88,10 @@ class SignalProcessing:
             if index_in_FFT_old_values == number_of_old_FFT:
                 index_in_FFT_old_values = 0
 
-    def mean_of_old_values(self, FFT_old_values, average_over, window_width, FFT_counter):
+    def mean_of_old_values(self, FFT_old_values, number_of_old_FFT, window_width, FFT_counter):
         FFT_average_out = np.zeros(window_width)
         for j in range(0, window_width):
-            for i in range(0, len(FFT_old_values)):
+            for i in range(0, len(number_of_old_FFT)):
                 FFT_average_out[j] = FFT_old_values[i][j] + FFT_average_out[j]
 
         return FFT_average_out / FFT_counter
