@@ -44,6 +44,9 @@ class SignalProcessing:
         self.FFTfreq = FFTfreq
         self.FFTamplitude = FFTamplitude
 
+    # Kaos i koden, behöver struktureras upp och alla konstanter måste defineras i början
+    # Följer just nu Matlab strukturen.
+
     def heart_rate(self):  # MAIN for finding pulse
         print("heart_rate thread started")
         T_resolution = 30
@@ -51,35 +54,35 @@ class SignalProcessing:
         beta = 1  # ??
         tau = 12  # TODO Beskriva alla variabler
         # Data in vector with length of window
-        fft_window = np.zeros(T_resolution*self.sample_freq)
+        fft_window = np.zeros(T_resolution*self.sample_freq)  # Width in samples of FFT
         window_width = int(len(fft_window))
-        window_width_half = int(window_width/2)
+        window_width_half = int(window_width/2)  # Since FFT only processes half of freq (Nyqvist)
         window_slide = int(np.round(window_width*(1-overlap/100)))
         delta_T = window_slide / self.sample_freq
         number_of_old_FFT = int(round(tau / delta_T))  # Ta bort int?
-        FFT_old_values = np.zeros((number_of_old_FFT, window_width_half))
-        index_in_FFT_old_values = 0
-        FFT_counter = 1
+        FFT_old_values = np.zeros((number_of_old_FFT, window_width_half)
+                                  )  # Saving old values for a while
+        index_in_FFT_old_values = 0  # Placement of old FFT in FFT_old_values
+        FFT_counter = 1  # In start to avg over FFT_counter before FFT_old_values is filled to max
         while self.go:
             print("in while loop heart_rate")
             freq, fft_signal_out, window_slide = self.windowedFFT(fft_window, overlap, beta)
             fft_signal_out_dB = 20*np.log10(fft_signal_out)
             FFT_old_values[index_in_FFT_old_values][:] = fft_signal_out_dB
             RBW = freq[1] - freq[0]
-
-            # Test av fft movemean
+            # fft movemean
             FFT_averaged = self.mean_of_old_values(
                 FFT_old_values, number_of_old_FFT, window_width_half, FFT_counter)
+            # Lower and higher freq for removing unwanted areas of the FFT
+            F_scan_lower = 1
+            F_scan_upper = 3
 
-            print("Old FFT \n {}".format(FFT_old_values[:, 0]))
-           # print(FFT_old_values.shape)
-            print("FFT_Avg \n {}".format(FFT_averaged[0]))
-        #   print(i) TODO: ta bort sen. Ta fram pulsen här
+            #FFT_peaks = self.find_peaks(FFT_averaged)
 
-            self.FFTfreq = freq
-            self.FFTamplitude = 20*np.log10(fft_signal_out)
+            # print("Old FFT \n {}".format(FFT_old_values[:, 0]))
+            # print("FFT_Avg \n {}".format(FFT_averaged[0]))
             BPM_search = freq * 60
-            print("past plot heart rate")
+            # print("past plot heart rate")
 
             # increment counters in loop
             if FFT_counter < number_of_old_FFT:
@@ -87,6 +90,9 @@ class SignalProcessing:
             index_in_FFT_old_values += 1
             if index_in_FFT_old_values == number_of_old_FFT:
                 index_in_FFT_old_values = 0
+            # Plotting for FFT
+            self.FFTfreq = freq
+            self.FFTamplitude = 20*np.log10(fft_signal_out)
 
     def mean_of_old_values(self, FFT_old_values, number_of_old_FFT, window_width, FFT_counter):
         FFT_average_out = np.zeros(window_width)
@@ -146,7 +152,7 @@ class SignalProcessing:
 
         # frequency array corresponding to frequencies in the fft
         freq = self.sample_freq*np.arange(length_seq/2)/length_seq
-
+        print(freq)
         return freq, signal_out
 
     def findPeaks(self):
