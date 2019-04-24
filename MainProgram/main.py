@@ -61,7 +61,7 @@ def main():
     FFTamplitude = [1, 2, 3]
 
     # BluetoothServer object sent to classes which sends data locally
-    bluetooth_server = bluetooth_server_module.BluetoothServer(list_of_variables_for_threads)
+    #bluetooth_server = bluetooth_server_module.BluetoothServer(list_of_variables_for_threads)
 
     # Starts thread of run() method in DataAcquisition class
     data_acquisition = data_acquisition_module.DataAcquisition(
@@ -87,7 +87,7 @@ def main():
         #print(FFTfreq, FFTamplitude)
 
     # Waits for running threads to finish their loops
-    bluetooth_server.connect_device_thread.join()
+    # bluetooth_server.connect_device_thread.join()
     print("bluetooth_server is closed")
     # signal_processings.heart_rate_thread.join()
     signal_processing.schmittTrigger_thread.join()
