@@ -53,9 +53,9 @@ class SignalProcessing:
         # Data in vector with length of window
         fft_window = np.zeros(T_resolution*self.sample_freq)
         window_width = len(fft_window)
-
+        window_width_half = int(window_width/2)
         number_of_old_FFT = 5
-        FFT_old_values = np.zeros((number_of_old_FFT, int(window_width/2)))
+        FFT_old_values = np.zeros((number_of_old_FFT, window_width_half))
         index_in_FFT_old_values = 0
         FFT_counter = 1
         while self.go:
@@ -273,7 +273,7 @@ class SignalProcessing:
             mean = 0        # TODO ta det föregående värdet istället
             print("No values left in freqArrayTemp")
         mean = mean * 60  # To get resp rate in Hz to BPM
-        mean = int(round(mean))
+        mean = int(np.round(mean))
         # print("data from schmitt {}".format(mean))
         end = time.time()
         # print("Time through getMeanFreq {}".format(end-start))
