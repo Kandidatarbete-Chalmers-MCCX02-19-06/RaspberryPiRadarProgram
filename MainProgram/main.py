@@ -74,6 +74,7 @@ def main():
 
     plt.plot(FFTfreq, FFTamplitude)
     plt.pause(1)
+    plt.xlim(1, 3)
     # Lets threads and thereby program run while go is True. Go is set from app
     while list_of_variables_for_threads.get('go'):
         # Test of FFT, remove later
