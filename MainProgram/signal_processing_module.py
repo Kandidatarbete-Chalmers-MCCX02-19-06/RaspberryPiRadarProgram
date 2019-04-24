@@ -76,12 +76,17 @@ class SignalProcessing:
             # Lower and higher freq for removing unwanted areas of the FFT
             F_scan_lower = 1
             F_scan_upper = 3
-            test = FFT_averaged[freq <= F_scan_upper]
+            FFT_in_interval = FFT_averaged[freq <= F_scan_upper]
             freq2 = freq[freq <= F_scan_upper]
-            test = test[freq2 >= F_scan_lower]
+            FFT_in_interval = FFT_in_interval[freq2 >= F_scan_lower]
 
-            print("Test \n", test, "\n", len(test))
-            print("FFT_avg \n", FFT_averaged, "\n", len(FFT_averaged))
+            MaxFFT = np.amax(FFT_in_interval)
+            print("MaxFFT {}".format(MaxFFT))
+            threshold = MaxFFT - 30
+            print("Threshold {}".format(threshold))
+            Peaks = signal.find_peaks(FFT_in_interval, threshold=threshold)
+            print("Peaks {}".format(Peaks))
+
             #FFT_averaged = [x for x in FFT_averaged if (x < FHighRR and x > FLowRR)]
 
             #FFT_peaks = self.find_peaks(FFT_averaged)
