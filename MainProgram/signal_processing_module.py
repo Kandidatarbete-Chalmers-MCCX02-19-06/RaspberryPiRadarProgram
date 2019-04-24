@@ -62,15 +62,16 @@ class SignalProcessing:
             print("in while loop heart_rate")
             freq, fft_signal_out, window_slide = self.windowedFFT(fft_window, overlap, beta)
             fft_signal_out_dB = 20*np.log10(fft_signal_out)
-            FFT_old_values[index_in_FFT_old_values] = fft_signal_out_dB
+            FFT_old_values[index_in_FFT_old_values][:] = fft_signal_out_dB
             RBW = freq[1] - freq[0]
             delta_T = window_slide / self.sample_freq
             average_over = int(round(tau / delta_T))  # Ta bort int?
-            print("This FFT \n {}".format(fft_signal_out_dB))
+
             # Test av fft movemean
             FFT_averaged = self.mean_of_old_values(
                 FFT_old_values, average_over, window_width_half, FFT_counter)
-            print("FFT_Avg \n {}".format(FFT_averaged))
+            print("Old FFT \n {}".format(FFT_old_values[:][0]))
+            print("FFT_Avg \n {}".format(FFT_averaged[0]))
         #   print(i) TODO: ta bort sen. Ta fram pulsen här
 
             self.FFTfreq = freq
