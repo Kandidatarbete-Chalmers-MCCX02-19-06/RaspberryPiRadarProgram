@@ -48,7 +48,7 @@ class SignalProcessing:
     # Följer just nu Matlab strukturen.
 
     def heart_rate(self):  # MAIN for finding pulse
-        print("heart_rate thread started")
+        #print("heart_rate thread started")
         T_resolution = 30
         overlap = 90  # Percentage of old values for the new FFT
         beta = 1  # ??
@@ -77,7 +77,8 @@ class SignalProcessing:
             F_scan_lower = 1
             F_scan_upper = 3
             test = FFT_averaged[freq < F_scan_upper]
-            print("Test \n", test)
+            print("Test \n", test, "\n", len(test))
+            print("FFT_avg \n", FFT_averaged, "\n", len(FFT_averaged))
             #FFT_averaged = [x for x in FFT_averaged if (x < FHighRR and x > FLowRR)]
 
             #FFT_peaks = self.find_peaks(FFT_averaged)
