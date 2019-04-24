@@ -80,9 +80,9 @@ def main():
         plt.clf()
         FFTfreq, FFTamplitude = signal_processing.getFFTvalues()
         plt.plot(FFTfreq, FFTamplitude)
-        plt.pause(3)
+        plt.pause(1)
         # time.sleep(1)
-        print(FFTfreq, FFTamplitude)
+        #print(FFTfreq, FFTamplitude)
 
     # Waits for running threads to finish their loops
     bluetooth_server.connect_device_thread.join()
