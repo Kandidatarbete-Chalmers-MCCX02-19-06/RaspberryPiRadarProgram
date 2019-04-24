@@ -65,7 +65,7 @@ class SignalProcessing:
         index_in_FFT_old_values = 0  # Placement of old FFT in FFT_old_values
         FFT_counter = 1  # In start to avg over FFT_counter before FFT_old_values is filled to max
         while self.go:
-            print("in while loop heart_rate")
+            #print("in while loop heart_rate")
             freq, fft_signal_out, window_slide = self.windowedFFT(fft_window, overlap, beta)
             fft_signal_out_dB = 20*np.log10(fft_signal_out)
             FFT_old_values[index_in_FFT_old_values][:] = fft_signal_out_dB
@@ -77,7 +77,7 @@ class SignalProcessing:
             F_scan_lower = 1
             F_scan_upper = 3
             test = FFT_averaged[freq < F_scan_upper]
-            print(test)
+            print("Test \n", test)
             #FFT_averaged = [x for x in FFT_averaged if (x < FHighRR and x > FLowRR)]
 
             #FFT_peaks = self.find_peaks(FFT_averaged)
@@ -118,7 +118,7 @@ class SignalProcessing:
         window_width = len(fft_window)  # size of each window
         window_slide = int(np.round(window_width*(1-overlap/100)))  # number of overlapping points
 
-        print("Window slide: ", window_slide)
+        #print("Window slide: ", window_slide)
         for i in range(window_slide):  # fills the fft_window array with window_slide values from filtered queue
             fft_window[self.index_fft] = self.HR_filtered_queue.get()
             self.index_fft += 1
@@ -143,7 +143,7 @@ class SignalProcessing:
     # signal_out: fft of the in signal as an array
 
     def smartFFT(self, signal_in, beta):
-        print("In smartFFT")
+        #print("In smartFFT")
         length_seq = len(signal_in)  # number of sequences
         window = np.kaiser(length_seq, beta)  # beta: shape factor
         signal_in = np.multiply(signal_in, window)
