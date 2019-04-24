@@ -79,6 +79,7 @@ def main():
     while list_of_variables_for_threads.get('go'):
         # Test of FFT, remove later
         plt.clf()
+        plt.xlim(1, 3)
         FFTfreq, FFTamplitude = signal_processing.getFFTvalues()
         plt.plot(FFTfreq, FFTamplitude)
         plt.pause(1)
