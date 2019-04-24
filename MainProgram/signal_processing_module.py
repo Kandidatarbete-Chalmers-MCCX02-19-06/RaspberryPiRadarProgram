@@ -91,7 +91,7 @@ class SignalProcessing:
     def mean_of_old_values(self, FFT_old_values, number_of_old_FFT, window_width, FFT_counter):
         FFT_average_out = np.zeros(window_width)
         for j in range(0, window_width):
-            for i in range(0, len(number_of_old_FFT)):
+            for i in range(0, number_of_old_FFT):
                 FFT_average_out[j] = FFT_old_values[i][j] + FFT_average_out[j]
 
         return FFT_average_out / FFT_counter
