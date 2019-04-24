@@ -55,7 +55,7 @@ class SignalProcessing:
         window_width = len(fft_window)
 
         number_of_old_FFT = 5
-        FFT_old_values = np.zeros((number_of_old_FFT, window_width))  # Change to matrix instead
+        FFT_old_values = np.zeros((number_of_old_FFT, window_width/2))  # Change to matrix instead
         index_in_FFT_old_values = 0
         FFT_counter = 1
         while self.go:
@@ -69,7 +69,7 @@ class SignalProcessing:
             print("This FFT \n {}".format(fft_signal_out_dB))
             # Test av fft movemean
             FFT_averaged = self.mean_of_old_values(
-                FFT_old_values, average_over, window_width, FFT_counter)
+                FFT_old_values, average_over, window_width/2, FFT_counter)
             print("FFT_Avg \n {}".format(FFT_averaged))
         #   print(i) TODO: ta bort sen. Ta fram pulsen här
 
