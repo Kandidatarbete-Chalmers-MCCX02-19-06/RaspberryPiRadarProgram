@@ -55,7 +55,7 @@ class SignalProcessing:
         window_width = len(fft_window)
 
         number_of_old_FFT = 5
-        FFT_old_values = np.zeros(number_of_old_FFT, window_width)  # Change to matrix instead
+        FFT_old_values = np.zeros((number_of_old_FFT, window_width))  # Change to matrix instead
         index_in_FFT_old_values = 0
         FFT_counter = 1
         while self.go:
