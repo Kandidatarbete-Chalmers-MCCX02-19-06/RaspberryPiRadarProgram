@@ -49,7 +49,7 @@ class SignalProcessing:
         T_resolution = 30
         overlap = 90  # Percentage of old values for the new FFT
         beta = 1  # ??
-        tau = 45  # TODO Beskriva alla variabler
+        tau = 12  # TODO Beskriva alla variabler
         # Data in vector with length of window
         fft_window = np.zeros(T_resolution*self.sample_freq)
         window_width = len(fft_window)
@@ -65,12 +65,12 @@ class SignalProcessing:
             FFT_old_values[index_in_FFT_old_values] = fft_signal_out_dB
             RBW = freq[1] - freq[0]
             delta_T = window_slide / self.sample_freq
-            average_over = tau / delta_T
-
+            average_over = int(round(tau / delta_T))  # Ta bort int?
+            print("This FFT \n {}".format(fft_signal_out_dB))
             # Test av fft movemean
             FFT_averaged = self.mean_of_old_values(
                 FFT_old_values, average_over, window_width, FFT_counter)
-
+            print("FFT_Avg \n {}".format(FFT_averaged))
         #   print(i) TODO: ta bort sen. Ta fram pulsen här
 
             self.FFTfreq = freq
@@ -87,8 +87,8 @@ class SignalProcessing:
 
     def mean_of_old_values(self, FFT_old_values, average_over, window_width, FFT_counter):
         FFT_average_out = np.zeros(window_width)
-        for j in range(0: window_width):
-            for i in range(0: len(FFT_old_values)):
+        for j in range(0, window_width):
+            for i in range(0, len(FFT_old_values)):
                 FFT_average_out[j] = FFT_old_values[i][j] + FFT_average_out[j]
 
         return FFT_average_out / FFT_counter
@@ -110,7 +110,7 @@ class SignalProcessing:
         for i in range(window_slide):  # fills the fft_window array with window_slide values from filtered queue
             fft_window[self.index_fft] = self.HR_filtered_queue.get()
             self.index_fft += 1
-            if self.index_fft == window_width-1:
+            if self.index_fft == window_width:  # Increment before if statement does not need -1
                 self.index_fft = 0
 
         # TODO: Check if necessary. # roll the matrix so that the last inserted value is to the right.
