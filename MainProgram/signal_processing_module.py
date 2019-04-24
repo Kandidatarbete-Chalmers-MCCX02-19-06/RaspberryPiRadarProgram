@@ -79,8 +79,8 @@ class SignalProcessing:
             print("past plot heart rate")
 
             # increment counters in loop
-            if FFT_counter < number_of_old_FFT
-            FFT_counter += 1
+            if FFT_counter < number_of_old_FFT:
+                FFT_counter += 1
             index_in_FFT_old_values += 1
             if index_in_FFT_old_values == number_of_old_FFT:
                 index_in_FFT_old_values = 0
