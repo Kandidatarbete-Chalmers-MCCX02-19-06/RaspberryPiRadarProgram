@@ -2,6 +2,8 @@ addpath(genpath(pwd))
 addpath('Dataread')
 addpath('tracker')
 addpath('Radar_pulse_watch_and_EKG')
+addpath('2019-04-16')
+
 clc
 clear all
 format shorteng
@@ -10,18 +12,18 @@ format shorteng
 %filename_radar = 'Manniska_1m_0305_Test1.csv'
 %filename_radar = 'Manniska_lang_0305_Test2.csv'
 %filename_radar = 'PulsMetern_0313_Test1.csv'
-%filename_radar = 'Lins50cmPuls_0328_Test1.csv'
-filename_radar = 'PulsLowerGain_EKG_Test2_0415.csv'
+%filename_radar = 'Lins50cmPuls0328_Test1.csv'
+filename_radar = 'PulsLowerGain_EKG_Test1_0416.csv'
 [dist,amp, phase,t,gain, L_start, L_end, L_data, L_seq, Fs] = IQ_read_3(filename_radar);
 
 %Reading of wristband pulse measurements
 %filename_pulsemeter = 'PulsMetern_0313_Test1.tcx'
-filename_pulsemeter = 'Lins50cmPuls_0328_Test1.tcx'
-filename_pulsemeter = 'PulsLowerGain_EKG_Test2_0415.tcx'
+%filename_pulsemeter = 'Lins50cmPuls_0328_Test1.tcx'
+filename_pulsemeter = 'PulsLowerGain_EKG_Test1_0416.tcx'
 [AvHR, MaxHR, HR, tHR] = Read_Pulse(filename_pulsemeter,false);
 
-filename_EKG = "PulsLowerGain_EKG_Test2_0415_EKG.csv";
-[T_EKG,F_EKG] = EKG_read(filename_EKG,false);
+filename_EKG = "EKG_PulsLowerGain_EKG_Test3_0416.csv";
+[T_EKG,F_EKG] = EKG_read(filename_EKG,'HP',false);
 HR_EKG = 60*F_EKG;
 
 gain = gain
@@ -35,7 +37,7 @@ fc = 60.5e9;% [Hz]
 wavelength = c/fc
 
 %Detektering och följning utav mål
-start_distance = 0.47%m
+start_distance = 0.6%m
 N_avg = 100;
 [t,target_amplitude, target_phase, target_distance] = target_tracker_2(t,dist,amp,phase,start_distance,N_avg);
 
@@ -127,20 +129,23 @@ ylabel('Plot of HR bandwidth [m]')
 xlabel('Time [s]')
 
 %Settings for continuous pulse detection
-T_resolution = 15 % Time resolution[s]
+T_resolution = 25 % Time resolution[s]
 overlap = 90% overlap of slidiing frames [%]
-S_leakage = 0.3 % Leakage from tones 
+S_leakage = 0.1 % Leakage from tones 
 
 %test with overtone finder
-Fscan_lower_HR = 60/60
+Fscan_lower_HR = 50/60
 Fscan_upper_HR = 160/60
 BW_comb =5/60
 N_harmonics = 2
 
 %tracking parameters
 f0_tracking = 140/60%Guessed frequency to track
+B_tracking = 20;
 tao_tracking = 60/60%Time cosntant for tracking
-[T,BPM_search,FoM_log,f_found] = pulseTrack(delta_distance_HR,Fs,Fscan_lower_HR, Fscan_upper_HR, BW_comb, N_harmonics, T_resolution,overlap,S_leakage,f0_tracking,tao_tracking);
+
+[T,BPM_search,FoM_log,f_found] = pulseTrack(delta_distance_HR,Fs,Fscan_lower_HR, Fscan_upper_HR, BW_comb, N_harmonics, T_resolution,overlap,S_leakage,f0_tracking,B_tracking,tao_tracking);
+
 Tao = 5%s
 ThrowawayFactor = 10
 

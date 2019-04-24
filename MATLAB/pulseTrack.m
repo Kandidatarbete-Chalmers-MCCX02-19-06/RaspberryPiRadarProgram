@@ -1,4 +1,4 @@
-function [T,BPM_search,FoM_dB,f_found] = pulseTrack(d_relative,Fs,Fscan_lower, Fscan_upper, BW_comb, N_harmonics, T_resolution,overlap,S_leakage,f0_tracking,tao)
+function [T,BPM_search,FoM_dB,f_found] = pulseTrack(d_relative,Fs,Fscan_lower, Fscan_upper, BW_comb, N_harmonics, T_resolution,overlap,S_leakage,f0_tracking,B,tao)
 %Takes a filtered signal over time and tries to detect and track the
 %heartbeat over time
 %   Detailed explanation goes here
@@ -40,7 +40,7 @@ BPM_search = F*60;
 RBW = F(2) - F(1);
 
 %Test with movmean for each frequency over time
-Tao_FFT_filter = 45;
+Tao_FFT_filter = 10;
 Ts_FFT = T(2) - T(1);%amount of time the FFT shifts each time.
 N_filt = Tao_FFT_filter/Ts_FFT;
 FoM_dB = movmean(FoM_dB,N_filt,2);
@@ -49,7 +49,7 @@ FoM_dB = movmean(FoM_dB,N_filt,2);
 %Declare the weighting function, peaks with a closer to the last value
 %are weighted stronger than further away as they are most likely
 %outliars
-lambda = @(dFrequency,tao) exp(-abs(dFrequency)/tao);
+lambda = @(dFrequency,tao) B*exp(-abs(dFrequency)/tao);
 
 %Tracking algorythm here, this is done cycle by cycle.
 f_found = zeros(length(T),1);
@@ -98,7 +98,7 @@ for i_cycle = 1:length(T)
    end
    
    %Weights based of lambda
-   weighted_peaks = VAL_peaks_sorted + 20*lambda(dF_peaks_sorted,tao);
+   weighted_peaks = VAL_peaks_sorted + lambda(dF_peaks_sorted,tao);
    [VAL_peak_max,I_peak_max] = max(weighted_peaks);
    f_found(i_cycle) = F_peaks_sorted(I_peak_max(1));
    

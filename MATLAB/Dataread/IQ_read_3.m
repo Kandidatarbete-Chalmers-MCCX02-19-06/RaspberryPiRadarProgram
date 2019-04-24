@@ -48,6 +48,7 @@ function [dist,amp_out, phase_out,t,gain, L_start, L_end, L_data, L_seq, Fs] = I
         % replace parentheses with blank spaces
         Y = strrep(X, '(', ''); 
         Y = strrep(Y, ')', ''); 
+        Y = strrep(Y, '+-', '-'); %Tabort ifall +- fel inte finns
         frewind(fid);                       %To overwrite file
         fwrite(fid,Y);
         fclose(fid);
