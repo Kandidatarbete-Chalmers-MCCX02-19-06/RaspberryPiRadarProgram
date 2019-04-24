@@ -70,8 +70,8 @@ class SignalProcessing:
             # Test av fft movemean
             FFT_averaged = self.mean_of_old_values(
                 FFT_old_values, average_over, window_width_half, FFT_counter)
-            #print("Old FFT \n {}".format(FFT_old_values[:][0]))
-            print(FFT_old_values.shape)
+            print("Old FFT \n {}".format(FFT_old_values[:, 0]))
+           # print(FFT_old_values.shape)
             print("FFT_Avg \n {}".format(FFT_averaged[0]))
         #   print(i) TODO: ta bort sen. Ta fram pulsen här
 
