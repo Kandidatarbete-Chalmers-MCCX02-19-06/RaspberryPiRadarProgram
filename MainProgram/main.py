@@ -80,7 +80,7 @@ def main():
         plt.clf()
         FFTfreq, FFTamplitude = signal_processing.getFFTvalues()
         plt.plot(FFTfreq, FFTamplitude)
-        plt.pause(1)
+        plt.pause(3)
         # time.sleep(1)
         print(FFTfreq, FFTamplitude)
 

@@ -47,21 +47,21 @@ class SignalProcessing:
     def heart_rate(self):
         print("heart_rate thread started")
         T_resolution = 30
-        overlap = 90
-        beta = 1
+        overlap = 90  # Percentage of old values for the new FFT
+        beta = 1  # ??
+        tau = 45  # TODO Beskriva alla variabler
         # Data in vector with length of window
         fft_window = np.zeros(T_resolution*self.sample_freq)
         #i = 0
         while self.go:
             print("in while loop heart_rate")
-            [freq, fft_signal_out] = self.windowedFFT(fft_window, overlap, beta)
+            freq, fft_signal_out, window_slide = self.windowedFFT(fft_window, overlap, beta)
+            RBW = freq[1] - freq[0]
+            T_sample = window_slide / self.sample_freq
         #     print(i) TODO: ta bort sen. Ta fram pulsen här
-            #i += 1
-            #plt.clf()
-            #plt.plot(freq, 20*np.log10(fft_signal_out))
-            #plt.grid()
             self.FFTfreq = freq
             self.FFTamplitude = 20*np.log10(fft_signal_out)
+            BPM_search = freq * 60
             print("past plot heart rate")
 
     ### windowedFFT ###
@@ -86,10 +86,11 @@ class SignalProcessing:
         # TODO: Check if necessary. # roll the matrix so that the last inserted value is to the right.
         fft_window = np.roll(fft_window, -(self.index_fft+1))
         [freq, fft_signal_out] = self.smartFFT(fft_window, beta)  # do fft
+
         # TODO: check if necessayr. # roll the matrix back
         fft_window = np.roll(fft_window, (self.index_fft+1))
 
-        return freq, fft_signal_out
+        return freq, fft_signal_out, window_slide
 
     ### smartFFT ###
     # input:
@@ -142,7 +143,7 @@ class SignalProcessing:
             # to be able to use the same value in the whole loop
             if self.time_when_sent_last_value is not None and (time.time() - self.time_when_sent_last_value > 10):
                 # sends zero as breath rate if no value was found the last ten seconds
-                self.bluetooth_server.write_data_to_app(0,'breath rate')
+                self.bluetooth_server.write_data_to_app(0, 'breath rate')
                 self.time_when_sent_last_value = time.time()
             trackedRRvector[countHys - 1] = self.RR_filtered_queue.get()
             # self.RTB_final_queue.put(trackedRRvector[countHys - 1])
@@ -151,7 +152,7 @@ class SignalProcessing:
                 Hcut = np.sqrt(np.mean(np.square(trackedRRvector)))*0.7  # rms of trackedRRvector
                 #Hcut = 0.002
                 Lcut = -Hcut
-                #print("Hcut: ", Hcut)       # se vad hysteres blir
+                # print("Hcut: ", Hcut)       # se vad hysteres blir
                 #print("The last value of vector {}".format(trackedRRvector[countHys-1]))
                 # TODO Hinder så att insvängningstiden för filtret hanteras
                 countHys = 0
@@ -171,9 +172,10 @@ class SignalProcessing:
                     # RR_final_queue is supposed to be the breathing rate queue that is sent to app
                     #self.RR_final_queue.put(self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR))
                     #start = time.time()
-                    self.bluetooth_server.write_data_to_app(self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR), 'breath rate')
+                    self.bluetooth_server.write_data_to_app(
+                        self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR), 'breath rate')
                     self.time_when_sent_last_value = time.time()
-                    #done = time.time() # verkar ta lite tid, troligtvis på grund av getMeanOfFrequency
+                    # done = time.time() # verkar ta lite tid, troligtvis på grund av getMeanOfFrequency
                     #print('send to app', (done - start)*1000)
 
                     # TODO put getMeanOfFreqArray() into queue that connects to send bluetooth values instead
