@@ -68,7 +68,7 @@ class SignalProcessing:
             average_over = tau / delta_T
 
             # Test av fft movemean
-            FFT_averaged = mean_of_old_values(
+            FFT_averaged = self.mean_of_old_values(
                 FFT_old_values, average_over, window_width, FFT_counter)
 
         #   print(i) TODO: ta bort sen. Ta fram pulsen här
@@ -87,7 +87,6 @@ class SignalProcessing:
 
     def mean_of_old_values(self, FFT_old_values, average_over, window_width, FFT_counter):
         FFT_average_out = np.zeros(window_width)
-
         for j in range(0: window_width):
             for i in range(0: len(FFT_old_values)):
                 FFT_average_out[j] = FFT_old_values[i][j] + FFT_average_out[j]
