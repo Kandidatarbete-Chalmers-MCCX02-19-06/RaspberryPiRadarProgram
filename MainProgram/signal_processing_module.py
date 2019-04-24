@@ -52,7 +52,7 @@ class SignalProcessing:
         tau = 12  # TODO Beskriva alla variabler
         # Data in vector with length of window
         fft_window = np.zeros(T_resolution*self.sample_freq)
-        window_width = len(fft_window)
+        window_width = int(len(fft_window))
         window_width_half = int(window_width/2)
         number_of_old_FFT = 5
         FFT_old_values = np.zeros((number_of_old_FFT, window_width_half))
@@ -69,7 +69,7 @@ class SignalProcessing:
             print("This FFT \n {}".format(fft_signal_out_dB))
             # Test av fft movemean
             FFT_averaged = self.mean_of_old_values(
-                FFT_old_values, average_over, window_width/2, FFT_counter)
+                FFT_old_values, average_over, window_width_half, FFT_counter)
             print("FFT_Avg \n {}".format(FFT_averaged))
         #   print(i) TODO: ta bort sen. Ta fram pulsen här
 
