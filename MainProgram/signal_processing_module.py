@@ -76,6 +76,9 @@ class SignalProcessing:
             # Lower and higher freq for removing unwanted areas of the FFT
             F_scan_lower = 1
             F_scan_upper = 3
+            test = FFT_averaged[freq < F_scan_upper]
+            print(test)
+            #FFT_averaged = [x for x in FFT_averaged if (x < FHighRR and x > FLowRR)]
 
             #FFT_peaks = self.find_peaks(FFT_averaged)
 
@@ -152,7 +155,6 @@ class SignalProcessing:
 
         # frequency array corresponding to frequencies in the fft
         freq = self.sample_freq*np.arange(length_seq/2)/length_seq
-        print(freq)
         return freq, signal_out
 
     def findPeaks(self):
