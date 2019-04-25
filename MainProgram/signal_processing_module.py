@@ -29,7 +29,7 @@ class SignalProcessing:
         # Variables for Pulse detection
         self.index_fft = 0
         self.T_resolution = 30
-        self.overlap = 90  # Percentage of old values for the new FFT
+        self.overlap = 0  # Percentage of old values for the new FFT
         self.beta = 1  # Kaiser window form
         self.tau = 12  # TODO Beskriva alla variabler
         # Data in vector with length of window
@@ -42,7 +42,8 @@ class SignalProcessing:
             np.arange(self.length_fft_window/2)/self.length_fft_window  # Evenly spaced freq array
 
         self.delta_T = self.window_slide / self.sample_freq
-        self.number_of_old_FFT = int(round(self.tau / self.delta_T))  # Ta bort int?
+        # int(round(self.tau / self.delta_T))  # Make tau is larger than delta_T, else it will be zero and programme will fail.
+        self.number_of_old_FFT = 4
         self.FFT_old_values = np.zeros((self.number_of_old_FFT, int(
             self.window_width/2)))  # Saving old values for moving mean
         # Starta heart_rate
