@@ -78,18 +78,19 @@ class SignalProcessing:
             F_scan_upper = 3
             FFT_in_interval = FFT_averaged[freq <= F_scan_upper]
             freq2 = freq[freq <= F_scan_upper]
-            FFT_in_interval = FFT_in_interval[freq2 >= F_scan_lower]
+            FFT_in_interval = FFT_in_interval[freq2 > F_scan_lower]
 
-            MaxFFT = np.amax(FFT_in_interval)
-            print("MaxFFT {}".format(MaxFFT))
+            print("FFT_in_interval", FFT_in_interval, "\n", len(FFT_in_interval))
+
+            MaxFFT = np.amax(FFT_in_interval)  # Do on one line later, to remove outliers
             threshold = MaxFFT - 30
-            print("Threshold {}".format(threshold))
             Peaks, _ = signal.find_peaks(FFT_in_interval, threshold=threshold)
-            #print("Peaks {}".format(Peaks))
-            next_peak = []
+
+            peak_freq = []
+            peak_amplitude = []
             for i in Peaks:
                 next_peak.append(FFT_in_interval[i])
-            print("Next peak", next_peak)
+            #print("Next peak", next_peak)
 
             #FFT_averaged = [x for x in FFT_averaged if (x < FHighRR and x > FLowRR)]
 
