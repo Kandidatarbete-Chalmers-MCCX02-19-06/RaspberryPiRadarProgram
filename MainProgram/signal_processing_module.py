@@ -99,8 +99,11 @@ class SignalProcessing:
             self.peak_weighted = np.add(
                 peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
             # freq_old is the new found heart freq
-            found_heart_freq = peak_freq[np.argmax(self.peak_weighted)]
-            found_heart_freq_old = found_heart_freq
+            if len(peak_freq) > 0:
+                found_heart_freq = peak_freq[np.argmax(self.peak_weighted)]
+                found_heart_freq_old = found_heart_freq
+            else:
+                found_heart_freq = found_heart_freq_old
             print("freq_old: ", found_heart_freq)
             BPM_search = freq * 60
             # print("past plot heart rate")
