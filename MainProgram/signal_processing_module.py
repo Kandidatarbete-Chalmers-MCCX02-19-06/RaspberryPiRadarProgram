@@ -85,7 +85,9 @@ class SignalProcessing:
             threshold = MaxFFT - 30
             print("Threshold {}".format(threshold))
             Peaks, _ = signal.find_peaks(FFT_in_interval, threshold=threshold)
-            print("Peaks {}".format(Peaks))
+            #print("Peaks {}".format(Peaks))
+            for i in Peaks:
+                print("Next peak", FFT_in_interval[i])
 
             #FFT_averaged = [x for x in FFT_averaged if (x < FHighRR and x > FLowRR)]
 
