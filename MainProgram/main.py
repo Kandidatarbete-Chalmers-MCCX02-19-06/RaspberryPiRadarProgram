@@ -59,6 +59,8 @@ def main():
                                      "sample_freq": sample_freq}
     FFTfreq = [1, 2, 3]
     FFTamplitude = [1, 2, 3]
+    peak_freq = [1]
+    peak_amplitude = [1]
 
     # BluetoothServer object sent to classes which sends data locally
     bluetooth_server = bluetooth_server_module.BluetoothServer(list_of_variables_for_threads)
@@ -80,8 +82,9 @@ def main():
         # Test of FFT, remove later
         plt.clf()
         plt.xlim(1, 3)
-        FFTfreq, FFTamplitude = signal_processing.getFFTvalues()
+        FFTfreq, FFTamplitude, peak_freq, peak_amplitude = signal_processing.getFFTvalues()
         plt.plot(FFTfreq, FFTamplitude)
+        plt.plot(peak_freq, peak_amplitude, 'bo')
         plt.pause(1)
         # time.sleep(1)
         #print(FFTfreq, FFTamplitude)

@@ -43,6 +43,8 @@ class SignalProcessing:
         # Temporary for test of FFT
         self.FFTfreq = FFTfreq
         self.FFTamplitude = FFTamplitude
+        self.peak_freq = []
+        self.peak_amplitude = []
 
     # Kaos i koden, behöver struktureras upp och alla konstanter måste defineras i början
     # Följer just nu Matlab strukturen.
@@ -79,6 +81,7 @@ class SignalProcessing:
             FFT_in_interval = FFT_averaged[freq <= F_scan_upper]
             freq2 = freq[freq <= F_scan_upper]
             FFT_in_interval = FFT_in_interval[freq2 > F_scan_lower]
+            peak_freq_linspace = np.linspace(F_scan_lower, F_scan_upper, num=len(FFT_in_interval))
 
             print("FFT_in_interval", FFT_in_interval, "\n", len(FFT_in_interval))
 
@@ -86,10 +89,12 @@ class SignalProcessing:
             threshold = MaxFFT - 30
             Peaks, _ = signal.find_peaks(FFT_in_interval, threshold=threshold)
 
-            peak_freq = []
-            peak_amplitude = []
+            self.peak_freq = []
             for i in Peaks:
-                peak_amplitude.append(FFT_in_interval[i])
+                self.peak_freq.append(peak_freq_linspace[i])
+            self.peak_amplitude = []
+            for i in Peaks:
+                self.peak_amplitude.append(FFT_in_interval[i])
             #print("Next peak", next_peak)
 
             #FFT_averaged = [x for x in FFT_averaged if (x < FHighRR and x > FLowRR)]
@@ -175,7 +180,7 @@ class SignalProcessing:
         pass
 
     def getFFTvalues(self):
-        return self.FFTfreq, self.FFTamplitude
+        return self.FFTfreq, self.FFTamplitude, self.peak_freq, self.peak_amplitude
 
     def schmittTrigger(self):
         print("SchmittTrigger started")
