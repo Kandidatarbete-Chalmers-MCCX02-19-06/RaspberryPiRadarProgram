@@ -82,9 +82,10 @@ def main():
         # Test of FFT, remove later
         plt.clf()
         plt.xlim(1, 3)
-        FFTfreq, FFTamplitude, peak_freq, peak_amplitude = signal_processing.getFFTvalues()
+        FFTfreq, FFTamplitude, peak_freq, peak_amplitude, peak_weighted = signal_processing.getFFTvalues()
         plt.plot(FFTfreq, FFTamplitude)
         plt.plot(peak_freq, peak_amplitude, 'bo')
+        plt.plot(peak_freq, peak_weighted, 'ro')
         plt.pause(1)
         # time.sleep(1)
         #print(FFTfreq, FFTamplitude)

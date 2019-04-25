@@ -28,6 +28,20 @@ class SignalProcessing:
 
         # Variables for Pulse detection
         self.index_fft = 0
+        self.T_resolution = 30
+        self.overlap = 90  # Percentage of old values for the new FFT
+        self.beta = 1  # Kaiser window form
+        self.tau = 12  # TODO Beskriva alla variabler
+        # Data in vector with length of window
+        self.fft_window = np.zeros(T_resolution*self.sample_freq)  # Width in samples of FFT
+        self.length_fft_window = len(fft_window)  # length of fft_window array
+        self.window_width = int(len(fft_window))
+        # window_width_half = int(window_width/2)  # Since FFT only processes half of freq (Nyqvist)
+        self.window_slide = int(np.round(window_width*(1-overlap/100)))
+        self.delta_T = self.window_slide / self.sample_freq
+        self.number_of_old_FFT = int(round(self.tau / self.delta_T))  # Ta bort int?
+        self.FFT_old_values = np.zeros((self.number_of_old_FFT, int(
+            self.window_width/2)))  # Saving old values for moving mean
 
         # Starta heart_rate
         self.heart_rate_thread = threading.Thread(target=self.heart_rate)
@@ -45,64 +59,46 @@ class SignalProcessing:
         self.FFTamplitude = FFTamplitude
         self.peak_freq = []
         self.peak_amplitude = []
+        self.peak_weighted = []
 
     # Kaos i koden, behöver struktureras upp och alla konstanter måste defineras i början
     # Följer just nu Matlab strukturen.
 
     def heart_rate(self):  # MAIN for finding pulse
-        #print("heart_rate thread started")
-        T_resolution = 30
-        overlap = 90  # Percentage of old values for the new FFT
-        beta = 1  # ??
-        tau = 12  # TODO Beskriva alla variabler
-        # Data in vector with length of window
-        fft_window = np.zeros(T_resolution*self.sample_freq)  # Width in samples of FFT
-        window_width = int(len(fft_window))
-        window_width_half = int(window_width/2)  # Since FFT only processes half of freq (Nyqvist)
-        window_slide = int(np.round(window_width*(1-overlap/100)))
-        delta_T = window_slide / self.sample_freq
-        number_of_old_FFT = int(round(tau / delta_T))  # Ta bort int?
-        FFT_old_values = np.zeros((number_of_old_FFT, window_width_half)
-                                  )  # Saving old values for a while
+        # print("heart_rate thread started")
         index_in_FFT_old_values = 0  # Placement of old FFT in FFT_old_values
         FFT_counter = 1  # In start to avg over FFT_counter before FFT_old_values is filled to max
+        freq_old = 70/60  # Guess the first freq
+        # Variables for weigthed peaks
+        multiplication_factor = 20
+        time_constant = 1
+
         while self.go:
-            #print("in while loop heart_rate")
-            freq, fft_signal_out, window_slide = self.windowedFFT(fft_window, overlap, beta)
+            # print("in while loop heart_rate")
+            freq, fft_signal_out = self.windowedFFT()
             fft_signal_out_dB = 20*np.log10(fft_signal_out)
-            FFT_old_values[index_in_FFT_old_values][:] = fft_signal_out_dB
+
+            self.FFT_old_values[index_in_FFT_old_values][:] = fft_signal_out_dB
             RBW = freq[1] - freq[0]
             # fft movemean
-            FFT_averaged = self.mean_of_old_values(
-                FFT_old_values, number_of_old_FFT, window_width_half, FFT_counter)
-            # Lower and higher freq for removing unwanted areas of the FFT
-            F_scan_lower = 1
-            F_scan_upper = 3
-            FFT_in_interval = FFT_averaged[freq <= F_scan_upper]
-            freq2 = freq[freq <= F_scan_upper]
-            FFT_in_interval = FFT_in_interval[freq2 > F_scan_lower]
-            peak_freq_linspace = np.linspace(F_scan_lower, F_scan_upper, num=len(FFT_in_interval))
+            FFT_averaged = self.mean_of_old_values(FFT_counter)
 
-            print("FFT_in_interval", FFT_in_interval, "\n", len(FFT_in_interval))
+            # Returns the peaks in set inteval from averaged FFT
+            peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
 
-            MaxFFT = np.amax(FFT_in_interval)  # Do on one line later, to remove outliers
-            threshold = MaxFFT - 30
-            Peaks, _ = signal.find_peaks(FFT_in_interval, threshold=threshold)
+            # Going into own method when tested and working
+            delta_freq = []
+            for freq in peak_freq:
+                delta_freq.append(freq - freq_old)
 
-            self.peak_freq = []
-            for i in Peaks:
-                self.peak_freq.append(peak_freq_linspace[i])
-            self.peak_amplitude = []
-            for i in Peaks:
-                self.peak_amplitude.append(FFT_in_interval[i])
-            #print("Next peak", next_peak)
+            # Weighted peak value
+            # Två variabler B och Tidskonstant
+            self.peak_weighted = list(
+                map(add, peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant)))
 
-            #FFT_averaged = [x for x in FFT_averaged if (x < FHighRR and x > FLowRR)]
 
-            #FFT_peaks = self.find_peaks(FFT_averaged)
-
-            # print("Old FFT \n {}".format(FFT_old_values[:, 0]))
-            # print("FFT_Avg \n {}".format(FFT_averaged[0]))
+x
+x
             BPM_search = freq * 60
             # print("past plot heart rate")
 
@@ -116,11 +112,11 @@ class SignalProcessing:
             self.FFTfreq = peak_freq_linspace
             self.FFTamplitude = FFT_in_interval
 
-    def mean_of_old_values(self, FFT_old_values, number_of_old_FFT, window_width, FFT_counter):
-        FFT_average_out = np.zeros(window_width)
-        for j in range(0, window_width):
-            for i in range(0, number_of_old_FFT):
-                FFT_average_out[j] = FFT_old_values[i][j] + FFT_average_out[j]
+    def mean_of_old_values(self, FFT_counter):
+        FFT_average_out = np.zeros(int(self.window_width/2))
+        for j in range(0, int(self.window_width/2)):
+            for i in range(0, self.number_of_old_FFT):
+                FFT_average_out[j] = self.FFT_old_values[i][j] + FFT_average_out[j]
 
         return FFT_average_out / FFT_counter
 
@@ -133,25 +129,25 @@ class SignalProcessing:
     # freq: corresponding frequency array
     # fft_signal_out: fft:d array
 
-    def windowedFFT(self, fft_window, overlap, beta):
-        window_width = len(fft_window)  # size of each window
-        window_slide = int(np.round(window_width*(1-overlap/100)))  # number of overlapping points
+    def windowedFFT(self):
+        # window_width = len(fft_window)  # size of each window
+        # window_slide = int(np.round(window_width*(1-overlap/100)))  # number of overlapping points
 
-        #print("Window slide: ", window_slide)
-        for i in range(window_slide):  # fills the fft_window array with window_slide values from filtered queue
-            fft_window[self.index_fft] = self.HR_filtered_queue.get()
+        # print("Window slide: ", window_slide)
+        for i in range(self.window_slide):  # fills the fft_window array with window_slide values from filtered queue
+            self.fft_window[self.index_fft] = self.HR_filtered_queue.get()
             self.index_fft += 1
-            if self.index_fft == window_width:  # Increment before if statement does not need -1
+            if self.index_fft == self.window_width:  # Increment before if statement does not need -1
                 self.index_fft = 0
 
         # TODO: Check if necessary. # roll the matrix so that the last inserted value is to the right.
-        fft_window = np.roll(fft_window, -(self.index_fft+1))
-        [freq, fft_signal_out] = self.smartFFT(fft_window, beta)  # do fft
+        self.fft_window = np.roll(self.fft_window, -(self.index_fft+1))
+        [freq, fft_signal_out] = self.smartFFT(self.fft_window, self.beta)  # do fft
 
         # TODO: check if necessayr. # roll the matrix back
-        fft_window = np.roll(fft_window, (self.index_fft+1))
+        self.fft_window = np.roll(self.fft_window, (self.index_fft+1))
 
-        return freq, fft_signal_out, window_slide
+        return freq, fft_signal_out
 
     ### smartFFT ###
     # input:
@@ -161,8 +157,8 @@ class SignalProcessing:
     # freq: frequency array [Hz]
     # signal_out: fft of the in signal as an array
 
-    def smartFFT(self, signal_in, beta):
-        #print("In smartFFT")
+    def smartFFT(self, signal_in, beta): # "signal_in" is "fft_window"
+        # print("In smartFFT")
         length_seq = len(signal_in)  # number of sequences
         window = np.kaiser(length_seq, beta)  # beta: shape factor
         signal_in = np.multiply(signal_in, window)
@@ -176,11 +172,33 @@ class SignalProcessing:
         freq = self.sample_freq*np.arange(length_seq/2)/length_seq
         return freq, signal_out
 
-    def findPeaks(self):
-        pass
+    def findPeaks(self,FFT_averaged):
+        # Lower and higher freq for removing unwanted areas of the FFT
+            F_scan_lower = 1
+            F_scan_upper = 3
+            FFT_in_interval = FFT_averaged[freq <= F_scan_upper]
+            freq2 = freq[freq <= F_scan_upper]
+            FFT_in_interval = FFT_in_interval[freq2 > F_scan_lower]
+            peak_freq_linspace = np.linspace(F_scan_lower, F_scan_upper, num=len(FFT_in_interval))
 
+            print("FFT_in_interval", FFT_in_interval, "\n", len(FFT_in_interval))
+
+            MaxFFT = np.amax(FFT_in_interval)  # Do on one line later, to remove outliers
+            threshold = MaxFFT - 30
+            peaks, _ = signal.find_peaks(FFT_in_interval, threshold=threshold)
+
+            self.peak_freq = [] # Maybe change to array?
+            for i in peaks:
+                self.peak_freq.append(peak_freq_linspace[i])
+
+            self.peak_amplitude = []
+            for i in peaks:
+                self.peak_amplitude.append(FFT_in_interval[i])
+            return self.peak_freq, self.peak_amplitude
+    
+    # TODO Used for plotting in main, remove later
     def getFFTvalues(self):
-        return self.FFTfreq, self.FFTamplitude, self.peak_freq, self.peak_amplitude
+        return self.FFTfreq, self.FFTamplitude, self.peak_freq, self.peak_amplitude, self.peak_weighted
 
     def schmittTrigger(self):
         print("SchmittTrigger started")
@@ -213,10 +231,10 @@ class SignalProcessing:
 
             if countHys == self.sample_freq * Tc:
                 Hcut = np.sqrt(np.mean(np.square(trackedRRvector)))*0.7  # rms of trackedRRvector
-                #Hcut = 0.002
+                # Hcut = 0.002
                 Lcut = -Hcut
                 # print("Hcut: ", Hcut)       # se vad hysteres blir
-                #print("The last value of vector {}".format(trackedRRvector[countHys-1]))
+                # print("The last value of vector {}".format(trackedRRvector[countHys-1]))
                 # TODO Hinder så att insvängningstiden för filtret hanteras
                 countHys = 0
 
@@ -227,19 +245,19 @@ class SignalProcessing:
             if trackedRRvector[countHys - 1] <= Lcut:
                 schNy = 0
                 if schGa == 1:
-                    #print("Inside update resprate loop")
+                    # print("Inside update resprate loop")
                     np.roll(freqArray, 1)
                     # save the new frequency between two negative flanks
                     freqArray[0] = self.sample_freq / count
                     # Take the mean value
                     # RR_final_queue is supposed to be the breathing rate queue that is sent to app
-                    #self.RR_final_queue.put(self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR))
-                    #start = time.time()
+                    # self.RR_final_queue.put(self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR))
+                    # start = time.time()
                     self.bluetooth_server.write_data_to_app(
                         self.getMeanOfFreqArray(freqArray, FHighRR, FLowRR), 'breath rate')
                     self.time_when_sent_last_value = time.time()
                     # done = time.time() # verkar ta lite tid, troligtvis på grund av getMeanOfFrequency
-                    #print('send to app', (done - start)*1000)
+                    # print('send to app', (done - start)*1000)
 
                     # TODO put getMeanOfFreqArray() into queue that connects to send bluetooth values instead
                     count = 0
@@ -260,7 +278,7 @@ class SignalProcessing:
     # Used in schmittTrigger. Removes outliers and return mean value over last avOver values.
     def getMeanOfFreqArray(self, freqArray, FHighRR, FLowRR):  # remove all values > FHighRR and < FLowRR
         self.time = time.time()
-        #print("Since last time {}".format(self.time - self.last_time))
+        # print("Since last time {}".format(self.time - self.last_time))
         self.last_time = self.time
         start = time.time()
         # freqArrayTemp = [x for x in freqArray if (x < FHighRR and x > FLowRR)]
