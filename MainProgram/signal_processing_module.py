@@ -83,6 +83,7 @@ class SignalProcessing:
             # RBW = self.freq[1] - self.freq[0] # Used where?
             print("This new FFT: ", fft_signal_out_dB[2])
             saved_old = self.FFT_old_values[:][2]
+            print("length: ", len(saved_old))
             print("Saved old FFT: ", self.FFT_old_values)
             #print("Rows", len(self.FFT_old_values))
             #print("Columns", len(self.FFT_old_values[0]))
