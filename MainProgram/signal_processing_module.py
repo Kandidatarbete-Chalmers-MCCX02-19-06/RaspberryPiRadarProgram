@@ -62,7 +62,6 @@ class SignalProcessing:
         window_slide = int(np.round(window_width*(1-overlap/100)))
         delta_T = window_slide / self.sample_freq
         number_of_old_FFT = int(round(tau / delta_T))  # Ta bort int?
-        number_of_old_FFT = 1
         FFT_old_values = np.zeros((number_of_old_FFT, window_width_half)
                                   )  # Saving old values for a while
         index_in_FFT_old_values = 0  # Placement of old FFT in FFT_old_values
@@ -115,7 +114,7 @@ class SignalProcessing:
                 index_in_FFT_old_values = 0
             # Plotting for FFT
             self.FFTfreq = freq
-            self.FFTamplitude = 20*np.log10(fft_signal_out)
+            self.FFTamplitude = FFT_averaged
 
     def mean_of_old_values(self, FFT_old_values, number_of_old_FFT, window_width, FFT_counter):
         FFT_average_out = np.zeros(window_width)
