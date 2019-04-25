@@ -88,23 +88,18 @@ class SignalProcessing:
 
             # Returns the peaks in set inteval from averaged FFT
             peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
-
-            # Going into own method when tested and working staying in "main loop"
-            delta_freq = []
-            for freq in peak_freq:
-                delta_freq.append(freq - found_heart_freq_old)
-
-            # Weighted peak value
-            # Två variabler B och Tidskonstant
-            # self.peak_weighted = list(
-            #    map(add, peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant)))
-            self.peak_weighted = np.add(
-                peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
             if len(peak_freq) > 0:  # In case zero peaks, use last value
+                # Going into own method when tested and working staying in "main loop"
+                delta_freq = []
+                for freq in peak_freq:
+                    delta_freq.append(freq - found_heart_freq_old)
+                self.peak_weighted = np.add(
+                    peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
                 found_heart_freq = peak_freq[np.argmax(self.peak_weighted)]
                 found_heart_freq_old = found_heart_freq
             else:
-                found_heart_freq = found_heart_freq_old
+                #found_heart_freq = found_heart_freq_old
+                found_heart_freq = 0
             print("Found heart rate Hz and BPM: ", found_heart_freq, int(60*found_heart_freq))
             found_heart_rate = int(60 * found_heart_freq)  # Send to app
             self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
