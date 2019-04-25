@@ -84,7 +84,7 @@ class SignalProcessing:
 
             # fft movemean
             FFT_averaged = self.mean_of_old_values(FFT_counter)
-            print(FFT_averaged[:][10])
+            print("One value in avg FFT: ", FFT_averaged[:][10])
             # Returns the peaks in set inteval from averaged FFT
             peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
             if len(peak_freq) > 0:  # In case zero peaks, use last value
@@ -118,7 +118,7 @@ class SignalProcessing:
         for j in range(0, int(self.window_width/2)):
             for i in range(0, self.number_of_old_FFT):
                 self.FFT_average_out[j] = self.FFT_old_values[i][j] + self.FFT_average_out[j]
-        print("Mean of old values: ", self.FFT_average_out / FFT_counter)
+        #print("Mean of old values: ", self.FFT_average_out / FFT_counter)
         return self.FFT_average_out / FFT_counter
 
     ### windowedFFT ###
