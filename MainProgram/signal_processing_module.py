@@ -89,7 +89,7 @@ class SignalProcessing:
             next_peak = []
             for i in Peaks:
                 next_peak.append(FFT_in_interval[i])
-                print("Next peak", next_peak)
+            print("Next peak", next_peak)
 
             #FFT_averaged = [x for x in FFT_averaged if (x < FHighRR and x > FLowRR)]
 
