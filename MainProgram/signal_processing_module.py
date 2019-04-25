@@ -68,7 +68,7 @@ class SignalProcessing:
         # print("heart_rate thread started")
         index_in_FFT_old_values = 0  # Placement of old FFT in FFT_old_values
         FFT_counter = 1  # In start to avg over FFT_counter before FFT_old_values is filled to max
-        freq_old = 70/60  # Guess the first freq
+        found_heart_freq_old = 70/60  # Guess the first freq
         # Variables for weigthed peaks
         multiplication_factor = 20
         time_constant = 1
@@ -90,7 +90,7 @@ class SignalProcessing:
             # Going into own method when tested and working
             delta_freq = []
             for freq in peak_freq:
-                delta_freq.append(freq - freq_old)
+                delta_freq.append(freq - found_heart_freq_old)
 
             # Weighted peak value
             # Två variabler B och Tidskonstant
@@ -98,12 +98,17 @@ class SignalProcessing:
             #    map(add, peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant)))
             self.peak_weighted = np.add(
                 peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
+            # freq_old is the new found heart freq
+            found_heart_freq = peak_freq[np.argmax(self.peak_weighted)]
+            found_heart_freq_old = found_heart_freq
+            print("freq_old: ", found_heart_freq)
             BPM_search = freq * 60
             # print("past plot heart rate")
 
             # increment counters in loop
             if FFT_counter < self.number_of_old_FFT:
                 FFT_counter += 1
+
             index_in_FFT_old_values += 1
             if index_in_FFT_old_values == self.number_of_old_FFT:
                 index_in_FFT_old_values = 0
