@@ -81,10 +81,11 @@ class SignalProcessing:
             fft_signal_out_dB = 20*np.log10(fft_signal_out)
             self.FFT_old_values[index_in_FFT_old_values][:] = fft_signal_out_dB
             # RBW = self.freq[1] - self.freq[0] # Used where?
-
+            print("This new FFT: ", fft_signal_out_dB[10])
+            print("Saved old FFT: ", self.FFT_old_values[:][10])
             # fft movemean
             FFT_averaged = self.mean_of_old_values(FFT_counter)
-            print("One value in avg FFT: ", FFT_averaged[:][10])
+            print("Averaged FFT: ", FFT_averaged[:][10])
             # Returns the peaks in set inteval from averaged FFT
             peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
             if len(peak_freq) > 0:  # In case zero peaks, use last value
@@ -108,18 +109,18 @@ class SignalProcessing:
             # increment counters in loop
             if FFT_counter < self.number_of_old_FFT:
                 FFT_counter += 1
-
             index_in_FFT_old_values += 1
             if index_in_FFT_old_values == self.number_of_old_FFT:
                 index_in_FFT_old_values = 0
 
-    def mean_of_old_values(self, FFT_counter):
-        self.FFT_average_out = np.zeros(int(self.window_width/2))
-        for j in range(0, int(self.window_width/2)):
-            for i in range(0, self.number_of_old_FFT):
-                self.FFT_average_out[j] = self.FFT_old_values[i][j] + self.FFT_average_out[j]
+    def mean_of_old_values(self, FFT_counter):  # Check
+        FFT_average_over = np.zeros(int(self.window_width/2))
+        for columns in range(0, int(self.window_width/2)):
+            for rows in range(0, self.number_of_old_FFT):
+                FFT_average_over[columns] = self.FFT_old_values[rows][columns] + \
+                    FFT_average_over[columns]
         #print("Mean of old values: ", self.FFT_average_out / FFT_counter)
-        return self.FFT_average_out / FFT_counter
+        return FFT_average_over / FFT_counter
 
     ### windowedFFT ###
     # input:
