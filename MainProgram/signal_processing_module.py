@@ -113,8 +113,8 @@ class SignalProcessing:
             if index_in_FFT_old_values == number_of_old_FFT:
                 index_in_FFT_old_values = 0
             # Plotting for FFT
-            self.FFTfreq = freq
-            self.FFTamplitude = FFT_averaged
+            self.FFTfreq = peak_freq_linspace
+            self.FFTamplitude = FFT_in_interval
 
     def mean_of_old_values(self, FFT_old_values, number_of_old_FFT, window_width, FFT_counter):
         FFT_average_out = np.zeros(window_width)
