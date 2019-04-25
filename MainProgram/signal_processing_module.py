@@ -81,15 +81,15 @@ class SignalProcessing:
             fft_signal_out_dB = 20*np.log10(fft_signal_out)
             self.FFT_old_values[index_in_FFT_old_values][:] = fft_signal_out_dB
             # RBW = self.freq[1] - self.freq[0] # Used where?
-            print("This new FFT: ", fft_signal_out_dB[2])
+            #print("This new FFT: ", fft_signal_out_dB[2])
             saved_old = self.FFT_old_values[:, 2]
-            print("length: ", len(saved_old))
-            print("Saved old FFT: ", saved_old)
+            #print("length: ", len(saved_old))
+            #print("Saved old FFT: ", saved_old)
             #print("Rows", len(self.FFT_old_values))
             #print("Columns", len(self.FFT_old_values[0]))
             # fft movemean
             FFT_averaged = self.mean_of_old_values(FFT_counter)
-            print("Averaged FFT: ", FFT_averaged[2])
+            #print("Averaged FFT: ", FFT_averaged[2])
             # Returns the peaks in set inteval from averaged FFT
             peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
             if len(peak_freq) > 0:  # In case zero peaks, use last value
@@ -147,7 +147,7 @@ class SignalProcessing:
                 self.index_fft = 0
         # TODO: Check if necessary. # roll the matrix so that the last inserted value is to the right.
         self.fft_window = np.roll(self.fft_window, -(self.index_fft+1))
-        fft_signal_out = self.smartFFT(self.fft_window, self.beta)  # do fft
+        fft_signal_out = self.smartFFT()  # do fft
         # TODO: check if necessayr. # roll the matrix back
         self.fft_window = np.roll(self.fft_window, (self.index_fft+1))
 
@@ -161,16 +161,16 @@ class SignalProcessing:
     # freq: frequency array [Hz]
     # signal_out: fft of the in signal as an array
 
-    def smartFFT(self, signal_in, beta):  # "signal_in" is "fft_window"
+    def smartFFT(self):  # "signal_in" is "fft_window"
         # print("In smartFFT")
         # length_seq = len(signal_in)  # number of sequences
-        window = np.kaiser(self.length_fft_window, beta)  # beta: shape factor
-        signal_in = np.multiply(signal_in, window)
+        window = np.kaiser(self.length_fft_window, self.beta)  # beta: shape factor
+        self.fft_window = np.multiply(self.fft_window, window)
 
-        signal_in_fft = fft(signal_in)  # two-sided fft of input signal
+        signal_in_fft = fft(self.fft_window)  # two-sided fft of input signal
 
-        signal_fft_abs = abs(signal_in_fft/self.length_fft_window)
-        signal_out = 2*signal_fft_abs[0:self.length_fft_window//2]  # one-sided fft
+        signal_fft_abs = np.abs(np.divide(signal_in_fft, self.length_fft_window))
+        signal_out = np.multiply(2, signal_fft_abs[0:self.length_fft_window//2])  # one-sided fft
 
         # frequency array corresponding to frequencies in the fft
         return signal_out
@@ -189,10 +189,11 @@ class SignalProcessing:
         MaxFFT = np.amax(FFT_in_interval)  # Do on one line later, to remove outliers
         threshold = MaxFFT - 30
         peaks, _ = signal.find_peaks(FFT_in_interval, threshold=threshold)
-
+        #print("Peaks: ",)
         self.peak_freq = []  # Maybe change to array?
         for i in peaks:
             self.peak_freq.append(peak_freq_linspace[i])
+        print(self.peak_freq)
 
         self.peak_amplitude = []
         for i in peaks:
