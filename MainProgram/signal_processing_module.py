@@ -105,7 +105,7 @@ class SignalProcessing:
                 found_heart_freq_old = found_heart_freq
             else:
                 found_heart_freq = found_heart_freq_old
-            print("freq_old: ", found_heart_freq)
+            print("Found heart rate Hz and BPM: ", found_heart_freq, int(60*found_heart_freq))
             found_heart_rate = int(60 * found_heart_freq)  # Send to app
             self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
             # BPM_search = self.freq * 60 # Used where?
