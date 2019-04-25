@@ -45,7 +45,6 @@ class SignalProcessing:
         self.number_of_old_FFT = int(round(self.tau / self.delta_T))  # Ta bort int?
         self.FFT_old_values = np.zeros((self.number_of_old_FFT, int(
             self.window_width/2)))  # Saving old values for moving mean
-        self.FFT_average_out = np.zeros(int(self.window_width/2))
         # Starta heart_rate
         self.heart_rate_thread = threading.Thread(target=self.heart_rate)
         self.heart_rate_thread.start()
@@ -115,6 +114,7 @@ class SignalProcessing:
                 index_in_FFT_old_values = 0
 
     def mean_of_old_values(self, FFT_counter):
+        self.FFT_average_out = np.zeros(int(self.window_width/2))
         for j in range(0, int(self.window_width/2)):
             for i in range(0, self.number_of_old_FFT):
                 self.FFT_average_out[j] = self.FFT_old_values[i][j] + self.FFT_average_out[j]
