@@ -38,6 +38,9 @@ class SignalProcessing:
         self.window_width = int(len(self.fft_window))
         # window_width_half = int(window_width/2)  # Since FFT only processes half of freq (Nyqvist)
         self.window_slide = int(np.round(self.window_width*(1-self.overlap/100)))
+        self.freq = self.sample_freq * \
+            np.arange(self.length_fft_window/2)/self.length_fft_window  # Evenly spaced freq array
+
         self.delta_T = self.window_slide / self.sample_freq
         self.number_of_old_FFT = int(round(self.tau / self.delta_T))  # Ta bort int?
         self.FFT_old_values = np.zeros((self.number_of_old_FFT, int(
@@ -75,19 +78,18 @@ class SignalProcessing:
 
         while self.go:
             # print("in while loop heart_rate")
-            freq, fft_signal_out = self.windowedFFT()
+            fft_signal_out = self.windowedFFT()
             fft_signal_out_dB = 20*np.log10(fft_signal_out)
-
             self.FFT_old_values[index_in_FFT_old_values][:] = fft_signal_out_dB
-            RBW = freq[1] - freq[0]
+            # RBW = self.freq[1] - self.freq[0] # Used where?
+
             # fft movemean
             FFT_averaged = self.mean_of_old_values(FFT_counter)
 
             # Returns the peaks in set inteval from averaged FFT
-            peak_freq, peak_amplitude, peak_freq_linspace, FFT_in_interval = self.findPeaks(
-                FFT_averaged, freq)
+            peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
 
-            # Going into own method when tested and working
+            # Going into own method when tested and working staying in "main loop"
             delta_freq = []
             for freq in peak_freq:
                 delta_freq.append(freq - found_heart_freq_old)
@@ -98,14 +100,15 @@ class SignalProcessing:
             #    map(add, peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant)))
             self.peak_weighted = np.add(
                 peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
-            # freq_old is the new found heart freq
-            if len(peak_freq) > 0:
+            if len(peak_freq) > 0:  # In case zero peaks, use last value
                 found_heart_freq = peak_freq[np.argmax(self.peak_weighted)]
                 found_heart_freq_old = found_heart_freq
             else:
                 found_heart_freq = found_heart_freq_old
             print("freq_old: ", found_heart_freq)
-            BPM_search = freq * 60
+            found_heart_rate = 60 * found_heart_freq  # Send to app
+            self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
+            # BPM_search = self.freq * 60 # Used where?
             # print("past plot heart rate")
 
             # increment counters in loop
@@ -115,16 +118,12 @@ class SignalProcessing:
             index_in_FFT_old_values += 1
             if index_in_FFT_old_values == self.number_of_old_FFT:
                 index_in_FFT_old_values = 0
-            # Plotting for FFT
-            self.FFTfreq = peak_freq_linspace
-            self.FFTamplitude = FFT_in_interval
 
     def mean_of_old_values(self, FFT_counter):
         FFT_average_out = np.zeros(int(self.window_width/2))
         for j in range(0, int(self.window_width/2)):
             for i in range(0, self.number_of_old_FFT):
                 FFT_average_out[j] = self.FFT_old_values[i][j] + FFT_average_out[j]
-
         return FFT_average_out / FFT_counter
 
     ### windowedFFT ###
@@ -144,17 +143,15 @@ class SignalProcessing:
         for i in range(self.window_slide):  # fills the fft_window array with window_slide values from filtered queue
             self.fft_window[self.index_fft] = self.HR_filtered_queue.get()
             self.index_fft += 1
-            if self.index_fft == self.window_width:  # Increment before if statement does not need -1
+            if self.index_fft == self.window_width:
                 self.index_fft = 0
-
         # TODO: Check if necessary. # roll the matrix so that the last inserted value is to the right.
         self.fft_window = np.roll(self.fft_window, -(self.index_fft+1))
-        [freq, fft_signal_out] = self.smartFFT(self.fft_window, self.beta)  # do fft
-
+        fft_signal_out = self.smartFFT(self.fft_window, self.beta)  # do fft
         # TODO: check if necessayr. # roll the matrix back
         self.fft_window = np.roll(self.fft_window, (self.index_fft+1))
 
-        return freq, fft_signal_out
+        return fft_signal_out
 
     ### smartFFT ###
     # input:
@@ -166,25 +163,24 @@ class SignalProcessing:
 
     def smartFFT(self, signal_in, beta):  # "signal_in" is "fft_window"
         # print("In smartFFT")
-        length_seq = len(signal_in)  # number of sequences
-        window = np.kaiser(length_seq, beta)  # beta: shape factor
+        # length_seq = len(signal_in)  # number of sequences
+        window = np.kaiser(self.length_fft_window, beta)  # beta: shape factor
         signal_in = np.multiply(signal_in, window)
 
         signal_in_fft = fft(signal_in)  # two-sided fft of input signal
 
-        signal_fft_abs = abs(signal_in_fft/length_seq)
-        signal_out = 2*signal_fft_abs[0:length_seq//2]  # one-sided fft
+        signal_fft_abs = abs(signal_in_fft/self.length_fft_window)
+        signal_out = 2*signal_fft_abs[0:self.length_fft_window//2]  # one-sided fft
 
         # frequency array corresponding to frequencies in the fft
-        freq = self.sample_freq*np.arange(length_seq/2)/length_seq
-        return freq, signal_out
+        return signal_out
 
-    def findPeaks(self, FFT_averaged, freq):
+    def findPeaks(self, FFT_averaged):
         # Lower and higher freq for removing unwanted areas of the FFT
         F_scan_lower = 1
         F_scan_upper = 3
-        FFT_in_interval = FFT_averaged[freq <= F_scan_upper]
-        freq2 = freq[freq <= F_scan_upper]
+        FFT_in_interval = FFT_averaged[self.freq <= F_scan_upper]
+        freq2 = self.freq[self.freq <= F_scan_upper]
         FFT_in_interval = FFT_in_interval[freq2 > F_scan_lower]
         peak_freq_linspace = np.linspace(F_scan_lower, F_scan_upper, num=len(FFT_in_interval))
 
@@ -201,7 +197,11 @@ class SignalProcessing:
         self.peak_amplitude = []
         for i in peaks:
             self.peak_amplitude.append(FFT_in_interval[i])
-        return self.peak_freq, self.peak_amplitude, peak_freq_linspace, FFT_in_interval  # Last two args for plot
+
+        # Plotting for FFT
+        self.FFTfreq = peak_freq_linspace
+        self.FFTamplitude = FFT_in_interval
+        return self.peak_freq, self.peak_amplitude
 
     # TODO Used for plotting in main, remove later
     def getFFTvalues(self):
