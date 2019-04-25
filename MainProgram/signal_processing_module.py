@@ -31,7 +31,7 @@ class SignalProcessing:
         self.T_resolution = 30
         self.overlap = 90  # Percentage of old values for the new FFT
         self.beta = 1  # Kaiser window form
-        self.tau = 12  # TODO Beskriva alla variabler
+        self.tau = 45  # TODO Beskriva alla variabler
         # Data in vector with length of window
         self.fft_window = np.zeros(self.T_resolution*self.sample_freq)  # Width in samples of FFT
         self.length_fft_window = len(self.fft_window)  # length of fft_window array
@@ -71,7 +71,7 @@ class SignalProcessing:
         # print("heart_rate thread started")
         index_in_FFT_old_values = 0  # Placement of old FFT in FFT_old_values
         FFT_counter = 1  # In start to avg over FFT_counter before FFT_old_values is filled to max
-        found_heart_freq_old = 70/60  # Guess the first freq
+        found_heart_freq_old = 80/60  # Guess the first freq
         # Variables for weigthed peaks
         multiplication_factor = 20
         time_constant = 1
