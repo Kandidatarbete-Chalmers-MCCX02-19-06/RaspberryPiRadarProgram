@@ -45,7 +45,7 @@ class SignalProcessing:
         self.number_of_old_FFT = int(round(self.tau / self.delta_T))  # Ta bort int?
         self.FFT_old_values = np.zeros((self.number_of_old_FFT, int(
             self.window_width/2)))  # Saving old values for moving mean
-
+        self.FFT_average_out = np.zeros(int(self.window_width/2))
         # Starta heart_rate
         self.heart_rate_thread = threading.Thread(target=self.heart_rate)
         self.heart_rate_thread.start()
@@ -85,7 +85,7 @@ class SignalProcessing:
 
             # fft movemean
             FFT_averaged = self.mean_of_old_values(FFT_counter)
-
+            print(FFT_averaged[:][10])
             # Returns the peaks in set inteval from averaged FFT
             peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
             if len(peak_freq) > 0:  # In case zero peaks, use last value
@@ -115,11 +115,10 @@ class SignalProcessing:
                 index_in_FFT_old_values = 0
 
     def mean_of_old_values(self, FFT_counter):
-        FFT_average_out = np.zeros(int(self.window_width/2))
         for j in range(0, int(self.window_width/2)):
             for i in range(0, self.number_of_old_FFT):
-                FFT_average_out[j] = self.FFT_old_values[i][j] + FFT_average_out[j]
-        return FFT_average_out / FFT_counter
+                self.FFT_average_out[j] = self.FFT_old_values[i][j] + self.FFT_average_out[j]
+        return self.FFT_average_out / FFT_counter
 
     ### windowedFFT ###
     # input:
@@ -179,7 +178,7 @@ class SignalProcessing:
         FFT_in_interval = FFT_in_interval[freq2 > F_scan_lower]
         peak_freq_linspace = np.linspace(F_scan_lower, F_scan_upper, num=len(FFT_in_interval))
 
-        print("FFT_in_interval", FFT_in_interval, "\n", len(FFT_in_interval))
+        #print("FFT_in_interval", FFT_in_interval, "\n", len(FFT_in_interval))
 
         MaxFFT = np.amax(FFT_in_interval)  # Do on one line later, to remove outliers
         threshold = MaxFFT - 30
