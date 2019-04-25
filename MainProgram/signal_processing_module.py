@@ -29,7 +29,7 @@ class SignalProcessing:
         # Variables for Pulse detection
         self.index_fft = 0
         self.T_resolution = 30
-        self.overlap = 90  # Percentage of old values for the new FFT
+        self.overlap = 0  # Percentage of old values for the new FFT
         self.beta = 1  # Kaiser window form
         self.tau = 12  # TODO Beskriva alla variabler
         # Data in vector with length of window
@@ -193,7 +193,7 @@ class SignalProcessing:
         self.peak_freq = []  # Maybe change to array?
         for i in peaks:
             self.peak_freq.append(peak_freq_linspace[i])
-        print(self.peak_freq)
+        print("Found peak freq: ", self.peak_freq)
 
         self.peak_amplitude = []
         for i in peaks:
