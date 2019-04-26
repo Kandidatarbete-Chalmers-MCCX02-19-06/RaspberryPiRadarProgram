@@ -70,7 +70,6 @@ class DataAcquisition(threading.Thread):
         self.plot_time_length = 10  # Length of plotted data
         self.number_of_time_samples = int(self.plot_time_length / self.dt)  # Number of time samples when plotting
         self.max_peak_amplitude = 0
-        self.min_peak_amplitude = 0
         self.tracked_distance_over_time = np.zeros(self.number_of_time_samples)  # Array for distance over time plot
         self.local_peaks_index = []  # Index of big local peaks
         self.all_local_peaks_index = None  # Index of all, even the smaller local peaks
@@ -90,12 +89,13 @@ class DataAcquisition(threading.Thread):
         self.track_peak_relative_position = None  # used for plotting
         self.relative_distance = 0  # the relative distance that is measured from phase differences (mm)
         self.last_phase = 0  # tracked phase from previous loop
-        #self.old_relative_distance_values = []  # saves old values to remove bias in real time breathing plot
-        self.old_relative_distance_values = np.zeros(1000)
+        self.old_relative_distance_values = np.zeros(1000)  # saves old values to remove bias in real time breathing plot
         self.c = 2.998e8  # light speed (m/s)
         self.freq = 60e9  # radar frequency (Hz)
         self.wave_length = self.c / self.freq  # wave length of the radar
         self.delta_distance = 0  # difference in distance between the last two phases (m)
+        self.noise_run_time = 0  # number of run times with noise, used to remove noise
+        self.not_noise_run_time = 0  # number of run times without noise
 
         # other
         self.modulo_base = int(self.list_of_variables_for_threads["sample_freq"] / 20)  # how often values are plotted and sent to the app
@@ -104,8 +104,7 @@ class DataAcquisition(threading.Thread):
         print('modulo base', self.modulo_base)
         self.run_times = 0  # number of times run in run
         self.calibrating_time = 5  # Time sleep for passing through filters. Used for Real time breathing
-        self.noise_run_time = 0
-        self.not_noise_run_time = 0
+
 
         # Graphs
         self.plot_graphs = True  # if plot the graphs or not
@@ -218,10 +217,9 @@ class DataAcquisition(threading.Thread):
         # elif self.noise_run_time < 10:
         #     self.noise_run_time = self.noise_run_time + 1
 
-        if np.sum(amplitude)/data_length > 1e-6:  # TODO lägre värde? Ursprunligen 1e-6
+        if np.sum(amplitude)/data_length > 1e-6:
             max_peak_index = np.argmax(power)
             self.max_peak_amplitude = amplitude[max_peak_index]
-            #self.min_peak_amplitude = amplitude[np.argmin(power)]
             if self.first_data:  # first time
                 self.track_peak_index.append(max_peak_index)  # global max peak
                 self.track_peaks_average_index = max_peak_index
@@ -277,7 +275,7 @@ class DataAcquisition(threading.Thread):
             if self.first_data:  # first time
                 self.track_peaks_average_index = 0
 
-        # Plots
+        # Plots,
         if self.first_data:
             self.tracked_data = None
             self.low_pass_amplitude = amplitude
@@ -318,6 +316,19 @@ class DataAcquisition(threading.Thread):
             self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi) * self.low_pass_const + \
                 (1 - self.low_pass_const) * self.delta_distance  # calculates the distance traveled from phase differences
 
+            # TODO testa utan lågpassfilter
+            # self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi)
+
+            # TODO testa med konjugat
+            # com_idx = int(self.track_peak_relative_position * data_length)
+            # print('com_idx',com_idx)
+            # print('average index',self.track_peaks_average_index)
+            # delta_angle = np.angle(data[com_idx] * np.conj(self.last_data[com_idx]))
+            # vel = self.list_of_variables_for_threads["sample_freq"] * 2.5 * delta_angle / (2 * np.pi)
+            # self.low_pass_vel = self.low_pass_const * vel + \
+            #     (1 - self.low_pass_const) * self.low_pass_vel
+            # dp = self.low_pass_vel / self.list_of_variables_for_threads["sample_freq"]
+
             # Don't use the data if only noise were found TODO improve
             # if self.tracked_amplitude < 2e-2 and np.sum(amplitude) / data_length < 1e-2 and self.noise_run_time == 10:
             #     self.delta_distance = 0
@@ -330,58 +341,30 @@ class DataAcquisition(threading.Thread):
             # if self.not_noise_run_time < 5:
             #     self.delta_distance = 0
 
-            # New
-            #print('tracked amp',self.tracked_amplitude)
-            #print('average amp',np.sum(amplitude)/data_length)
+            # Remove Noise
+            # Indicate if the current measurement is noise or not, to not use the noise in signal_processing
             print('kvot',self.max_peak_amplitude/(np.sum(amplitude[self.all_local_peaks_index])-self.max_peak_amplitude)*(len(self.all_local_peaks_index)-1))
             if self.max_peak_amplitude < (np.sum(amplitude[self.all_local_peaks_index])-self.max_peak_amplitude)/(len(self.all_local_peaks_index)-1)*3: # np.mean(amplitude[self.all_local_peaks_index])    np.mean(amplitude)
+                # Noise
                 self.noise_run_time += 1
                 if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
                     self.not_noise_run_time = 0
-                #print('noise',self.noise_run_time)
             else:
+                # Real value
                 self.not_noise_run_time += 1
                 if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
                     self.noise_run_time = 0
-                #print('not noise', self.not_noise_run_time)
-
             if self.noise_run_time >= 10 and self.not_noise_run_time < 5:
+                # If there has been noise at least 10 times with less than 5 real values, the data is considered to be purely noise.
                 self.tracked_distance = 0
                 self.delta_distance = 0
                 # if self.relative_distance == 0: # TODO
                 #    self.old_relative_distance_values = np.zeros(1000)
 
-            # if self.noise_run_time >= 10:
-            #     self.tracked_distance = 0
-            #     self.delta_distance = 0
-            #     self.not_noise_run_time = 0 # ?
-            #     #if self.relative_distance == 0: # TODO
-            #     #    self.old_relative_distance_values = np.zeros(1000)
-            # elif self.not_noise_run_time >= 5:
-            #     self.noise_run_time = 0
-            # else:
-            #     self.tracked_distance = 0
-            #     self.delta_distance = 0
-            #     #if self.relative_distance == 0:
-            #     #    self.old_relative_distance_values = np.zeros(1000)
-
             self.relative_distance = self.relative_distance - self.delta_distance  # relative distance in mm
             # The minus sign comes from changing coordinate system; what the radar think is outward is inward for the person that is measured on
             self.last_phase = self.tracked_phase
 
-            # list
-            # start = time.time()
-            # # Averaging # TODO array instead of list?
-            # self.old_relative_distance_values.append(self.relative_distance)
-            # if len(self.old_relative_distance_values) > 0:
-            #     #self.relative_distance = self.relative_distance - np.mean(self.old_relative_distance_values)/1000
-            #     self.old_relative_distance_values[:] = self.old_relative_distance_values[:] - np.mean(
-            #         self.old_relative_distance_values)
-            #     self.relative_distance = self.old_relative_distance_values[-1]
-            # if len(self.old_relative_distance_values) > 1000:
-            #     self.old_relative_distance_values.pop(0)
-            # end = time.time()
-            # print('time diff for list/array',(end-start)*1000)
 
             # array
             #start = time.time()
