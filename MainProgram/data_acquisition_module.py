@@ -327,10 +327,12 @@ class DataAcquisition(threading.Thread):
             # New
             #print('tracked amp',self.tracked_amplitude)
             #print('average amp',np.sum(amplitude)/data_length)
-            if self.tracked_amplitude < np.sum(amplitude)/data_length*1.5:
+            if self.tracked_amplitude < np.sum(amplitude)/data_length*1.3:
                 self.noise_run_time += 1
+                print('noise',self.noise_run_time)
             else:
                 self.not_noise_run_time += 1
+                print('not noise', self.not_noise_run_time)
 
             if self.noise_run_time >= 10:
                 self.tracked_distance = 0
