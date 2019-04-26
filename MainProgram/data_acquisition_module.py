@@ -162,10 +162,10 @@ class DataAcquisition(threading.Thread):
                 if not self.run_measurement:
                     calibrating_time = time.time() + self.calibrating_time
                 if (self.run_measurement):
-                    #self.HR_filtered_queue.put(
-                    #    bandpass_filtered_data_HR)  # Put filtered data in output queue to send to SignalProcessing
-                    #self.RR_filtered_queue.put(bandpass_filtered_data_RR) # TODO Aktivera igen
-                    # self.RTB_final_queue.put(bandpass_filtered_data_RR)
+                    self.HR_filtered_queue.put(
+                       bandpass_filtered_data_HR)  # Put filtered data in output queue to send to SignalProcessing
+                    self.RR_filtered_queue.put(bandpass_filtered_data_RR) # TODO Aktivera igen
+                    self.RTB_final_queue.put(bandpass_filtered_data_RR)
                     #done = time.time()
                     #print('filter', (done - start)*1000)
 
@@ -275,7 +275,7 @@ class DataAcquisition(threading.Thread):
             if self.first_data:  # first time
                 self.track_peaks_average_index = 0
 
-        # Plots,
+        # Plots, phase to distance and noise ignoring
         if self.first_data:
             self.tracked_data = None
             self.low_pass_amplitude = amplitude
@@ -346,17 +346,17 @@ class DataAcquisition(threading.Thread):
             # Remove Noise
             # Indicate if the current measurement is noise or not, to not use the noise in signal_processing
             #print('kvot',self.max_peak_amplitude/(np.sum(amplitude[self.all_local_peaks_index])-self.max_peak_amplitude)*(len(self.all_local_peaks_index)-1))
-            if self.max_peak_amplitude < (np.sum(amplitude[self.all_local_peaks_index])-self.max_peak_amplitude)/(len(self.all_local_peaks_index)-1)*2: # np.mean(amplitude[self.all_local_peaks_index])    np.mean(amplitude)
+            if self.max_peak_amplitude < (np.sum(amplitude[self.all_local_peaks_index])-self.max_peak_amplitude)/(len(self.all_local_peaks_index)-1)*3: # np.mean(amplitude[self.all_local_peaks_index])    np.mean(amplitude)
                 # Noise
                 self.noise_run_time += 1
-                if self.noise_run_time >= 10 and self.not_noise_run_time >= 10:
+                if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
                     self.not_noise_run_time = 0
             else:
                 # Real value
                 self.not_noise_run_time += 1
-                if self.noise_run_time >= 10 and self.not_noise_run_time >= 10:
+                if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
                     self.noise_run_time = 0
-            if self.noise_run_time >= 10 and self.not_noise_run_time < 10:
+            if self.noise_run_time >= 10 and self.not_noise_run_time < 5:
                 # If there has been noise at least 10 times with less than 5 real values, the data is considered to be purely noise.
                 self.tracked_distance = 0
                 self.delta_distance = 0
