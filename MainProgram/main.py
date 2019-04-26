@@ -61,9 +61,9 @@ def main():
     FFTamplitude = [1, 2, 3]
     peak_freq = [1]
     peak_amplitude = [1]
-    specFreq = [1]
-    specTime = [1]
-    specSignal = [1]
+    specFreq = [1, 2, 3]
+    specTime = [1, 2, 3]
+    specSignal = [1, 2, 3]
 
     # BluetoothServer object sent to classes which sends data locally
     bluetooth_server = bluetooth_server_module.BluetoothServer(list_of_variables_for_threads)
