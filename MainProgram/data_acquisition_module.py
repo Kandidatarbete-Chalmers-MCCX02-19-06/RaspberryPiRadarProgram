@@ -347,14 +347,14 @@ class DataAcquisition(threading.Thread):
             if self.max_peak_amplitude < (np.sum(amplitude[self.all_local_peaks_index])-self.max_peak_amplitude)/(len(self.all_local_peaks_index)-1)*4: # np.mean(amplitude[self.all_local_peaks_index])    np.mean(amplitude)
                 # Noise
                 self.noise_run_time += 1
-                if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
+                if self.noise_run_time >= 10 and self.not_noise_run_time >= 10:
                     self.not_noise_run_time = 0
             else:
                 # Real value
                 self.not_noise_run_time += 1
-                if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
+                if self.noise_run_time >= 10 and self.not_noise_run_time >= 10:
                     self.noise_run_time = 0
-            if self.noise_run_time >= 10 and self.not_noise_run_time < 5:
+            if self.noise_run_time >= 10 and self.not_noise_run_time < 10:
                 # If there has been noise at least 10 times with less than 5 real values, the data is considered to be purely noise.
                 self.tracked_distance = 0
                 self.delta_distance = 0
