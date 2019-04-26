@@ -61,7 +61,7 @@ def main():
     FFTamplitude = [1, 2, 3]
     peak_freq = [1]
     peak_amplitude = [1]
-    array = [[], []]
+    array = np.empty((1, 30))
 
     # BluetoothServer object sent to classes which sends data locally
     bluetooth_server = bluetooth_server_module.BluetoothServer(list_of_variables_for_threads)
