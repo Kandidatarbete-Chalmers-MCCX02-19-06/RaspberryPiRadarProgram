@@ -330,24 +330,32 @@ class DataAcquisition(threading.Thread):
             print('average amp',np.sum(amplitude)/data_length)
             if self.tracked_amplitude < np.sum(amplitude)/data_length*1.3:
                 self.noise_run_time += 1
+                self.not_noise_run_time = 0
                 print('noise',self.noise_run_time)
             else:
                 self.not_noise_run_time += 1
+                self.noise_run_time = 0
                 print('not noise', self.not_noise_run_time)
 
-            if self.noise_run_time >= 10:
+            if self.noise_run_time >= 10 and self.not_noise_run_time < 5:
                 self.tracked_distance = 0
                 self.delta_distance = 0
-                self.not_noise_run_time = 0 # ?
-                #if self.relative_distance == 0: # TODO
+                # if self.relative_distance == 0: # TODO
                 #    self.old_relative_distance_values = np.zeros(1000)
-            elif self.not_noise_run_time >= 5:
-                self.noise_run_time = 0
-            else:
-                self.tracked_distance = 0
-                self.delta_distance = 0
-                #if self.relative_distance == 0:
-                #    self.old_relative_distance_values = np.zeros(1000)
+
+            # if self.noise_run_time >= 10:
+            #     self.tracked_distance = 0
+            #     self.delta_distance = 0
+            #     self.not_noise_run_time = 0 # ?
+            #     #if self.relative_distance == 0: # TODO
+            #     #    self.old_relative_distance_values = np.zeros(1000)
+            # elif self.not_noise_run_time >= 5:
+            #     self.noise_run_time = 0
+            # else:
+            #     self.tracked_distance = 0
+            #     self.delta_distance = 0
+            #     #if self.relative_distance == 0:
+            #     #    self.old_relative_distance_values = np.zeros(1000)
 
             self.relative_distance = self.relative_distance - self.delta_distance  # relative distance in mm
             # The minus sign comes from changing coordinate system; what the radar think is outward is inward for the person that is measured on
