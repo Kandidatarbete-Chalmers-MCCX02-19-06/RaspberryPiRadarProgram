@@ -327,6 +327,8 @@ class DataAcquisition(threading.Thread):
                 if np.abs(peak_index - self.max_peak_index) > data_length/5:
                     amplitude_average += amplitude[peak_index]
                     peak_number += 1
+            if peak_number == 0:
+                peak_number = 1
 
 
 
