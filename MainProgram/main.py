@@ -87,11 +87,11 @@ def main():
         print("Length of FFT_amplitude", len(FFTamplitude))
         if len(FFTamplitude) == 30:
             array = np.append(array, FFTamplitude, 1)
+            plt.pcolormesh(array)
+        plt.pause(1)
         # plt.plot(FFTfreq, FFTamplitude)
         # plt.plot(peak_freq, peak_amplitude, 'bo')
         # plt.plot(peak_freq, peak_weighted, 'ro')
-        plt.pcolormesh(array)
-        plt.pause(1)
 
         # time.sleep(1)
         #print(FFTfreq, FFTamplitude)
