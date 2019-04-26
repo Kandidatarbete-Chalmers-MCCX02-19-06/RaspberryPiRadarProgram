@@ -207,7 +207,7 @@ class SignalProcessing:
 
     # TODO Used for plotting in main, remove later
     def getFFTvalues(self):
-        return self.FFTfreq*60, self.FFTamplitude*60, self.peak_freq*60, self.peak_amplitude*60, self.peak_weighted*60
+        return self.FFTfreq, self.FFTamplitude, self.peak_freq, self.peak_amplitude, self.peak_weighted
 
     def schmittTrigger(self):
         print("SchmittTrigger started")
