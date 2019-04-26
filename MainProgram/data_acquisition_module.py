@@ -69,6 +69,7 @@ class DataAcquisition(threading.Thread):
         self.number_of_averages = 2  # Number of averages for tracked peak
         self.plot_time_length = 10  # Length of plotted data
         self.number_of_time_samples = int(self.plot_time_length / self.dt)  # Number of time samples when plotting
+        self.max_peak_amplitude = 0
         self.tracked_distance_over_time = np.zeros(self.number_of_time_samples)  # Array for distance over time plot
         self.local_peaks_index = []  # Index of local peaks
         self.track_peak_index = []  # Index of last tracked peaks
@@ -217,6 +218,7 @@ class DataAcquisition(threading.Thread):
 
         if np.sum(amplitude)/data_length > 1e-6:  # TODO lägre värde? Ursprunligen 1e-6
             max_peak_index = np.argmax(power)
+            self.max_peak_amplitude = amplitude[max_peak_index]
             if self.first_data:  # first time
                 self.track_peak_index.append(max_peak_index)  # global max peak
                 self.track_peaks_average_index = max_peak_index
@@ -242,8 +244,7 @@ class DataAcquisition(threading.Thread):
                         self.local_peaks_index[np.argmin(np.abs(peak_difference_index))])
                 if len(self.track_peak_index) > self.number_of_averages:
                     self.track_peak_index.pop(0)  # remove oldest value
-                if amplitude[self.track_peak_index[-1]] < 0.5 * amplitude[
-                        max_peak_index]:  # if there is a much larger peak
+                if amplitude[self.track_peak_index[-1]] < 0.5 * self.max_peak_amplitude:  # if there is a much larger peak
                     self.track_peak_index.clear()  # reset the array
                     self.track_peak_index.append(max_peak_index)  # new peak is global max
                 self.track_peaks_average_index = int(  # Average and smooth the movements of the tracked peak
@@ -328,7 +329,7 @@ class DataAcquisition(threading.Thread):
             # New
             print('tracked amp',self.tracked_amplitude)
             print('average amp',np.sum(amplitude)/data_length)
-            if self.tracked_amplitude < np.sum(amplitude)/data_length*3:
+            if self.max_peak_amplitude < np.sum(amplitude)/data_length*3:
                 self.noise_run_time += 1
                 self.not_noise_run_time = 0
                 print('noise',self.noise_run_time)
