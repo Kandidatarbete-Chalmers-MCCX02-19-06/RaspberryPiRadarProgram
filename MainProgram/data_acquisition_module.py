@@ -51,7 +51,7 @@ class DataAcquisition(threading.Thread):
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
-        self.config.sweep_rate = 20  # Probably 30 is the best, can go up to 100 without graph
+        self.config.sweep_rate = 5  # Probably 30 is the best, can go up to 100 without graph
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
@@ -260,6 +260,7 @@ class DataAcquisition(threading.Thread):
                 0] + self.track_peaks_average_index / len(data) * self.config.range_interval[1]
             # Tracked amplitude is absolute value of data for the tracked index
             self.tracked_amplitude = np.abs(data[self.track_peaks_average_index])
+            #self.tracked_amplitude = amplitude[self.track_peaks_average_index] TODO byt till denna
             # Tracked phase is the angle between I and Q in data for tracked index
             self.tracked_phase = np.angle(data[self.track_peaks_average_index])
         else:
@@ -325,8 +326,8 @@ class DataAcquisition(threading.Thread):
             #     self.delta_distance = 0
 
             # New
-            #print('tracked amp',self.tracked_amplitude)
-            #print('average amp',np.sum(amplitude)/data_length)
+            print('tracked amp',self.tracked_amplitude)
+            print('average amp',np.sum(amplitude)/data_length)
             if self.tracked_amplitude < np.sum(amplitude)/data_length*1.3:
                 self.noise_run_time += 1
                 print('noise',self.noise_run_time)
