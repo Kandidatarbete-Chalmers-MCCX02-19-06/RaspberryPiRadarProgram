@@ -29,7 +29,7 @@ class SignalProcessing:
 
         # Variables for Pulse detection
         self.index_fft = 0
-        self.T_resolution = 30  # förut 30
+        self.T_resolution = 15  # förut 30
         self.overlap = 90  # Percentage of old values for the new FFT
         self.beta = 1  # Kaiser window form
         self.tau = 12  # TODO Beskriva alla variabler
@@ -44,7 +44,7 @@ class SignalProcessing:
 
         self.delta_T = self.window_slide / self.sample_freq
         # int(round(self.tau / self.delta_T))  # Make tau is larger than delta_T, else it will be zero and programme will fail.
-        self.number_of_old_FFT = 5
+        self.number_of_old_FFT = 10
         self.FFT_old_values = np.zeros((self.number_of_old_FFT, int(
             self.window_width/2)))  # Saving old values for moving mean
         # Starta heart_rate
@@ -64,10 +64,6 @@ class SignalProcessing:
         self.peak_freq = []
         self.peak_amplitude = []
         self.peak_weighted = []
-        self.spectroList = []
-        self.specFreq = []
-        self.specTime = []
-        self.specSignal = []
 
     # Kaos i koden, behöver struktureras upp och alla konstanter måste defineras i början
     # Följer just nu Matlab strukturen.
@@ -86,8 +82,6 @@ class SignalProcessing:
             fft_signal_out = self.windowedFFT()
             fft_signal_out_dB = 20*np.log10(fft_signal_out)
             self.FFT_old_values[index_in_FFT_old_values][:] = fft_signal_out_dB
-            self.spectroList.append(fft_signal_out_dB)
-            self.specFreq, self.specTime, self.specSignal = spectrogram(self.spectroList, 1/3)
 
             # RBW = self.freq[1] - self.freq[0] # Used where?
             #print("This new FFT: ", fft_signal_out_dB[2])
@@ -216,8 +210,7 @@ class SignalProcessing:
 
     # TODO Used for plotting in main, remove later
     def getFFTvalues(self):
-        # return self.FFTfreq, self.FFTamplitude, self.peak_freq, self.peak_amplitude, self.peak_weighted
-        return self.specFreq, self.specTime, self.specSignal
+        return self.FFTfreq, self.FFTamplitude, self.peak_freq, self.peak_amplitude, self.peak_weighted
 
     def schmittTrigger(self):
         print("SchmittTrigger started")
