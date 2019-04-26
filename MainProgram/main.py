@@ -74,7 +74,7 @@ def main():
     signal_processing = signal_processing_module.SignalProcessing(
         list_of_variables_for_threads, bluetooth_server, FFTfreq, FFTamplitude)
 
-    plt.plot(FFTfreq, FFTamplitude)
+    plt.plot(FFTfreq*60, FFTamplitude)
     plt.pause(1)
     plt.xlim(60, 180)
     # Lets threads and thereby program run while go is True. Go is set from app
