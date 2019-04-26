@@ -83,9 +83,9 @@ def main():
         plt.clf()
         plt.xlim(1, 3)
         FFTfreq, FFTamplitude, peak_freq, peak_amplitude, peak_weighted = signal_processing.getFFTvalues()
-        plt.plot(FFTfreq, FFTamplitude)
-        plt.plot(peak_freq, peak_amplitude, 'bo')
-        plt.plot(peak_freq, peak_weighted, 'ro')
+        plt.plot(FFTfreq*60, FFTamplitude)
+        plt.plot(peak_freq*60, peak_amplitude, 'bo')
+        plt.plot(peak_freq*60, peak_weighted, 'ro')
         plt.pause(1)
 
 
