@@ -320,10 +320,19 @@ class DataAcquisition(threading.Thread):
             # if self.not_noise_run_time < 5:
             #     self.delta_distance = 0
 
+            amplitude_average = 0
+            peak_number = 0
+            for peak_index in self.all_local_peaks_index:
+                if np.abs(peak_index - max_peak_index) > data_length/5:
+                    amplitude_average += amplitude[peak_index]
+                    peak_number += 1
+
+
+
             # Remove Noise
             # Indicate if the current measurement is noise or not, to not use the noise in signal_processing
             #print('kvot',self.max_peak_amplitude/(np.sum(amplitude[self.all_local_peaks_index])-self.max_peak_amplitude)*(len(self.all_local_peaks_index)-1))
-            if self.max_peak_amplitude < np.mean(amplitude)*4:
+            if self.max_peak_amplitude < amplitude_average/peak_number*2:  # np.mean(amplitude)
                 # Noise
                 self.noise_run_time += 1
                 if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
@@ -337,7 +346,7 @@ class DataAcquisition(threading.Thread):
                 # If there has been noise at least 10 times with less than 5 real values, the data is considered to be purely noise.
                 self.tracked_distance = 0
                 self.delta_distance = 0
-                if self.relative_distance == 0: # TODO
+                if self.relative_distance == 0:
                    self.old_relative_distance_values = np.zeros(1000)
 
             self.relative_distance = self.relative_distance - self.delta_distance  # relative distance in mm
