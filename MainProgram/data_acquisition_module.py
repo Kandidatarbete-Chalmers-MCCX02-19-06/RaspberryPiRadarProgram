@@ -220,7 +220,7 @@ class DataAcquisition(threading.Thread):
         if np.sum(amplitude)/data_length > 1e-6:  # TODO lägre värde? Ursprunligen 1e-6
             max_peak_index = np.argmax(power)
             self.max_peak_amplitude = amplitude[max_peak_index]
-            self.min_peak_amplitude = amplitude[np.argmin(power)]
+            #self.min_peak_amplitude = amplitude[np.argmin(power)]
             if self.first_data:  # first time
                 self.track_peak_index.append(max_peak_index)  # global max peak
                 self.track_peaks_average_index = max_peak_index
@@ -331,8 +331,8 @@ class DataAcquisition(threading.Thread):
             # New
             #print('tracked amp',self.tracked_amplitude)
             #print('average amp',np.sum(amplitude)/data_length)
-            print('kvot',self.max_peak_amplitude/self.min_peak_amplitude)
-            if self.max_peak_amplitude < self.min_peak_amplitude*5:
+            print('kvot',self.max_peak_amplitude/np.mean(amplitude[self.local_peaks_index]))
+            if self.max_peak_amplitude < np.mean(amplitude[self.local_peaks_index]):
                 self.noise_run_time += 1
                 if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
                     self.not_noise_run_time = 0
