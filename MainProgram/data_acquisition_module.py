@@ -51,7 +51,7 @@ class DataAcquisition(threading.Thread):
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
-        self.config.sweep_rate = 40  # Probably 30 or 40 is the best without graph
+        self.config.sweep_rate = 50  # Probably 30 or 40 is the best without graph
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
@@ -323,7 +323,7 @@ class DataAcquisition(threading.Thread):
             # Remove Noise
             # Indicate if the current measurement is noise or not, to not use the noise in signal_processing
             #print('kvot',self.max_peak_amplitude/(np.sum(amplitude[self.all_local_peaks_index])-self.max_peak_amplitude)*(len(self.all_local_peaks_index)-1))
-            if self.max_peak_amplitude < (np.sum(amplitude[self.all_local_peaks_index])-self.max_peak_amplitude)/(len(self.all_local_peaks_index)-1)*2: # np.mean(amplitude[self.all_local_peaks_index])    np.mean(amplitude)
+            if self.max_peak_amplitude < (np.sum(amplitude[self.all_local_peaks_index])-self.max_peak_amplitude)/(len(self.all_local_peaks_index)-1)*4: # np.mean(amplitude[self.all_local_peaks_index])    np.mean(amplitude)
                 # Noise
                 self.noise_run_time += 1
                 if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
