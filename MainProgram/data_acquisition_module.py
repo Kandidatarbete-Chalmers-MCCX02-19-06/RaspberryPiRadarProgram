@@ -196,7 +196,7 @@ class DataAcquisition(threading.Thread):
         info, data = self.client.get_next()  # get the next data from the radar
         if info[-1]['sequence_number'] > self.run_times + 10:
             # to remove delay if handling the data takes longer time than for the radar to get it
-            print("sequence diff over 10, removing difference")
+            print("sequence diff over 10, removing difference",info[-1]['sequence_number']-self.run_times)
             for i in range(0, info[-1]['sequence_number']-self.run_times-1):
                 self.client.get_next()  # getting the data without using it
             info, data = self.client.get_next()
