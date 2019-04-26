@@ -333,8 +333,8 @@ class DataAcquisition(threading.Thread):
             # New
             #print('tracked amp',self.tracked_amplitude)
             #print('average amp',np.sum(amplitude)/data_length)
-            print('kvot',self.max_peak_amplitude/np.mean(amplitude))
-            if self.max_peak_amplitude < np.mean(amplitude)*2: # np.mean(amplitude[self.all_local_peaks_index])
+            print('kvot',self.max_peak_amplitude/np.mean(amplitude[self.all_local_peaks_index]-self.max_peak_amplitude))
+            if self.max_peak_amplitude < np.mean(amplitude[self.all_local_peaks_index]-self.max_peak_amplitude)*2: # np.mean(amplitude[self.all_local_peaks_index])    np.mean(amplitude)
                 self.noise_run_time += 1
                 if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
                     self.not_noise_run_time = 0
