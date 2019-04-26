@@ -76,6 +76,7 @@ class DataAcquisition(threading.Thread):
         self.track_peak_index = []  # Index of last tracked peaks
         self.track_peaks_average_index = None  # Average of last tracked peaks
         self.threshold = 1  # Threshold for removing small local peaks. Start value not important
+        self.max_peak_index = 0
 
         # Returned variables
         self.tracked_distance = None  # distance to the tracked peak (m)
@@ -196,11 +197,11 @@ class DataAcquisition(threading.Thread):
         #     self.noise_run_time = self.noise_run_time + 1
 
         if np.sum(amplitude)/data_length > 1e-6:
-            max_peak_index = np.argmax(power)
-            self.max_peak_amplitude = amplitude[max_peak_index]
+            self.max_peak_index = np.argmax(power)
+            self.max_peak_amplitude = amplitude[self.max_peak_index]
             if self.first_data:  # first time
-                self.track_peak_index.append(max_peak_index)  # global max peak
-                self.track_peaks_average_index = max_peak_index
+                self.track_peak_index.append(self.max_peak_index)  # global max peak
+                self.track_peaks_average_index = self.max_peak_index
             else:
                 self.local_peaks_index, _ = signal.find_peaks(power)  # find local max in data
                 self.all_local_peaks_index=self.local_peaks_index
@@ -226,7 +227,7 @@ class DataAcquisition(threading.Thread):
                     self.track_peak_index.pop(0)  # remove oldest value
                 if amplitude[self.track_peak_index[-1]] < 0.5 * self.max_peak_amplitude:  # if there is a much larger peak
                     self.track_peak_index.clear()  # reset the array
-                    self.track_peak_index.append(max_peak_index)  # new peak is global max
+                    self.track_peak_index.append(self.max_peak_index)  # new peak is global max
                 self.track_peaks_average_index = int(  # Average and smooth the movements of the tracked peak
                     np.round(self.low_pass_const * (np.average(self.track_peak_index))
                              + (1 - self.low_pass_const) * self.track_peaks_average_index))
@@ -323,7 +324,7 @@ class DataAcquisition(threading.Thread):
             amplitude_average = 0
             peak_number = 0
             for peak_index in self.all_local_peaks_index:
-                if np.abs(peak_index - max_peak_index) > data_length/5:
+                if np.abs(peak_index - self.max_peak_index) > data_length/5:
                     amplitude_average += amplitude[peak_index]
                     peak_number += 1
 
