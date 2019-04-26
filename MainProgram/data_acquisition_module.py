@@ -70,6 +70,7 @@ class DataAcquisition(threading.Thread):
         self.plot_time_length = 10  # Length of plotted data
         self.number_of_time_samples = int(self.plot_time_length / self.dt)  # Number of time samples when plotting
         self.max_peak_amplitude = 0
+        self.min_peak_amplitude = 0
         self.tracked_distance_over_time = np.zeros(self.number_of_time_samples)  # Array for distance over time plot
         self.local_peaks_index = []  # Index of local peaks
         self.track_peak_index = []  # Index of last tracked peaks
@@ -219,6 +220,7 @@ class DataAcquisition(threading.Thread):
         if np.sum(amplitude)/data_length > 1e-6:  # TODO lägre värde? Ursprunligen 1e-6
             max_peak_index = np.argmax(power)
             self.max_peak_amplitude = amplitude[max_peak_index]
+            self.min_peak_amplitude = amplitude[np.argmin(power)]
             if self.first_data:  # first time
                 self.track_peak_index.append(max_peak_index)  # global max peak
                 self.track_peaks_average_index = max_peak_index
@@ -327,18 +329,18 @@ class DataAcquisition(threading.Thread):
             #     self.delta_distance = 0
 
             # New
-            print('tracked amp',self.tracked_amplitude)
-            print('average amp',np.sum(amplitude)/data_length)
-            if self.max_peak_amplitude < np.sum(amplitude)/data_length*3:
+            #print('tracked amp',self.tracked_amplitude)
+            #print('average amp',np.sum(amplitude)/data_length)
+            if self.max_peak_amplitude < self.min_peak_amplitude*3:
                 self.noise_run_time += 1
                 if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
                     self.not_noise_run_time = 0
-                print('noise',self.noise_run_time)
+                #print('noise',self.noise_run_time)
             else:
                 self.not_noise_run_time += 1
                 if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
                     self.noise_run_time = 0
-                print('not noise', self.not_noise_run_time)
+                #print('not noise', self.not_noise_run_time)
 
             if self.noise_run_time >= 10 and self.not_noise_run_time < 5:
                 self.tracked_distance = 0
