@@ -358,8 +358,8 @@ class DataAcquisition(threading.Thread):
                 # If there has been noise at least 10 times with less than 5 real values, the data is considered to be purely noise.
                 self.tracked_distance = 0
                 self.delta_distance = 0
-                # if self.relative_distance == 0: # TODO
-                #    self.old_relative_distance_values = np.zeros(1000)
+                if self.relative_distance == 0: # TODO
+                   self.old_relative_distance_values = np.zeros(1000)
 
             self.relative_distance = self.relative_distance - self.delta_distance  # relative distance in mm
             # The minus sign comes from changing coordinate system; what the radar think is outward is inward for the person that is measured on
@@ -371,7 +371,7 @@ class DataAcquisition(threading.Thread):
             # Code to remove bias that comes from larger movements that is not completely captured by the radar.
             self.old_relative_distance_values = np.roll(self.old_relative_distance_values,-1)
             self.old_relative_distance_values[-1] = self.relative_distance
-            self.old_relative_distance_values = self.old_relative_distance_values - self.old_relative_distance_values.mean()
+            self.old_relative_distance_values = self.old_relative_distance_values - self.old_relative_distance_values.mean()/4
             self.relative_distance = self.old_relative_distance_values[-1]
             #end = time.time()
             #print('time diff for list/array',(end-start)*1000)
