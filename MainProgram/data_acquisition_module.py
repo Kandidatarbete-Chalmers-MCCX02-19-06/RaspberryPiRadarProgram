@@ -185,6 +185,7 @@ class DataAcquisition(threading.Thread):
     def tracking(self, data):
         data = np.array(data).flatten()
         data_length = len(data)
+        print(data_length)
         amplitude = np.abs(data)
         power = amplitude * amplitude
 
