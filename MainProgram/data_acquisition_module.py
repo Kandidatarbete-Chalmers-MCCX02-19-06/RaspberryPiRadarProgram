@@ -323,13 +323,13 @@ class DataAcquisition(threading.Thread):
             #com_idx = int(self.track_peak_relative_position * data_length)
             #print('com_idx',com_idx) samma
             #print('average index',self.track_peaks_average_index)
-            # com_idx=self.track_peaks_average_index
-            # delta_angle = np.angle(data[com_idx] * np.conj(self.last_data[com_idx]))
-            # vel = self.list_of_variables_for_threads["sample_freq"] * 2.5 * delta_angle / (2 * np.pi)
-            # self.low_pass_vel = self.low_pass_const * vel + \
-            #     (1 - self.low_pass_const) * self.low_pass_vel
-            # dp = self.low_pass_vel / self.list_of_variables_for_threads["sample_freq"]
-            # self.delta_distance = dp
+            com_idx=self.track_peaks_average_index
+            delta_angle = np.angle(data[com_idx] * np.conj(self.last_data[com_idx]))
+            vel = self.list_of_variables_for_threads["sample_freq"] * 2.5 * delta_angle / (2 * np.pi)
+            self.low_pass_vel = self.low_pass_const * vel + \
+                (1 - self.low_pass_const) * self.low_pass_vel
+            dp = self.low_pass_vel / self.list_of_variables_for_threads["sample_freq"]
+            self.delta_distance = dp
 
             # Don't use the data if only noise were found TODO improve
             # if self.tracked_amplitude < 2e-2 and np.sum(amplitude) / data_length < 1e-2 and self.noise_run_time == 10:
