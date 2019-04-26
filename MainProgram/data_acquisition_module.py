@@ -317,7 +317,7 @@ class DataAcquisition(threading.Thread):
                 (1 - self.low_pass_const) * self.delta_distance  # calculates the distance traveled from phase differences
 
             # TODO testa utan lågpassfilter
-            # self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi)
+            self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi)
 
             # TODO testa med konjugat
             # com_idx = int(self.track_peak_relative_position * data_length)
