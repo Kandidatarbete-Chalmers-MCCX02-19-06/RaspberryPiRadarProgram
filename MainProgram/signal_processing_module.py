@@ -3,7 +3,7 @@ from scipy import signal  # Det här kanske behöver importeras på något annat
 import matplotlib.pyplot as plt  # TODO: ta bort sen
 import time  # TODO: Ta bort sen
 from scipy.fftpack import fft
-from scipy.sginal import spectrogram  # To plot spectrogram of FFT.
+from scipy.signal import spectrogram  # To plot spectrogram of FFT.
 import threading
 import queue
 
