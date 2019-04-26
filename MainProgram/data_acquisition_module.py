@@ -160,9 +160,9 @@ class DataAcquisition(threading.Thread):
                 if not self.run_measurement:
                     calibrating_time = time.time() + self.calibrating_time
                 if (self.run_measurement):
-                    self.HR_filtered_queue.put(
-                        bandpass_filtered_data_HR)  # Put filtered data in output queue to send to SignalProcessing
-                    self.RR_filtered_queue.put(bandpass_filtered_data_RR)
+                    #self.HR_filtered_queue.put(
+                    #    bandpass_filtered_data_HR)  # Put filtered data in output queue to send to SignalProcessing
+                    #self.RR_filtered_queue.put(bandpass_filtered_data_RR) # TODO Aktivera igen
                     # self.RTB_final_queue.put(bandpass_filtered_data_RR)
                     #done = time.time()
                     #print('filter', (done - start)*1000)
@@ -328,7 +328,7 @@ class DataAcquisition(threading.Thread):
             # New
             print('tracked amp',self.tracked_amplitude)
             print('average amp',np.sum(amplitude)/data_length)
-            if self.tracked_amplitude < np.sum(amplitude)/data_length*2:
+            if self.tracked_amplitude < np.sum(amplitude)/data_length*3:
                 self.noise_run_time += 1
                 self.not_noise_run_time = 0
                 print('noise',self.noise_run_time)
