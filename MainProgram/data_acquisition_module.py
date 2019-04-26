@@ -317,7 +317,7 @@ class DataAcquisition(threading.Thread):
                 (1 - self.low_pass_const) * self.delta_distance  # calculates the distance traveled from phase differences
 
             # TODO testa utan lågpassfilter
-            self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi)
+            #self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi)
 
             # TODO testa med konjugat
             # com_idx = int(self.track_peak_relative_position * data_length)
@@ -343,7 +343,7 @@ class DataAcquisition(threading.Thread):
 
             # Remove Noise
             # Indicate if the current measurement is noise or not, to not use the noise in signal_processing
-            print('kvot',self.max_peak_amplitude/(np.sum(amplitude[self.all_local_peaks_index])-self.max_peak_amplitude)*(len(self.all_local_peaks_index)-1))
+            #print('kvot',self.max_peak_amplitude/(np.sum(amplitude[self.all_local_peaks_index])-self.max_peak_amplitude)*(len(self.all_local_peaks_index)-1))
             if self.max_peak_amplitude < (np.sum(amplitude[self.all_local_peaks_index])-self.max_peak_amplitude)/(len(self.all_local_peaks_index)-1)*3: # np.mean(amplitude[self.all_local_peaks_index])    np.mean(amplitude)
                 # Noise
                 self.noise_run_time += 1
