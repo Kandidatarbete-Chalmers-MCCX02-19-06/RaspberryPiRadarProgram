@@ -51,7 +51,7 @@ class DataAcquisition(threading.Thread):
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
-        self.config.sweep_rate = 50  # Probably 30 is the best, can go up to 100 without graph
+        self.config.sweep_rate = 40  # Probably 30 or 40 is the best without graph
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
@@ -130,28 +130,13 @@ class DataAcquisition(threading.Thread):
 
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
-        #runtimeold=time.time()
         while self.go:
             self.run_times = self.run_times + 1
-            #startstart = time.time()
-            #runtime = time.time()
-            #print('runtime',(runtime-runtimeold)*1000)
-            #runtimeold = runtime
-
             # This data is an 1D array in terminal print, not in Python script however....
-            #start = time.time()
             data = self.get_data()
-            #done = time.time()
-            #print('get_data',(done - start)*1000)
-            #start = time.time()
             tracked_data = self.tracking(data)  # processing data and tracking peaks
-            #done = time.time()
-            #print('tracking', (done - start)*1000)
-
             # Test with acconeer filter for schmitt.
             if tracked_data is not None:
-                #start = time.time()
-                #self.RTB_final_queue.put(tracked_data["relative distance"])
                 # filter the data
                 highpass_filtered_data_HR = self.highpass_HR.filter(
                     tracked_data["relative distance"])
@@ -167,27 +152,19 @@ class DataAcquisition(threading.Thread):
                        bandpass_filtered_data_HR)  # Put filtered data in output queue to send to SignalProcessing
                     self.RR_filtered_queue.put(bandpass_filtered_data_RR) # TODO Aktivera igen
                     self.RTB_final_queue.put(bandpass_filtered_data_RR)
-                    #done = time.time()
-                    #print('filter an que', (done - start)*1000)
 
                     # Send to app
-                    #start = time.time()
                     if self.run_times % self.modulo_base == 0:
                         # Send real time breathing amplitude to the app
                         self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
                         #self.bluetooth_server.write_data_to_app(
                         #    bandpass_filtered_data_RR, 'real time breath')
-                    #done = time.time()
-                    #print('send to app', (done - start)*1000)
             if self.plot_graphs and self.run_times % self.modulo_base == 0:
                 try:
                     self.pg_process.put_data(tracked_data)  # plot data
                 except PGProccessDiedException:
                     self.go.pop(0)
                     break
-            #self.run_times_modulo = (self.run_times_modulo + 1) % self.modulo_base
-            #donedone = time.time()
-            #print('while time',(donedone-startstart)*1000)
         self.RR_filtered_queue.put(0)  # to quit the signal processing thread
         print("out of while go in radar")
         self.client.disconnect()
