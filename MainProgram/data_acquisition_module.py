@@ -72,7 +72,8 @@ class DataAcquisition(threading.Thread):
         self.max_peak_amplitude = 0
         self.min_peak_amplitude = 0
         self.tracked_distance_over_time = np.zeros(self.number_of_time_samples)  # Array for distance over time plot
-        self.local_peaks_index = []  # Index of local peaks
+        self.local_peaks_index = []  # Index of big local peaks
+        self.all_local_peaks_index = None  # Index of all, even the smaller local peaks
         self.track_peak_index = []  # Index of last tracked peaks
         self.track_peaks_average_index = None  # Average of last tracked peaks
         self.threshold = 1  # Threshold for removing small local peaks. Start value not important
@@ -226,6 +227,7 @@ class DataAcquisition(threading.Thread):
                 self.track_peaks_average_index = max_peak_index
             else:
                 self.local_peaks_index, _ = signal.find_peaks(power)  # find local max in data
+                self.all_local_peaks_index=self.local_peaks_index
                 index = 0
                 index_list = []
                 for peak in self.local_peaks_index:
@@ -331,8 +333,8 @@ class DataAcquisition(threading.Thread):
             # New
             #print('tracked amp',self.tracked_amplitude)
             #print('average amp',np.sum(amplitude)/data_length)
-            print('kvot',self.max_peak_amplitude/np.mean(amplitude[self.local_peaks_index]))
-            if self.max_peak_amplitude < np.mean(amplitude[self.local_peaks_index]):
+            print('kvot',self.max_peak_amplitude/np.mean(amplitude[self.all_local_peaks_index]))
+            if self.max_peak_amplitude < np.mean(amplitude[self.all_local_peaks_index]):
                 self.noise_run_time += 1
                 if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
                     self.not_noise_run_time = 0
