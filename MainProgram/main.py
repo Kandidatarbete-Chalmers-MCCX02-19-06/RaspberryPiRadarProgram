@@ -61,9 +61,9 @@ def main():
     FFTamplitude = [1, 2, 3]
     peak_freq = [1]
     peak_amplitude = [1]
-    specFreq = [1, 2, 3]
-    specTime = [1, 2, 3]
-    specSignal = [1, 2, 3]
+    specFreq = [[1, 2, 3],[1, 2, 3]]
+    #specTime = [1, 2, 3]
+    #specSignal = [1, 2, 3]
 
     # BluetoothServer object sent to classes which sends data locally
     bluetooth_server = bluetooth_server_module.BluetoothServer(list_of_variables_for_threads)
@@ -77,7 +77,7 @@ def main():
     signal_processing = signal_processing_module.SignalProcessing(
         list_of_variables_for_threads, bluetooth_server, FFTfreq, FFTamplitude)
 
-    plt.pcolormesh(specTime, specFreq, specSignal)
+    plt.pcolormesh(specFreq)
     plt.pause(1)
     #plt.xlim(1, 3)
     # Lets threads and thereby program run while go is True. Go is set from app
