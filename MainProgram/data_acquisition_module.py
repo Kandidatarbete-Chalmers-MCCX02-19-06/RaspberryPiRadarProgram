@@ -130,26 +130,27 @@ class DataAcquisition(threading.Thread):
 
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
-        # runtimeold=time.time()
+        runtimeold=time.time()
         while self.go:
             self.run_times = self.run_times + 1
             #startstart = time.time()
-            #runtime = time.time()
-            # print('runtime',(runtime-runtimeold)*1000)
-            #runtimeold = runtime
+            runtime = time.time()
+            print('runtime',(runtime-runtimeold)*1000)
+            runtimeold = runtime
+
             # This data is an 1D array in terminal print, not in Python script however....
-            start = time.time()
+            #start = time.time()
             data = self.get_data()
-            done = time.time()
-            print('get_data',(done - start)*1000)
-            start = time.time()
+            #done = time.time()
+            #print('get_data',(done - start)*1000)
+            #start = time.time()
             tracked_data = self.tracking(data)  # processing data and tracking peaks
-            done = time.time()
-            print('tracking', (done - start)*1000)
+            #done = time.time()
+            #print('tracking', (done - start)*1000)
 
             # Test with acconeer filter for schmitt.
             if tracked_data is not None:
-                start = time.time()
+                #start = time.time()
                 #self.RTB_final_queue.put(tracked_data["relative distance"])
                 # filter the data
                 highpass_filtered_data_HR = self.highpass_HR.filter(
@@ -166,18 +167,18 @@ class DataAcquisition(threading.Thread):
                        bandpass_filtered_data_HR)  # Put filtered data in output queue to send to SignalProcessing
                     self.RR_filtered_queue.put(bandpass_filtered_data_RR) # TODO Aktivera igen
                     self.RTB_final_queue.put(bandpass_filtered_data_RR)
-                    done = time.time()
-                    print('filter an que', (done - start)*1000)
+                    #done = time.time()
+                    #print('filter an que', (done - start)*1000)
 
                     # Send to app
-                    start = time.time()
+                    #start = time.time()
                     if self.run_times % self.modulo_base == 0:
                         # Send real time breathing amplitude to the app
                         self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
                         #self.bluetooth_server.write_data_to_app(
                         #    bandpass_filtered_data_RR, 'real time breath')
-                    done = time.time()
-                    print('send to app', (done - start)*1000)
+                    #done = time.time()
+                    #print('send to app', (done - start)*1000)
             if self.plot_graphs and self.run_times % self.modulo_base == 0:
                 try:
                     self.pg_process.put_data(tracked_data)  # plot data
