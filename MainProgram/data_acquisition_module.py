@@ -322,20 +322,18 @@ class DataAcquisition(threading.Thread):
             #     self.delta_distance = 0
 
             amplitude_average = 0
-            peak_number = 0
-            for peak_index in self.all_local_peaks_index:
-                if np.abs(peak_index - self.max_peak_index) > data_length/5:
-                    amplitude_average += amplitude[peak_index]
-                    peak_number += 1
-            if peak_number == 0:
-                peak_number = 1
-
-
+            data_number = 0
+            for data_index in range(0,len(amplitude)-1):
+                if np.abs(data_index - self.max_peak_index) > data_length/5:
+                    amplitude_average += amplitude[data_index]
+                    data_number += 1
+            if data_number == 0:
+                data_number = 1
 
             # Remove Noise
             # Indicate if the current measurement is noise or not, to not use the noise in signal_processing
             #print('kvot',self.max_peak_amplitude/(np.sum(amplitude[self.all_local_peaks_index])-self.max_peak_amplitude)*(len(self.all_local_peaks_index)-1))
-            if self.max_peak_amplitude < amplitude_average/peak_number*2:  # np.mean(amplitude)
+            if self.max_peak_amplitude < amplitude_average/data_number*2:  # np.mean(amplitude)
                 # Noise
                 self.noise_run_time += 1
                 if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
