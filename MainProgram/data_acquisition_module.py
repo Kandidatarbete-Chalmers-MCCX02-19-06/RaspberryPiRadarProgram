@@ -331,11 +331,13 @@ class DataAcquisition(threading.Thread):
             print('average amp',np.sum(amplitude)/data_length)
             if self.max_peak_amplitude < np.sum(amplitude)/data_length*3:
                 self.noise_run_time += 1
-                self.not_noise_run_time = 0
+                if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
+                    self.not_noise_run_time = 0
                 print('noise',self.noise_run_time)
             else:
                 self.not_noise_run_time += 1
-                self.noise_run_time = 0
+                if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
+                    self.noise_run_time = 0
                 print('not noise', self.not_noise_run_time)
 
             if self.noise_run_time >= 10 and self.not_noise_run_time < 5:
