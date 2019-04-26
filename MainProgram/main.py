@@ -61,6 +61,9 @@ def main():
     FFTamplitude = [1, 2, 3]
     peak_freq = [1]
     peak_amplitude = [1]
+    specFreq = [1]
+    specTime = [1]
+    specSignal = [1]
 
     # BluetoothServer object sent to classes which sends data locally
     bluetooth_server = bluetooth_server_module.BluetoothServer(list_of_variables_for_threads)
@@ -74,18 +77,20 @@ def main():
     signal_processing = signal_processing_module.SignalProcessing(
         list_of_variables_for_threads, bluetooth_server, FFTfreq, FFTamplitude)
 
-    plt.plot(FFTfreq, FFTamplitude)
+    plt.pcolormesh(specTime, specFreq, specSignal)
     plt.pause(1)
-    plt.xlim(1, 3)
+    #plt.xlim(1, 3)
     # Lets threads and thereby program run while go is True. Go is set from app
     while list_of_variables_for_threads.get('go'):
         # Test of FFT, remove later
         plt.clf()
-        plt.xlim(1, 3)
-        FFTfreq, FFTamplitude, peak_freq, peak_amplitude, peak_weighted = signal_processing.getFFTvalues()
-        plt.plot(FFTfreq, FFTamplitude)
-        plt.plot(peak_freq, peak_amplitude, 'bo')
-        plt.plot(peak_freq, peak_weighted, 'ro')
+        #plt.xlim(1, 3)
+        #FFTfreq, FFTamplitude, peak_freq, peak_amplitude, peak_weighted = signal_processing.getFFTvalues()
+        specFreq, specTime, specSignal = signal_processing.getFFTvalues()
+        # plt.plot(FFTfreq, FFTamplitude)
+        # plt.plot(peak_freq, peak_amplitude, 'bo')
+        # plt.plot(peak_freq, peak_weighted, 'ro')
+        plt.pcolormesh(specTime, specFreq, specSignal)
         plt.pause(1)
 
         # time.sleep(1)
