@@ -209,13 +209,13 @@ class DataAcquisition(threading.Thread):
         power = amplitude * amplitude
 
         # Find and track peaks
-        if np.sum(amplitude)/data_length > 8e-3:
-            self.noise_run_time = 0
-            self.not_noise_run_time = self.not_noise_run_time + 1
-        elif self.noise_run_time < 10:
-            self.noise_run_time = self.noise_run_time + 1
+        # if np.sum(amplitude)/data_length > 8e-3:
+        #     self.noise_run_time = 0
+        #     self.not_noise_run_time = self.not_noise_run_time + 1
+        # elif self.noise_run_time < 10:
+        #     self.noise_run_time = self.noise_run_time + 1
 
-        if self.noise_run_time < 10:  # TODO lägre värde? Ursprunligen 1e-6
+        if np.sum(amplitude)/data_length > 1e-6:  # TODO lägre värde? Ursprunligen 1e-6
             max_peak_index = np.argmax(power)
             if self.first_data:  # first time
                 self.track_peak_index.append(max_peak_index)  # global max peak
@@ -313,17 +313,36 @@ class DataAcquisition(threading.Thread):
                 (1 - self.low_pass_const) * self.delta_distance  # calculates the distance traveled from phase differences
 
             # Don't use the data if only noise were found TODO improve
-            if self.tracked_amplitude < 2e-2 and np.sum(amplitude) / data_length < 1e-2 and self.noise_run_time == 10:
-                self.delta_distance = 0
-                if self.relative_distance == 0:
-                    self.old_relative_distance_values = np.zeros(1000)
-            elif self.tracked_amplitude < 1.5e-2 and np.sum(amplitude) / data_length < 1e-2:
-                self.delta_distance = 0
-                if self.relative_distance == 0:
-                    self.old_relative_distance_values = np.zeros(1000)
+            # if self.tracked_amplitude < 2e-2 and np.sum(amplitude) / data_length < 1e-2 and self.noise_run_time == 10:
+            #     self.delta_distance = 0
+            #     if self.relative_distance == 0:
+            #         self.old_relative_distance_values = np.zeros(1000)
+            # elif self.tracked_amplitude < 1.5e-2 and np.sum(amplitude) / data_length < 1e-2:
+            #     self.delta_distance = 0
+            #     if self.relative_distance == 0:
+            #         self.old_relative_distance_values = np.zeros(1000)
+            # if self.not_noise_run_time < 5:
+            #     self.delta_distance = 0
 
-            if self.not_noise_run_time < 5:
+            # New
+            if self.tracked_amplitude < np.sum(amplitude)/data_length*1.3:
+                self.noise_run_time += 1
+            else:
+                self.not_noise_run_time += 1
+
+            if self.noise_run_time >= 10:
+                self.tracked_distance = 0
                 self.delta_distance = 0
+                self.not_noise_run_time = 0 # ?
+                #if self.relative_distance == 0: # TODO
+                #    self.old_relative_distance_values = np.zeros(1000)
+            elif self.not_noise_run_time >= 5:
+                self.noise_run_time = 0
+            else:
+                self.tracked_distance = 0
+                self.delta_distance = 0
+                #if self.relative_distance == 0:
+                #    self.old_relative_distance_values = np.zeros(1000)
 
             self.relative_distance = self.relative_distance - self.delta_distance  # relative distance in mm
             # The minus sign comes from changing coordinate system; what the radar think is outward is inward for the person that is measured on
