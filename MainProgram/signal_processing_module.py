@@ -28,8 +28,8 @@ class SignalProcessing:
 
         # Variables for Pulse detection
         self.index_fft = 0
-        self.T_resolution = 30  # förut 30
-        self.overlap = 0  # Percentage of old values for the new FFT
+        self.T_resolution = 40  # förut 30
+        self.overlap = 90  # Percentage of old values for the new FFT
         self.beta = 1  # Kaiser window form
         self.tau = 12  # TODO Beskriva alla variabler
         # Data in vector with length of window
