@@ -296,18 +296,18 @@ class DataAcquisition(threading.Thread):
                 (1 - self.low_pass_const) * self.delta_distance  # calculates the distance traveled from phase differences
 
             # TODO testa utan lågpassfilter
-            #self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi)
+            self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi)
 
             # TODO testa med konjugat
             #com_idx = int(self.track_peak_relative_position * data_length)
             #print('com_idx',com_idx) samma
             #print('average index',self.track_peaks_average_index)
-            com_idx=self.track_peaks_average_index
-            delta_angle = np.angle(data[com_idx] * np.conj(self.last_data[com_idx]))
-            vel = self.list_of_variables_for_threads["sample_freq"] * 2.5 * delta_angle / (2 * np.pi)
-            self.low_pass_vel = self.low_pass_const * vel + \
-                (1 - self.low_pass_const) * self.low_pass_vel
-            self.delta_distance = self.low_pass_vel / self.list_of_variables_for_threads["sample_freq"] / 1000
+            # com_idx=self.track_peaks_average_index
+            # delta_angle = np.angle(data[com_idx] * np.conj(self.last_data[com_idx]))
+            # vel = self.list_of_variables_for_threads["sample_freq"] * 2.5 * delta_angle / (2 * np.pi)
+            # self.low_pass_vel = self.low_pass_const * vel + \
+            #     (1 - self.low_pass_const) * self.low_pass_vel
+            # self.delta_distance = self.low_pass_vel / self.list_of_variables_for_threads["sample_freq"] / 1000
 
             # Don't use the data if only noise were found TODO improve
             # if self.tracked_amplitude < 2e-2 and np.sum(amplitude) / data_length < 1e-2 and self.noise_run_time == 10:
@@ -321,34 +321,34 @@ class DataAcquisition(threading.Thread):
             # if self.not_noise_run_time < 5:
             #     self.delta_distance = 0
 
-            amplitude_average = 0
-            data_number = 0
-            for data_index in range(0,len(amplitude)-1):
-                if np.abs(data_index - self.max_peak_index) > data_length/5:
-                    amplitude_average += amplitude[data_index]
-                    data_number += 1
-            if data_number == 0:
-                data_number = 1
+            # amplitude_average = 0
+            # data_number = 0
+            # for data_index in range(0,len(amplitude)-1):
+            #     if np.abs(data_index - self.max_peak_index) > data_length/5:
+            #         amplitude_average += amplitude[data_index]
+            #         data_number += 1
+            # if data_number == 0:
+            #     data_number = 1
 
             # Remove Noise
             # Indicate if the current measurement is noise or not, to not use the noise in signal_processing
             #print('kvot',self.max_peak_amplitude/(np.sum(amplitude[self.all_local_peaks_index])-self.max_peak_amplitude)*(len(self.all_local_peaks_index)-1))
-            if self.max_peak_amplitude < amplitude_average/data_number*2:  # np.mean(amplitude)
-                # Noise
-                self.noise_run_time += 1
-                if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
-                    self.not_noise_run_time = 0
-            else:
-                # Real value
-                self.not_noise_run_time += 1
-                if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
-                    self.noise_run_time = 0
-            if self.noise_run_time >= 10 and self.not_noise_run_time < 5:
-                # If there has been noise at least 10 times with less than 5 real values, the data is considered to be purely noise.
-                self.tracked_distance = 0
-                self.delta_distance = 0
-                if self.relative_distance == 0:
-                   self.old_relative_distance_values = np.zeros(1000)
+            # if self.max_peak_amplitude < (np.sum(amplitude[self.all_local_peaks_index])-self.max_peak_amplitude)/(len(self.all_local_peaks_index)-1)*3 or self.tracked_amplitude < 0.01:  # np.mean(amplitude)
+            #     # Noise
+            #     self.noise_run_time += 1
+            #     if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
+            #         self.not_noise_run_time = 0
+            # else:
+            #     # Real value
+            #     self.not_noise_run_time += 1
+            #     if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
+            #         self.noise_run_time = 0
+            # if self.noise_run_time >= 10 and self.not_noise_run_time < 5:
+            #     # If there has been noise at least 10 times with less than 5 real values, the data is considered to be purely noise.
+            #     self.tracked_distance = 0
+            #     self.delta_distance = 0
+            #     if self.relative_distance == 0:
+            #        self.old_relative_distance_values = np.zeros(1000)
 
             self.relative_distance = self.relative_distance - self.delta_distance  # relative distance in mm
             # The minus sign comes from changing coordinate system; what the radar think is outward is inward for the person that is measured on
