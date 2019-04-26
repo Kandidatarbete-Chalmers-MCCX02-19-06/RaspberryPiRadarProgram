@@ -61,7 +61,7 @@ def main():
     FFTamplitude = [1, 2, 3]
     peak_freq = [1]
     peak_amplitude = [1]
-    specFreq = [[1, 2, 3],[1, 2, 3]]
+    specFreq = [[3, 2, 1],[1, 2, 3]]
     #specTime = [1, 2, 3]
     #specSignal = [1, 2, 3]
 
