@@ -320,9 +320,10 @@ class DataAcquisition(threading.Thread):
             #self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi)
 
             # TODO testa med konjugat
-            com_idx = int(self.track_peak_relative_position * data_length)
-            print('com_idx',com_idx)
-            print('average index',self.track_peaks_average_index)
+            #com_idx = int(self.track_peak_relative_position * data_length)
+            #print('com_idx',com_idx) samma
+            #print('average index',self.track_peaks_average_index)
+            com_idx=self.track_peaks_average_index
             delta_angle = np.angle(data[com_idx] * np.conj(self.last_data[com_idx]))
             vel = self.list_of_variables_for_threads["sample_freq"] * 2.5 * delta_angle / (2 * np.pi)
             self.low_pass_vel = self.low_pass_const * vel + \
