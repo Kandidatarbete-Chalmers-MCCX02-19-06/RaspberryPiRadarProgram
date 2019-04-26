@@ -325,6 +325,8 @@ class DataAcquisition(threading.Thread):
             #     self.delta_distance = 0
 
             # New
+            print('tracked amp',self.tracked_amplitude)
+            print('average amp',np.sum(amplitude)/data_length)
             if self.tracked_amplitude < np.sum(amplitude)/data_length*1.3:
                 self.noise_run_time += 1
             else:
