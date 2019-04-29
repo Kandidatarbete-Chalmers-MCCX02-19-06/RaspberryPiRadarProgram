@@ -308,7 +308,7 @@ class DataAcquisition(threading.Thread):
 
             # Remove Noise
             # Indicate if the current measurement is noise or not, to not use the noise in signal_processing
-            if np.amax(self.low_pass_amplitude) < 0.008:
+            if np.amax(self.low_pass_amplitude) < 0.01:
                 # Noise
                 self.noise_run_time += 1
                 if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
