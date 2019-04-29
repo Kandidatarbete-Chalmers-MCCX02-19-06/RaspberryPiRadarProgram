@@ -333,7 +333,7 @@ class DataAcquisition(threading.Thread):
             # Remove Noise
             # Indicate if the current measurement is noise or not, to not use the noise in signal_processing
             #print('kvot',self.max_peak_amplitude/(np.sum(amplitude[self.all_local_peaks_index])-self.max_peak_amplitude)*(len(self.all_local_peaks_index)-1))
-            if self.max_peak_amplitude < 0 or self.tracked_amplitude < 0.01:  # np.mean(amplitude)
+            if self.max_peak_amplitude < 0.01:  # np.mean(amplitude)
                 # Noise
                 self.noise_run_time += 1
                 if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
