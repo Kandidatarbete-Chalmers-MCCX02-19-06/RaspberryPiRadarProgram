@@ -95,6 +95,7 @@ def main():
             plt.xlabel("Time (s)")
             plt.ylabel("Frequency (bpm)")
             run_times += 1
+            plt.subplot(peak_freq, peak_weighted, 'ro')
         plt.pause(1)
         # plt.plot(FFTfreq, FFTamplitude)
         # plt.plot(peak_freq, peak_amplitude, 'bo')
