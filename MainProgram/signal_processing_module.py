@@ -109,7 +109,7 @@ class SignalProcessing:
                 try:
                     for i in range(0,len(peak_freq)):
                         self.peak_weighted.append(peak_amplitude[i]+multiplication_factor*np.exp(-np.abs(peak_freq[i]-
-                                                                                                         found_heart_freq_old)/time_constant)/peak_freq[i])
+                                                                                                         found_heart_freq_old)/time_constant)*peak_freq[i])
 
                     found_heart_freq = peak_freq[np.argmax(np.array(self.peak_weighted))]
                 except Exception as e:
