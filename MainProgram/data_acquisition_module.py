@@ -148,9 +148,6 @@ class DataAcquisition(threading.Thread):
                 highpass_filtered_data_RR = self.highpass_RR.filter(
                     tracked_data["relative distance"])  # TODO: Ändra till highpass_filtered
                 bandpass_filtered_data_RR = self.lowpass_RR.filter(highpass_filtered_data_RR)
-
-                if not self.run_measurement:
-                    calibrating_time = time.time() + self.calibrating_time
                 if self.run_measurement:
                     self.HR_filtered_queue.put(
                         bandpass_filtered_data_HR)  # Put filtered data in output queue to send to SignalProcessing
@@ -164,12 +161,12 @@ class DataAcquisition(threading.Thread):
                             tracked_data["relative distance"], 'real time breath')
                         # self.bluetooth_server.write_data_to_app(
                         #    bandpass_filtered_data_RR, 'real time breath')
-            if self.plot_graphs and self.run_times % self.modulo_base == 0:
-                try:
-                    self.pg_process.put_data(tracked_data)  # plot data
-                except PGProccessDiedException:
-                    self.go.pop(0)
-                    break
+            # if self.plot_graphs and self.run_times % self.modulo_base == 0:
+            #     try:
+            #         self.pg_process.put_data(tracked_data)  # plot data
+            #     except PGProccessDiedException:
+            #         self.go.pop(0)
+            #         break
         self.RR_filtered_queue.put(0)  # to quit the signal processing thread
         print("out of while go in radar")
         self.client.disconnect()
