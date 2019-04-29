@@ -194,7 +194,16 @@ class SignalProcessing:
 
         MaxFFT = np.amax(FFT_in_interval)  # Do on one line later, to remove outliers
         threshold = MaxFFT - 10
-        peaks, _ = signal.find_peaks(FFT_in_interval, threshold=threshold)
+        peaks, _ = signal.find_peaks(FFT_in_interval)
+
+        index_list = []
+        index = 0
+        for peak in peaks:
+            if FFT_in_interval[peak] < threshold:
+                index_list.append(index)
+            index += 1
+        peaks = np.delete(peaks, index_list)
+
         #print("Peaks: ",)
         self.peak_freq = []  # Maybe change to array?
         for i in peaks:
