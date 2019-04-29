@@ -49,7 +49,7 @@ class DataAcquisition(threading.Thread):
         print(self.args.sensors)
         #self.config.sensor = 1
         # Settings for radar setup
-        self.config.range_interval = [0.6, 1]  # Measurement interval
+        self.config.range_interval = [0.2, 0.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
         self.config.sweep_rate = 40  # Probably 40 is the best without graph
         # For use of sample freq in other threads and classes.
@@ -110,7 +110,7 @@ class DataAcquisition(threading.Thread):
         self.calibrating_time = 5  # Time sleep for passing through filters. Used for Real time breathing
 
         # Graphs
-        self.plot_graphs = False  # if plot the graphs or not
+        self.plot_graphs = True  # if plot the graphs or not
         if self.plot_graphs:
             self.pg_updater = PGUpdater(self.config)
             self.pg_process = PGProcess(self.pg_updater)
@@ -161,12 +161,12 @@ class DataAcquisition(threading.Thread):
                             tracked_data["relative distance"], 'real time breath')
                         # self.bluetooth_server.write_data_to_app(
                         #    bandpass_filtered_data_RR, 'real time breath')
-            # if self.plot_graphs and self.run_times % self.modulo_base == 0:
-            #     try:
-            #         self.pg_process.put_data(tracked_data)  # plot data
-            #     except PGProccessDiedException:
-            #         self.go.pop(0)
-            #         break
+            if self.plot_graphs and self.run_times % self.modulo_base == 0:
+                try:
+                    self.pg_process.put_data(tracked_data)  # plot data
+                except PGProccessDiedException:
+                    self.go.pop(0)
+                    break
         self.RR_filtered_queue.put(0)  # to quit the signal processing thread
         print("out of while go in radar")
         self.client.disconnect()
