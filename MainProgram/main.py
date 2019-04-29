@@ -63,7 +63,7 @@ def main():
     peak_amplitude = [1]
     len_fft = 0
     array = []
-    freq_array = np.linspace(5, 20, 224)
+    freq_array = np.linspace(60, 180, 30)
     run_times = 0
 
     # BluetoothServer object sent to classes which sends data locally

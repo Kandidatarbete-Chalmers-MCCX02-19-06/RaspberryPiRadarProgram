@@ -51,7 +51,7 @@ class DataAcquisition(threading.Thread):
         # Settings for radar setup
         self.config.range_interval = [0.2, 0.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
-        self.config.sweep_rate = 40  # Probably 40 is the best without graph
+        self.config.sweep_rate = 20  # Probably 40 is the best without graph
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
