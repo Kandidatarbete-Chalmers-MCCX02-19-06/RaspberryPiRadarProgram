@@ -73,10 +73,10 @@ class SignalProcessing:
         # print("heart_rate thread started")
         index_in_FFT_old_values = 0  # Placement of old FFT in FFT_old_values
         FFT_counter = 1  # In start to avg over FFT_counter before FFT_old_values is filled to max
-        found_heart_freq_old = 14  # Guess the first freq
+        found_heart_freq_old = 180/60  # Guess the first freq
         # Variables for weigthed peaks
-        multiplication_factor = 10
-        time_constant = 100
+        multiplication_factor = 30
+        time_constant = 1
 
         while self.go:
             # print("in while loop heart_rate")
