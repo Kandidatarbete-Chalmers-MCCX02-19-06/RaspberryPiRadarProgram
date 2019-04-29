@@ -102,7 +102,7 @@ class SignalProcessing:
                     delta_freq.append(freq - found_heart_freq_old)
                 self.peak_weighted = np.add(
                     peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
-                found_heart_freq = peak_freq[np.argmax(self.peak_weighted)]
+                found_heart_freq = peak_freq[np.argmax(self.peak_weighted)]  # TODO send 0 if amplitude weak (only noise)
                 found_heart_freq_old = found_heart_freq
             else:
                 #found_heart_freq = found_heart_freq_old
