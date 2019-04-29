@@ -86,8 +86,8 @@ def main():
         FFTfreq, FFTamplitude, peak_freq, peak_amplitude, peak_weighted = signal_processing.getFFTvalues()
         print("Length of FFT_amplitude", len(FFTamplitude))
         if len(FFTamplitude) == 30:
-            array.append(np.transpose(FFTamplitude))
-            plt.pcolormesh(array)
+            array.append(FFTamplitude)
+            plt.pcolormesh(np.transpose(array))
         plt.pause(1)
         # plt.plot(FFTfreq, FFTamplitude)
         # plt.plot(peak_freq, peak_amplitude, 'bo')
