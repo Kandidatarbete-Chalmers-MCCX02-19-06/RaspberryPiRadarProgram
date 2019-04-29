@@ -84,7 +84,6 @@ def main():
     # Lets threads and thereby program run while go is True. Go is set from app
     while list_of_variables_for_threads.get('go'):
         # Test of FFT, remove later
-        plt.clf()
         #plt.xlim(1, 3)
         FFTfreq, FFTamplitude, peak_freq, peak_amplitude, len_fft, peak_weighted = signal_processing.getFFTvalues()
         print("Length of FFT_amplitude", len(FFTamplitude))
@@ -92,16 +91,17 @@ def main():
             time_array = np.linspace(0, (run_times+1)*1.5, run_times+1)
             array.append(FFTamplitude)
             plt.figure(1)
+            plt.clf()
             plt.plot(FFTfreq, FFTamplitude)
             plt.plot(peak_freq, peak_amplitude, 'bo')
             plt.plot(peak_freq, peak_weighted, 'ro')
             plt.pause(0.5)
             plt.figure(2)
+            plt.clf()
             plt.pcolormesh(time_array, freq_array, np.transpose(array))
             plt.xlabel("Time (s)")
             plt.ylabel("Frequency (bpm)")
             run_times += 1
-
         plt.pause(0.5)
         # plt.plot(FFTfreq, FFTamplitude)
         # plt.plot(peak_freq, peak_amplitude, 'bo')
