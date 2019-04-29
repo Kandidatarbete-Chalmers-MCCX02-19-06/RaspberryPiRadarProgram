@@ -104,8 +104,6 @@ class SignalProcessing:
                 #self.peak_weighted = np.add(
                 #    peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
                 self.peak_weighted = []
-                print(len(peak_freq))
-                print(len(peak_amplitude))
                 try:
                     for i in range(0,len(peak_freq)):  # Weight the peaks found depending on their amplitude,
                         # distance to the last tracked peak, and on the frequency (the noise is kind of 1/f, so to to fix that multiply with f)
@@ -218,7 +216,7 @@ class SignalProcessing:
         self.peak_freq = []  # Maybe change to array?
         for i in peaks:
             self.peak_freq.append(peak_freq_linspace[i])
-        print("Found peak freq: ", self.peak_freq)
+        #print("Found peak freq: ", self.peak_freq)
 
         self.peak_amplitude = []
         for i in peaks:
