@@ -157,10 +157,10 @@ class DataAcquisition(threading.Thread):
                     # Send to app
                     if self.run_times % self.modulo_base == 0:
                         # Send real time breathing amplitude to the app
-                        # self.bluetooth_server.write_data_to_app(
-                        #     tracked_data["relative distance"], 'real time breath')
                         self.bluetooth_server.write_data_to_app(
-                           bandpass_filtered_data_HR, 'real time breath')
+                            tracked_data["relative distance"], 'real time breath')
+                        # self.bluetooth_server.write_data_to_app(
+                        #    bandpass_filtered_data_HR, 'real time breath')
             if self.plot_graphs and self.run_times % self.modulo_base == 0:
                 try:
                     self.pg_process.put_data(tracked_data)  # plot data
