@@ -63,6 +63,7 @@ class SignalProcessing:
         self.FFTamplitude = FFTamplitude
         self.peak_freq = []
         self.peak_amplitude = []
+        self.peak_weighted = []
         self.len_fft = 0
 
     # Kaos i koden, behöver struktureras upp och alla konstanter måste defineras i början
@@ -74,8 +75,8 @@ class SignalProcessing:
         FFT_counter = 1  # In start to avg over FFT_counter before FFT_old_values is filled to max
         found_heart_freq_old = 14  # Guess the first freq
         # Variables for weigthed peaks
-        multiplication_factor = 20
-        time_constant = 1
+        multiplication_factor = 10
+        time_constant = 100
 
         while self.go:
             # print("in while loop heart_rate")
@@ -213,7 +214,7 @@ class SignalProcessing:
 
     # TODO Used for plotting in main, remove later
     def getFFTvalues(self):
-        return self.FFTfreq, self.FFTamplitude, self.peak_freq, self.peak_amplitude, self.len_fft
+        return self.FFTfreq, self.FFTamplitude, self.peak_freq, self.peak_amplitude, self.len_fft, self.peak_weighted
 
     def schmittTrigger(self):
         print("SchmittTrigger started")
