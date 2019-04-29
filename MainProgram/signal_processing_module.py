@@ -183,8 +183,8 @@ class SignalProcessing:
     def findPeaks(self, FFT_averaged):
         # Lower and higher freq for removing unwanted areas of the FFT
         # TODO Unsure about this part, same max freq several times in a row
-        F_scan_lower = 5
-        F_scan_upper = 20
+        F_scan_lower = 1
+        F_scan_upper = 3
         FFT_in_interval = FFT_averaged[self.freq <= F_scan_upper]
         freq2 = self.freq[self.freq <= F_scan_upper]
         FFT_in_interval = FFT_in_interval[freq2 > F_scan_lower]
