@@ -95,7 +95,7 @@ def main():
             plt.plot(FFTfreq, FFTamplitude)
             plt.plot(peak_freq, peak_amplitude, 'bo')
             plt.plot(peak_freq, peak_weighted, 'ro')
-            plt.pause(0.5)
+            plt.pause(0.1)
             plt.figure(2)
             plt.clf()
             freq_array = np.linspace(0.8*60, 180, len_fft)
@@ -103,7 +103,7 @@ def main():
             plt.xlabel("Time (s)")
             plt.ylabel("Frequency (bpm)")
             run_times += 1
-        plt.pause(0.5)
+        plt.pause(0.9)
         # plt.plot(FFTfreq, FFTamplitude)
         # plt.plot(peak_freq, peak_amplitude, 'bo')
         # plt.plot(peak_freq, peak_weighted, 'ro')
