@@ -107,9 +107,9 @@ class SignalProcessing:
                 print(len(peak_freq))
                 print(len(peak_amplitude))
                 try:
-                    for i in range(0,len(peak_freq)):
-                        self.peak_weighted.append(peak_amplitude[i]+multiplication_factor*np.exp(-np.abs(peak_freq[i]-
-                                                                                                         found_heart_freq_old)/time_constant)*peak_freq[i])
+                    for i in range(0,len(peak_freq)):  # Weight the peaks found depending on their amplitude,
+                        # distance to the last tracked peak, and on the frequency (the noise is kind of 1/f, so to to fix that multiply with f)
+                        self.peak_weighted.append(peak_amplitude[i]+multiplication_factor*np.exp(-np.abs(peak_freq[i]-found_heart_freq_old)/time_constant)*np.sqrt(peak_freq[i]))
 
                     found_heart_freq = peak_freq[np.argmax(np.array(self.peak_weighted))]
                 except Exception as e:
