@@ -104,10 +104,15 @@ class SignalProcessing:
                 #self.peak_weighted = np.add(
                 #    peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
                 self.peak_weighted = []
+                print('len of peak_freq',len(peak_freq))
                 for f in range(0,len(peak_freq)-1):
                     self.peak_weighted.append(peak_amplitude[f]+multiplication_factor*np.exp(-np.abs(peak_freq[f]-found_heart_freq_old)/time_constant)/f)
                 # TODO send 0 if amplitude weak (only noise)
-                found_heart_freq = peak_freq[np.argmax(np.array(self.peak_weighted))]
+                try:
+                    found_heart_freq = peak_freq[np.argmax(np.array(self.peak_weighted))]
+                except:
+                    print('exept in heart peak')
+                    found_heart_freq = 0
                 found_heart_freq_old = found_heart_freq
             else:
                 #found_heart_freq = found_heart_freq_old
