@@ -91,11 +91,15 @@ def main():
         if len(FFTamplitude) == len_fft:
             time_array = np.linspace(0, (run_times+1)*1.5, run_times+1)
             array.append(FFTamplitude)
+            plt.figure(1)
             plt.pcolormesh(time_array, freq_array, np.transpose(array))
             plt.xlabel("Time (s)")
             plt.ylabel("Frequency (bpm)")
             run_times += 1
-            plt.subplot(peak_freq, peak_weighted, 'ro')
+            plt.figure(2)
+            plt.plot(FFTfreq, FFTamplitude)
+            plt.plot(peak_freq, peak_amplitude, 'bo')
+            plt.plot(peak_freq, peak_weighted, 'ro')
         plt.pause(1)
         # plt.plot(FFTfreq, FFTamplitude)
         # plt.plot(peak_freq, peak_amplitude, 'bo')
