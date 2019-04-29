@@ -97,8 +97,8 @@ def main():
                 plt.plot(peak_freq, peak_amplitude, 'bo')
                 plt.plot(peak_freq, peak_weighted, 'ro')
                 plt.pause(0.1)
-            except:
-                print('plot error')
+            except Exception as e:
+                print('plot error',e)
 
             plt.figure(2)
             plt.clf()
