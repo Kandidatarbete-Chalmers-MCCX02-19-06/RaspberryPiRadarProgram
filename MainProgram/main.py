@@ -63,7 +63,7 @@ def main():
     peak_amplitude = [1]
     len_fft = 0
     array = []
-    freq_array = np.linspace(60, 180, 30)
+    freq_array = np.linspace(0.8*60, 180, 30)
     run_times = 0
 
     # BluetoothServer object sent to classes which sends data locally
@@ -98,6 +98,7 @@ def main():
             plt.pause(0.5)
             plt.figure(2)
             plt.clf()
+            freq_array = np.linspace(0.8*60, 180, len_fft)
             plt.pcolormesh(time_array, freq_array, np.transpose(array))
             plt.xlabel("Time (s)")
             plt.ylabel("Frequency (bpm)")
