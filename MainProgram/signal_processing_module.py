@@ -208,6 +208,7 @@ class SignalProcessing:
         self.FFTfreq = peak_freq_linspace
         self.FFTamplitude = FFT_in_interval
         self.len_fft = int(len(FFT_in_interval))
+        print("Length of fft:", self.len_fft)
         return self.peak_freq, self.peak_amplitude
 
     # TODO Used for plotting in main, remove later
