@@ -92,10 +92,14 @@ def main():
             array.append(FFTamplitude)
             plt.figure(1)
             plt.clf()
-            plt.plot(FFTfreq, FFTamplitude)
-            plt.plot(peak_freq, peak_amplitude, 'bo')
-            plt.plot(peak_freq, peak_weighted, 'ro')
-            plt.pause(0.1)
+            try:
+                plt.plot(FFTfreq, FFTamplitude)
+                plt.plot(peak_freq, peak_amplitude, 'bo')
+                plt.plot(peak_freq, peak_weighted, 'ro')
+                plt.pause(0.1)
+            except:
+                pass
+
             plt.figure(2)
             plt.clf()
             plt.pcolormesh(time_array, freq_array, np.transpose(array))
