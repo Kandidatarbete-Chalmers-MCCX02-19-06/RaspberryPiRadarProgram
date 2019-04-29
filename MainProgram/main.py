@@ -90,7 +90,7 @@ def main():
         if len(FFTamplitude) == 30:
             time_array = np.linspace(0,(run_times+1)*1.5,run_times+1)
             array.append(FFTamplitude)
-            plt.pcolormesh(freq_array, time_array, np.transpose(array))
+            plt.pcolormesh(time_array, freq_array, np.transpose(array))
             run_times += 1
         plt.pause(1)
         # plt.plot(FFTfreq, FFTamplitude)
