@@ -73,10 +73,10 @@ class SignalProcessing:
         # print("heart_rate thread started")
         index_in_FFT_old_values = 0  # Placement of old FFT in FFT_old_values
         FFT_counter = 1  # In start to avg over FFT_counter before FFT_old_values is filled to max
-        found_heart_freq_old = 14  # Guess the first freq
+        found_heart_freq_old = 180/60  # Guess the first freq
         # Variables for weigthed peaks
-        multiplication_factor = 10
-        time_constant = 100
+        multiplication_factor = 30
+        time_constant = 1
 
         while self.go:
             # print("in while loop heart_rate")
@@ -183,7 +183,7 @@ class SignalProcessing:
     def findPeaks(self, FFT_averaged):
         # Lower and higher freq for removing unwanted areas of the FFT
         # TODO Unsure about this part, same max freq several times in a row
-        F_scan_lower = 1
+        F_scan_lower = 0.8
         F_scan_upper = 3
         FFT_in_interval = FFT_averaged[self.freq <= F_scan_upper]
         freq2 = self.freq[self.freq <= F_scan_upper]
@@ -193,8 +193,17 @@ class SignalProcessing:
         #print("FFT_in_interval", FFT_in_interval, "\n", len(FFT_in_interval))
 
         MaxFFT = np.amax(FFT_in_interval)  # Do on one line later, to remove outliers
-        threshold = MaxFFT - 40
-        peaks, _ = signal.find_peaks(FFT_in_interval, threshold=threshold)
+        threshold = MaxFFT - 10
+        peaks, _ = signal.find_peaks(FFT_in_interval)
+
+        index_list = []
+        index = 0
+        for peak in peaks:
+            if FFT_in_interval[peak] < threshold:
+                index_list.append(index)
+            index += 1
+        peaks = np.delete(peaks, index_list)
+
         #print("Peaks: ",)
         self.peak_freq = []  # Maybe change to array?
         for i in peaks:
