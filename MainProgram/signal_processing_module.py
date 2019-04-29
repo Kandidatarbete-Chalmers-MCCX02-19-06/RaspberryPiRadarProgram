@@ -72,7 +72,7 @@ class SignalProcessing:
         # print("heart_rate thread started")
         index_in_FFT_old_values = 0  # Placement of old FFT in FFT_old_values
         FFT_counter = 1  # In start to avg over FFT_counter before FFT_old_values is filled to max
-        found_heart_freq_old = 110/60  # Guess the first freq
+        found_heart_freq_old = 14  # Guess the first freq
         # Variables for weigthed peaks
         multiplication_factor = 20
         time_constant = 1
@@ -102,7 +102,8 @@ class SignalProcessing:
                     delta_freq.append(freq - found_heart_freq_old)
                 self.peak_weighted = np.add(
                     peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
-                found_heart_freq = peak_freq[np.argmax(self.peak_weighted)]  # TODO send 0 if amplitude weak (only noise)
+                # TODO send 0 if amplitude weak (only noise)
+                found_heart_freq = peak_freq[np.argmax(self.peak_weighted)]
                 found_heart_freq_old = found_heart_freq
             else:
                 #found_heart_freq = found_heart_freq_old
@@ -181,8 +182,8 @@ class SignalProcessing:
     def findPeaks(self, FFT_averaged):
         # Lower and higher freq for removing unwanted areas of the FFT
         # TODO Unsure about this part, same max freq several times in a row
-        F_scan_lower = 1
-        F_scan_upper = 3
+        F_scan_lower = 8
+        F_scan_upper = 12
         FFT_in_interval = FFT_averaged[self.freq <= F_scan_upper]
         freq2 = self.freq[self.freq <= F_scan_upper]
         FFT_in_interval = FFT_in_interval[freq2 > F_scan_lower]

@@ -51,7 +51,7 @@ class DataAcquisition(threading.Thread):
         # Settings for radar setup
         self.config.range_interval = [0.6, 1]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
-        self.config.sweep_rate = 20  # Probably 40 is the best without graph
+        self.config.sweep_rate = 40  # Probably 40 is the best without graph
         # For use of sample freq in other threads and classes.
         self.list_of_variables_for_threads["sample_freq"] = self.config.sweep_rate
         # The hardware of UART/SPI limits the sweep rate.
@@ -63,13 +63,16 @@ class DataAcquisition(threading.Thread):
         # Variables for tracking method
         self.first_data = True      # first time data is processed
         self.dt = 1 / self.list_of_variables_for_threads["sample_freq"]
-        self.low_pass_const = self.low_pass_filter_constants_function(0.25, self.dt)  # Constant for a small
+        self.low_pass_const = self.low_pass_filter_constants_function(
+            0.25, self.dt)  # Constant for a small
         # low-pass filter to smooth the changes. tau changes the filter weight, lower tau means shorter delay.
         # Usually tau = 0.25 is good.
         self.number_of_averages = 2  # Number of averages for tracked peak
         self.plot_time_length = 10  # Length of plotted data
-        self.number_of_time_samples = int(self.plot_time_length / self.dt)  # Number of time samples when plotting
-        self.tracked_distance_over_time = np.zeros(self.number_of_time_samples)  # Array for distance over time plot
+        # Number of time samples when plotting
+        self.number_of_time_samples = int(self.plot_time_length / self.dt)
+        self.tracked_distance_over_time = np.zeros(
+            self.number_of_time_samples)  # Array for distance over time plot
         self.local_peaks_index = []  # Index of big local peaks
         self.track_peak_index = []  # Index of last tracked peaks
         self.track_peaks_average_index = None  # Average of last tracked peaks
@@ -85,9 +88,11 @@ class DataAcquisition(threading.Thread):
         self.low_pass_amplitude = None  # low pass filtered amplitude
         self.low_pass_track_peak = None
         self.track_peak_relative_position = None  # used for plotting
-        self.relative_distance = 0  # the relative distance that is measured from phase differences (mm)
+        # the relative distance that is measured from phase differences (mm)
+        self.relative_distance = 0
         self.last_phase = 0  # tracked phase from previous loop
-        self.old_relative_distance_values = np.zeros(1000)  # saves old values to remove bias in real time breathing plot
+        # saves old values to remove bias in real time breathing plot
+        self.old_relative_distance_values = np.zeros(1000)
         self.c = 2.998e8  # light speed (m/s)
         self.freq = 60e9  # radar frequency (Hz)
         self.wave_length = self.c / self.freq  # wave length of the radar
@@ -96,13 +101,13 @@ class DataAcquisition(threading.Thread):
         self.not_noise_run_time = 0  # number of run times without noise
 
         # other
-        self.modulo_base = int(self.list_of_variables_for_threads["sample_freq"] / 20)  # how often values are plotted and sent to the app
+        # how often values are plotted and sent to the app
+        self.modulo_base = int(self.list_of_variables_for_threads["sample_freq"] / 20)
         if self.modulo_base == 0:
             self.modulo_base = 1
         print('modulo base', self.modulo_base)
         self.run_times = 0  # number of times run in run
         self.calibrating_time = 5  # Time sleep for passing through filters. Used for Real time breathing
-
 
         # Graphs
         self.plot_graphs = True  # if plot the graphs or not
@@ -124,7 +129,8 @@ class DataAcquisition(threading.Thread):
 
         self.HR_filtered_queue = list_of_variables_for_threads["HR_filtered_queue"]
         self.RR_filtered_queue = list_of_variables_for_threads["RR_filtered_queue"]
-        self.RTB_final_queue = list_of_variables_for_threads["RTB_final_queue"]         # TODO remove
+        # TODO remove
+        self.RTB_final_queue = list_of_variables_for_threads["RTB_final_queue"]
 
     def run(self):
         self.client.start_streaming()  # Starts Acconeers streaming server
@@ -147,15 +153,16 @@ class DataAcquisition(threading.Thread):
                     calibrating_time = time.time() + self.calibrating_time
                 if self.run_measurement:
                     self.HR_filtered_queue.put(
-                       bandpass_filtered_data_HR)  # Put filtered data in output queue to send to SignalProcessing
-                    self.RR_filtered_queue.put(bandpass_filtered_data_RR) # TODO Aktivera igen
+                        bandpass_filtered_data_HR)  # Put filtered data in output queue to send to SignalProcessing
+                    self.RR_filtered_queue.put(bandpass_filtered_data_RR)  # TODO Aktivera igen
                     self.RTB_final_queue.put(bandpass_filtered_data_RR)
 
                     # Send to app
                     if self.run_times % self.modulo_base == 0:
                         # Send real time breathing amplitude to the app
-                        self.bluetooth_server.write_data_to_app(tracked_data["relative distance"], 'real time breath')
-                        #self.bluetooth_server.write_data_to_app(
+                        self.bluetooth_server.write_data_to_app(
+                            tracked_data["relative distance"], 'real time breath')
+                        # self.bluetooth_server.write_data_to_app(
                         #    bandpass_filtered_data_RR, 'real time breath')
             if self.plot_graphs and self.run_times % self.modulo_base == 0:
                 try:
@@ -172,7 +179,8 @@ class DataAcquisition(threading.Thread):
         info, data = self.client.get_next()  # get the next data from the radar
         if info[-1]['sequence_number'] > self.run_times + 10:
             # to remove delay if handling the data takes longer time than for the radar to get it
-            print("sequence diff over 10, removing difference",info[-1]['sequence_number']-self.run_times)
+            print("sequence diff over 10, removing difference",
+                  info[-1]['sequence_number']-self.run_times)
             for i in range(0, info[-1]['sequence_number']-self.run_times-1):
                 self.client.get_next()  # getting the data without using it
             info, data = self.client.get_next()
@@ -231,7 +239,8 @@ class DataAcquisition(threading.Thread):
             self.tracked_distance = (1 - self.track_peaks_average_index / len(data)) * self.config.range_interval[
                 0] + self.track_peaks_average_index / len(data) * self.config.range_interval[1]
             # Tracked amplitude is absolute value of data for the tracked index
-            self.tracked_amplitude = amplitude[self.track_peaks_average_index] # TODO byt till denna
+            # TODO byt till denna
+            self.tracked_amplitude = amplitude[self.track_peaks_average_index]
             # Tracked phase is the angle between I and Q in data for tracked index
             self.tracked_phase = np.angle(data[self.track_peaks_average_index])
         else:
@@ -282,14 +291,16 @@ class DataAcquisition(threading.Thread):
             else:
                 wrapped_phase = self.tracked_phase
             self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi) * self.low_pass_const + \
-                (1 - self.low_pass_const) * self.delta_distance  # calculates the distance traveled from phase differences
+                (1 - self.low_pass_const) * \
+                self.delta_distance  # calculates the distance traveled from phase differences
 
             # TODO testa utan lågpassfilter
-            self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi)
+            self.delta_distance = self.wave_length * \
+                (wrapped_phase - self.last_phase) / (4 * np.pi)
 
             # TODO testa med konjugat
             #com_idx = int(self.track_peak_relative_position * data_length)
-            #print('com_idx',com_idx) samma
+            # print('com_idx',com_idx) samma
             #print('average index',self.track_peaks_average_index)
             # com_idx=self.track_peaks_average_index
             # delta_angle = np.angle(data[com_idx] * np.conj(self.last_data[com_idx]))
@@ -315,19 +326,19 @@ class DataAcquisition(threading.Thread):
                 self.tracked_distance = 0
                 self.delta_distance = 0
                 if self.relative_distance == 0:
-                   self.old_relative_distance_values = np.zeros(1000)
+                    self.old_relative_distance_values = np.zeros(1000)
 
             self.relative_distance = self.relative_distance - self.delta_distance  # relative distance in mm
             # The minus sign comes from changing coordinate system; what the radar think is outward is inward for the person that is measured on
             self.last_phase = self.tracked_phase
 
-
             # array
             #start = time.time()
             # Code to remove bias that comes from larger movements that is not completely captured by the radar.
-            self.old_relative_distance_values = np.roll(self.old_relative_distance_values,-1)
+            self.old_relative_distance_values = np.roll(self.old_relative_distance_values, -1)
             self.old_relative_distance_values[-1] = self.relative_distance
-            self.old_relative_distance_values = self.old_relative_distance_values - self.old_relative_distance_values.mean()/4
+            self.old_relative_distance_values = self.old_relative_distance_values - \
+                self.old_relative_distance_values.mean()/4
             self.relative_distance = self.old_relative_distance_values[-1]
             #end = time.time()
             #print('time diff for list/array',(end-start)*1000)
