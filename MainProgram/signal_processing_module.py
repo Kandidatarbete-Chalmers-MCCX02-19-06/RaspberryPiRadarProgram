@@ -101,8 +101,8 @@ class SignalProcessing:
                 delta_freq = []
                 for freq in peak_freq:
                     delta_freq.append(freq - found_heart_freq_old)
-                self.peak_weighted = np.add(
-                    peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
+                #self.peak_weighted = np.add(
+                #    peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
                 self.peak_weighted = []
                 for f in range(0,len(peak_freq)-1):
                     self.peak_weighted.append(peak_amplitude[f]+multiplication_factor*np.exp(-np.abs(peak_freq[f]-found_heart_freq_old)/time_constant)/f)
