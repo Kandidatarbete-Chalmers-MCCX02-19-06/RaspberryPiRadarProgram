@@ -69,14 +69,11 @@ class DataAcquisition(threading.Thread):
         self.number_of_averages = 2  # Number of averages for tracked peak
         self.plot_time_length = 10  # Length of plotted data
         self.number_of_time_samples = int(self.plot_time_length / self.dt)  # Number of time samples when plotting
-        self.max_peak_amplitude = 0
         self.tracked_distance_over_time = np.zeros(self.number_of_time_samples)  # Array for distance over time plot
         self.local_peaks_index = []  # Index of big local peaks
-        self.all_local_peaks_index = None  # Index of all, even the smaller local peaks
         self.track_peak_index = []  # Index of last tracked peaks
         self.track_peaks_average_index = None  # Average of last tracked peaks
         self.threshold = 1  # Threshold for removing small local peaks. Start value not important
-        self.max_peak_index = 0
 
         # Returned variables
         self.tracked_distance = None  # distance to the tracked peak (m)
@@ -148,7 +145,7 @@ class DataAcquisition(threading.Thread):
 
                 if not self.run_measurement:
                     calibrating_time = time.time() + self.calibrating_time
-                if (self.run_measurement):
+                if self.run_measurement:
                     self.HR_filtered_queue.put(
                        bandpass_filtered_data_HR)  # Put filtered data in output queue to send to SignalProcessing
                     self.RR_filtered_queue.put(bandpass_filtered_data_RR) # TODO Aktivera igen
@@ -190,21 +187,14 @@ class DataAcquisition(threading.Thread):
         power = amplitude * amplitude
 
         # Find and track peaks
-        # if np.sum(amplitude)/data_length > 8e-3:
-        #     self.noise_run_time = 0
-        #     self.not_noise_run_time = self.not_noise_run_time + 1
-        # elif self.noise_run_time < 10:
-        #     self.noise_run_time = self.noise_run_time + 1
-
         if np.sum(amplitude)/data_length > 1e-6:
-            self.max_peak_index = np.argmax(power)
-            self.max_peak_amplitude = amplitude[self.max_peak_index]
+            max_peak_index = np.argmax(power)
+            max_peak_amplitude = amplitude[max_peak_index]
             if self.first_data:  # first time
-                self.track_peak_index.append(self.max_peak_index)  # global max peak
-                self.track_peaks_average_index = self.max_peak_index
+                self.track_peak_index.append(max_peak_index)  # global max peak
+                self.track_peaks_average_index = max_peak_index
             else:
                 self.local_peaks_index, _ = signal.find_peaks(power)  # find local max in data
-                self.all_local_peaks_index=self.local_peaks_index
                 index = 0
                 index_list = []
                 for peak in self.local_peaks_index:
@@ -225,9 +215,9 @@ class DataAcquisition(threading.Thread):
                         self.local_peaks_index[np.argmin(np.abs(peak_difference_index))])
                 if len(self.track_peak_index) > self.number_of_averages:
                     self.track_peak_index.pop(0)  # remove oldest value
-                if amplitude[self.track_peak_index[-1]] < 0.5 * self.max_peak_amplitude:  # if there is a much larger peak
+                if amplitude[self.track_peak_index[-1]] < 0.5 * max_peak_amplitude:  # if there is a much larger peak
                     self.track_peak_index.clear()  # reset the array
-                    self.track_peak_index.append(self.max_peak_index)  # new peak is global max
+                    self.track_peak_index.append(max_peak_index)  # new peak is global max
                 self.track_peaks_average_index = int(  # Average and smooth the movements of the tracked peak
                     np.round(self.low_pass_const * (np.average(self.track_peak_index))
                              + (1 - self.low_pass_const) * self.track_peaks_average_index))
@@ -241,7 +231,6 @@ class DataAcquisition(threading.Thread):
             self.tracked_distance = (1 - self.track_peaks_average_index / len(data)) * self.config.range_interval[
                 0] + self.track_peaks_average_index / len(data) * self.config.range_interval[1]
             # Tracked amplitude is absolute value of data for the tracked index
-            #self.tracked_amplitude = np.abs(data[self.track_peaks_average_index])
             self.tracked_amplitude = amplitude[self.track_peaks_average_index] # TODO byt till denna
             # Tracked phase is the angle between I and Q in data for tracked index
             self.tracked_phase = np.angle(data[self.track_peaks_average_index])
@@ -309,31 +298,9 @@ class DataAcquisition(threading.Thread):
             #     (1 - self.low_pass_const) * self.low_pass_vel
             # self.delta_distance = self.low_pass_vel / self.list_of_variables_for_threads["sample_freq"] / 1000
 
-            # Don't use the data if only noise were found TODO improve
-            # if self.tracked_amplitude < 2e-2 and np.sum(amplitude) / data_length < 1e-2 and self.noise_run_time == 10:
-            #     self.delta_distance = 0
-            #     if self.relative_distance == 0:
-            #         self.old_relative_distance_values = np.zeros(1000)
-            # elif self.tracked_amplitude < 1.5e-2 and np.sum(amplitude) / data_length < 1e-2:
-            #     self.delta_distance = 0
-            #     if self.relative_distance == 0:
-            #         self.old_relative_distance_values = np.zeros(1000)
-            # if self.not_noise_run_time < 5:
-            #     self.delta_distance = 0
-
-            # amplitude_average = 0
-            # data_number = 0
-            # for data_index in range(0,len(amplitude)-1):
-            #     if np.abs(data_index - self.max_peak_index) > data_length/5:
-            #         amplitude_average += amplitude[data_index]
-            #         data_number += 1
-            # if data_number == 0:
-            #     data_number = 1
-
             # Remove Noise
             # Indicate if the current measurement is noise or not, to not use the noise in signal_processing
-            #print('kvot',self.max_peak_amplitude/(np.sum(amplitude[self.all_local_peaks_index])-self.max_peak_amplitude)*(len(self.all_local_peaks_index)-1))
-            if np.amax(self.low_pass_amplitude) < 0.008:  # np.mean(amplitude)
+            if np.amax(self.low_pass_amplitude) < 0.008:
                 # Noise
                 self.noise_run_time += 1
                 if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:
