@@ -98,7 +98,7 @@ class SignalProcessing:
             peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
             print('length of peak_freq',len(peak_freq))
             print('length of peak_amplitude', len(peak_amplitude))
-            if len(peak_freq) > 0:  # In case zero peaks, use last value
+            if len(peak_freq) > 0 and np.amax(peak_amplitude) > -35:  # In case zero peaks, use last value, and to not trigger on noise
                 # Going into own method when tested and working staying in "main loop"
                 delta_freq = []
                 for freq in peak_freq:
@@ -116,8 +116,8 @@ class SignalProcessing:
                     print('exept in heart peak',e)
                     found_heart_freq = 0
                 found_heart_freq_old = found_heart_freq
-                if peak_amplitude[np.argmax(np.array(self.peak_weighted))] < -35:  # To not trigger on noise
-                    found_heart_freq = 0
+                # if peak_amplitude[np.argmax(np.array(self.peak_weighted))] < -35:  # To not trigger on noise
+                #     found_heart_freq = 0
             else:
                 #found_heart_freq = found_heart_freq_old
                 found_heart_freq = 0
