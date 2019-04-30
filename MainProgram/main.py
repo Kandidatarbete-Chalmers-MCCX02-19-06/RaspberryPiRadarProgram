@@ -5,6 +5,8 @@ import queue
 import subprocess       # For Raspberry Pi shutdown
 import os               # For using terminal commands
 import matplotlib.pyplot as plt
+from matplotlib.colors import BoundaryNorm
+from matplotlib.ticker import MaxNLocator
 import numpy as np
 
 # Import our own classes used in main
@@ -86,20 +88,28 @@ def main():
         # Test of FFT, remove later
         #plt.xlim(1, 3)
         FFTfreq, FFTamplitude, peak_freq, peak_amplitude, len_fft, peak_weighted = signal_processing.getFFTvalues()
-        print("Length of FFT_amplitude", len(FFTamplitude))
+        #print("Length of FFT_amplitude", len(FFTamplitude))
         if len(FFTamplitude) == len_fft:
             time_array = np.linspace(0, (run_times+1)*1.5, run_times+1)
             array.append(FFTamplitude)
             plt.figure(1)
             plt.clf()
-            plt.plot(FFTfreq, FFTamplitude)
-            plt.plot(peak_freq, peak_amplitude, 'bo')
-            plt.plot(peak_freq, peak_weighted, 'ro')
-            plt.pause(0.1)
+            try:
+                plt.plot(FFTfreq, FFTamplitude)
+                plt.plot(peak_freq, peak_amplitude, 'bo')
+                plt.plot(peak_freq, peak_weighted, 'ro')
+                plt.pause(0.1)
+            except Exception as e:
+                print('plot error',e)
+
+            cmap = plt.get_cmap('PiYG')
+            levels = MaxNLocator(nbins=30).tick_values(-40, np.amax(array))
+            norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
+
             plt.figure(2)
             plt.clf()
-            #freq_array = np.linspace(0.8*60, 180, len_fft)
-            plt.pcolormesh(time_array, freq_array, np.transpose(array))
+            plt.pcolormesh(time_array, freq_array, np.transpose(array), norm=norm)
+            plt.colorbar()
             plt.xlabel("Time (s)")
             plt.ylabel("Frequency (bpm)")
             run_times += 1

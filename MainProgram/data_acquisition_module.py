@@ -49,7 +49,7 @@ class DataAcquisition(threading.Thread):
         print(self.args.sensors)
         #self.config.sensor = 1
         # Settings for radar setup
-        self.config.range_interval = [0.2, 0.4]  # Measurement interval
+        self.config.range_interval = [0.4, 1]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
         self.config.sweep_rate = 20  # Probably 40 is the best without graph
         # For use of sample freq in other threads and classes.
@@ -160,7 +160,7 @@ class DataAcquisition(threading.Thread):
                         self.bluetooth_server.write_data_to_app(
                             tracked_data["relative distance"], 'real time breath')
                         # self.bluetooth_server.write_data_to_app(
-                        #    bandpass_filtered_data_RR, 'real time breath')
+                        #    bandpass_filtered_data_HR, 'real time breath')
             if self.plot_graphs and self.run_times % self.modulo_base == 0:
                 try:
                     self.pg_process.put_data(tracked_data)  # plot data
@@ -292,15 +292,11 @@ class DataAcquisition(threading.Thread):
                 self.delta_distance  # calculates the distance traveled from phase differences
 
             # TODO testa utan lågpassfilter
-            self.delta_distance = self.wave_length * \
-                (wrapped_phase - self.last_phase) / (4 * np.pi)
+            #self.delta_distance = self.wave_length * \
+            #    (wrapped_phase - self.last_phase) / (4 * np.pi)
 
             # TODO testa med konjugat
-            #com_idx = int(self.track_peak_relative_position * data_length)
-            # print('com_idx',com_idx) samma
-            #print('average index',self.track_peaks_average_index)
-            # com_idx=self.track_peaks_average_index
-            # delta_angle = np.angle(data[com_idx] * np.conj(self.last_data[com_idx]))
+            # delta_angle = np.angle(data[self.track_peaks_average_index] * np.conj(self.last_data[self.track_peaks_average_index]))
             # vel = self.list_of_variables_for_threads["sample_freq"] * 2.5 * delta_angle / (2 * np.pi)
             # self.low_pass_vel = self.low_pass_const * vel + \
             #     (1 - self.low_pass_const) * self.low_pass_vel
@@ -308,7 +304,7 @@ class DataAcquisition(threading.Thread):
 
             # Remove Noise
             # Indicate if the current measurement is noise or not, to not use the noise in signal_processing
-            if np.amax(self.low_pass_amplitude) < 0.008:
+            if np.amax(self.low_pass_amplitude) < 0.01:
                 # Noise
                 self.noise_run_time += 1
                 if self.noise_run_time >= 10 and self.not_noise_run_time >= 5:

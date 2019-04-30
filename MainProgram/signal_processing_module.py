@@ -101,10 +101,18 @@ class SignalProcessing:
                 delta_freq = []
                 for freq in peak_freq:
                     delta_freq.append(freq - found_heart_freq_old)
-                self.peak_weighted = np.add(
-                    peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
-                # TODO send 0 if amplitude weak (only noise)
-                found_heart_freq = peak_freq[np.argmax(self.peak_weighted)]
+                #self.peak_weighted = np.add(
+                #    peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
+                self.peak_weighted = []
+                try:
+                    for i in range(0,len(peak_freq)):  # Weight the peaks found depending on their amplitude,
+                        # distance to the last tracked peak, and on the frequency (the noise is kind of 1/f, so to to fix that multiply with f)
+                        self.peak_weighted.append(peak_amplitude[i]+multiplication_factor*np.exp(-np.abs(peak_freq[i]-found_heart_freq_old)/time_constant)*np.sqrt(peak_freq[i]))
+
+                    found_heart_freq = peak_freq[np.argmax(np.array(self.peak_weighted))]
+                except Exception as e:
+                    print('exept in heart peak',e)
+                    found_heart_freq = 0
                 found_heart_freq_old = found_heart_freq
             else:
                 #found_heart_freq = found_heart_freq_old
@@ -208,7 +216,7 @@ class SignalProcessing:
         self.peak_freq = []  # Maybe change to array?
         for i in peaks:
             self.peak_freq.append(peak_freq_linspace[i])
-        print("Found peak freq: ", self.peak_freq)
+        #print("Found peak freq: ", self.peak_freq)
 
         self.peak_amplitude = []
         for i in peaks:
