@@ -96,6 +96,8 @@ class SignalProcessing:
             #print("Averaged FFT: ", FFT_averaged[2])
             # Returns the peaks in set inteval from averaged FFT
             peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
+            print('length of peak_freq',peak_freq)
+            print('length of peak_amplitude', peak_amplitude)
             if len(peak_freq) > 0:  # In case zero peaks, use last value
                 # Going into own method when tested and working staying in "main loop"
                 delta_freq = []
