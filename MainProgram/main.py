@@ -103,7 +103,7 @@ def main():
                 print('plot error',e)
 
             cmap = plt.get_cmap('PiYG')
-            levels = MaxNLocator(nbins=30).tick_values(-40, np.amax(array))
+            levels = MaxNLocator(nbins=90).tick_values(-35, np.amax(array))
             norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
 
             plt.figure(2)
