@@ -116,10 +116,10 @@ class SignalProcessing:
                     print('exept in heart peak',e)
                     found_heart_freq = 0
                 found_heart_freq_old = found_heart_freq
+                if peak_amplitude[np.argmax(np.array(self.peak_weighted))] < -35:  # To not trigger on noise
+                    found_heart_freq = 0
             else:
                 #found_heart_freq = found_heart_freq_old
-                found_heart_freq = 0
-            if peak_amplitude[np.argmax(np.array(self.peak_weighted))] < -35:  # To not trigger on noise
                 found_heart_freq = 0
             print("Found heart rate Hz and BPM: ", found_heart_freq, int(60*found_heart_freq))
             found_heart_rate = int(60 * found_heart_freq)  # Send to app
