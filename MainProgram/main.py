@@ -5,6 +5,8 @@ import queue
 import subprocess       # For Raspberry Pi shutdown
 import os               # For using terminal commands
 import matplotlib.pyplot as plt
+from matplotlib.colors import BoundaryNorm
+from matplotlib.ticker import MaxNLocator
 import numpy as np
 
 # Import our own classes used in main
@@ -100,9 +102,14 @@ def main():
             except Exception as e:
                 print('plot error',e)
 
+            cmap = plt.get_cmap('PiYG')
+            levels = MaxNLocator(nbins=30).tick_values(-40, np.amax(array))
+            norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
+
             plt.figure(2)
             plt.clf()
-            plt.pcolormesh(time_array, freq_array, np.transpose(array))
+            plt.pcolormesh(time_array, freq_array, np.transpose(array), norm=norm)
+            plt.colorbar()
             plt.xlabel("Time (s)")
             plt.ylabel("Frequency (bpm)")
             run_times += 1
