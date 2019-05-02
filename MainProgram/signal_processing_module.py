@@ -124,7 +124,7 @@ class SignalProcessing:
                         #print('freq diff',np.abs(peak_freq[i] - found_heart_freq_old))
                         #print('amp diff',np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old))
                         #print('old amp',found_heart_freq_amplitude_old)
-                        if np.abs(peak_freq[i] - found_heart_freq_old) < 0.3 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 5:# and (found_heart_freq_old < 1 or peak_freq[i] > 1):
+                        if np.abs(peak_freq[i] - found_heart_freq_old) < 0.2 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 4:# and (found_heart_freq_old < 1 or peak_freq[i] > 1):
                             close_peaks_index.append(i)
                             close_peaks.append(peak_freq[i])
 
