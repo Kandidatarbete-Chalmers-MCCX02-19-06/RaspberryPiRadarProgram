@@ -120,6 +120,9 @@ class SignalProcessing:
                             multiplication_factor = 10
                         # distance to the last tracked peak, and on the frequency (the noise is kind of 1/f, so to to fix that multiply with f)
                         self.peak_weighted.append(peak_amplitude[i]+multiplication_factor*np.exp(-np.abs(peak_freq[i]-found_heart_freq_old)/time_constant)*np.sqrt(np.sqrt(peak_freq[i])))
+                        print('freq diff',np.abs(peak_freq[i] - found_heart_freq_old))
+                        print('amp diff',np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old))
+                        print('old amp',found_heart_freq_amplitude_old)
                         if np.abs(peak_freq[i] - found_heart_freq_old) < 0.5 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 10:# and (found_heart_freq_old < 1 or peak_freq[i] > 1):
                             close_peaks_index.append(i)
 
@@ -149,10 +152,14 @@ class SignalProcessing:
                 self.peak_weighted.clear()
 
 
-
-            print("Found heart rate Hz and BPM: ", found_heart_freq, int(60*found_heart_freq))
-            found_heart_rate = int(60 * found_heart_freq)  # Send to app
-            self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
+            if not first_real_value:
+                print("Found heart rate Hz and BPM: ", found_heart_freq, int(60*found_heart_freq))
+                found_heart_rate = int(60 * found_heart_freq)  # Send to app
+                self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
+            else:
+                print("Waiting to found heart rate Hz and BPM: ", 0, int(60 * 0))
+                found_heart_rate = 0  # Send to app
+                self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
             # BPM_search = self.freq * 60 # Used where?
             # print("past plot heart rate")
 
