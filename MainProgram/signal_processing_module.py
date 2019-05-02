@@ -150,6 +150,15 @@ class SignalProcessing:
                         print('To many disturbing peaks around, can\'t identify the correct one')
                         found_heart_freq = found_heart_freq_old
 
+                    old_heart_freq_list.append(found_heart_freq)  # save last 20 values
+                    if len(old_heart_freq_list) > 10:
+                        old_heart_freq_list.pop(0)
+
+                    if np.abs(np.mean(old_heart_freq_list[
+                                      0:-2]) - found_heart_freq) > 0.17:  # too big change, probably noise or other disruptions
+                        found_heart_freq = np.mean(old_heart_freq_list)
+                        print('too big change, probably noise or other disruptions, old:', old_heart_freq_list[-1])
+
 
                 except Exception as e:
                     print('exept in heart peak',e)
@@ -161,7 +170,7 @@ class SignalProcessing:
                     found_heart_freq = 0
 
 
-                #found_heart_freq_old = found_heart_freq
+                found_heart_freq_old = found_heart_freq
             elif len(peak_freq) > 0:
                 found_heart_freq = found_heart_freq_old  # just use the last values
             else:
@@ -169,15 +178,6 @@ class SignalProcessing:
                 #found_heart_freq = found_heart_freq_old
                 found_heart_freq = 0
                 self.peak_weighted.clear()
-
-            old_heart_freq_list.append(found_heart_freq)  # save last 20 values
-            if len(old_heart_freq_list) > 20:
-                old_heart_freq_list.pop(0)
-
-            if np.abs(np.mean(old_heart_freq_list[0:19])-found_heart_freq) > 0.17:  # too big change, probably noise or other disruptions
-                found_heart_freq = np.mean(old_heart_freq_list)
-
-            found_heart_freq_old = found_heart_freq
 
             if not first_real_value:
                 print("Found heart rate Hz and BPM: ", found_heart_freq, int(60*found_heart_freq))
