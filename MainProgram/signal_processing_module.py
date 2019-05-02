@@ -34,7 +34,8 @@ class SignalProcessing:
         self.beta = 1  # Kaiser window form
         self.tau = 12  # TODO Beskriva alla variabler
         # Data in vector with length of window
-        self.fft_window = np.zeros(self.T_resolution*self.sample_freq)  # Width in samples of FFT
+        #self.fft_window = np.zeros(self.T_resolution*self.sample_freq)  # Width in samples of FFT
+        self.fft_window = np.zeros(1200)  # Width in samples of FFT
         self.length_fft_window = len(self.fft_window)  # length of fft_window array
         self.window_width = int(len(self.fft_window))
         # window_width_half = int(window_width/2)  # Since FFT only processes half of freq (Nyqvist)
@@ -274,7 +275,6 @@ class SignalProcessing:
 
         # Plotting for FFT
         self.FFTfreq = peak_freq_linspace
-        print(len(FFT_in_interval))
         self.FFTamplitude = FFT_in_interval
         self.len_fft = int(len(FFT_in_interval))
         #print("Length of fft:", self.len_fft)
