@@ -102,7 +102,7 @@ class SignalProcessing:
             peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
             print('length of peak_freq',len(peak_freq))
             print('length of peak_amplitude', len(peak_amplitude))
-            if len(peak_freq) > 0 and np.amax(peak_amplitude) > -30 and time.time() - start_time > 30:
+            if len(peak_freq) > 0 and np.amax(peak_amplitude) > -30 and time.time() - start_time > 60:
                 # In case zero peaks, use last value, and to not trigger on noise, and there is just noise before 30 seconds has passed
                 # Going into own method when tested and working staying in "main loop"
                 delta_freq = []
@@ -120,7 +120,7 @@ class SignalProcessing:
                             multiplication_factor = 10
                         # distance to the last tracked peak, and on the frequency (the noise is kind of 1/f, so to to fix that multiply with f)
                         self.peak_weighted.append(peak_amplitude[i]+multiplication_factor*np.exp(-np.abs(peak_freq[i]-found_heart_freq_old)/time_constant)*np.sqrt(np.sqrt(peak_freq[i])))
-                        if np.abs(peak_freq[i] - found_heart_freq_old) < 0.3 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 4 and (found_heart_freq_old < 1 or peak_freq[i] > 1):
+                        if np.abs(peak_freq[i] - found_heart_freq_old) < 0.5 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 10 and (found_heart_freq_old < 1 or peak_freq[i] > 1):
                             close_peaks_index.append(i)
 
                     found_heart_freq = peak_freq[np.argmax(np.array(self.peak_weighted))]
