@@ -29,7 +29,7 @@ class SignalProcessing:
 
         # Variables for Pulse detection
         self.index_fft = 0
-        self.T_resolution = 15  # förut 30
+        self.T_resolution = 20  # förut 30
         self.overlap = 90  # Percentage of old values for the new FFT
         self.beta = 1  # Kaiser window form
         self.tau = 12  # TODO Beskriva alla variabler
@@ -45,8 +45,9 @@ class SignalProcessing:
         self.delta_T = self.window_slide / self.sample_freq
         # int(round(self.tau / self.delta_T))  # Make tau is larger than delta_T, else it will be zero and programme will fail.
         self.number_of_old_FFT = 10
-        self.FFT_old_values = np.zeros((self.number_of_old_FFT, int(
-            self.window_width/2)))  # Saving old values for moving mean
+        #self.FFT_old_values = np.zeros((self.number_of_old_FFT, int(
+        #    self.window_width/2)))  # Saving old values for moving mean
+        self.FFT_old_values = np.zeros((10,600))
         # Starta heart_rate
         self.heart_rate_thread = threading.Thread(target=self.heart_rate)
         self.heart_rate_thread.start()
@@ -74,14 +75,21 @@ class SignalProcessing:
         index_in_FFT_old_values = 0  # Placement of old FFT in FFT_old_values
         FFT_counter = 1  # In start to avg over FFT_counter before FFT_old_values is filled to max
         found_heart_freq_old = 180/60  # Guess the first freq
+        found_heart_freq_amplitude_old = -20
         # Variables for weigthed peaks
-        multiplication_factor = 30
-        time_constant = 1
+        #multiplication_factor = 20
+        time_constant = 2
+        start_time = time.time()
+        first_real_value = True  # the first real heart rate found
+        old_heart_freq_list = []
 
         while self.go:
             # print("in while loop heart_rate")
             fft_signal_out = self.windowedFFT()
+            #print(fft_signal_out)
             fft_signal_out_dB = 20*np.log10(fft_signal_out)
+            #print(type(fft_signal_out_dB))
+            #print(type(self.FFT_old_values[index_in_FFT_old_values]))
             self.FFT_old_values[index_in_FFT_old_values][:] = fft_signal_out_dB
 
             # RBW = self.freq[1] - self.freq[0] # Used where?
@@ -96,7 +104,14 @@ class SignalProcessing:
             #print("Averaged FFT: ", FFT_averaged[2])
             # Returns the peaks in set inteval from averaged FFT
             peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
+<<<<<<< HEAD
             if len(peak_freq) > 0 and np.amin(peak_amplitude) > -40:  # In case zero peaks, use last value
+=======
+            #print('length of peak_freq',len(peak_freq))
+            #print('length of peak_amplitude', len(peak_amplitude))
+            if len(peak_freq) > 0 and np.amax(peak_amplitude) > -30 and time.time() - start_time > 50:
+                # In case zero peaks, use last value, and to not trigger on noise, and there is just noise before 30 seconds has passed
+>>>>>>> 93c6b17e8b204ba6cd5c804f219b4f5465e7b1b1
                 # Going into own method when tested and working staying in "main loop"
                 delta_freq = []
                 for freq in peak_freq:
@@ -104,22 +119,59 @@ class SignalProcessing:
                 #self.peak_weighted = np.add(
                 #    peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
                 self.peak_weighted = []
+                close_peaks_index = []
+                close_peaks = []
                 try:
                     for i in range(0,len(peak_freq)):  # Weight the peaks found depending on their amplitude,
+                        if peak_freq[i] < 1:
+                            multiplication_factor = 7 # to lower the noise peak under 1 Hz
+                        else:
+                            multiplication_factor = 10
                         # distance to the last tracked peak, and on the frequency (the noise is kind of 1/f, so to to fix that multiply with f)
-                        self.peak_weighted.append(peak_amplitude[i]+multiplication_factor*np.exp(-np.abs(peak_freq[i]-found_heart_freq_old)/time_constant)*np.sqrt(peak_freq[i]))
+                        self.peak_weighted.append(peak_amplitude[i]+multiplication_factor*np.exp(-np.abs(peak_freq[i]-found_heart_freq_old)/time_constant)*np.sqrt(np.sqrt(peak_freq[i])))
+                        #print('freq diff',np.abs(peak_freq[i] - found_heart_freq_old))
+                        #print('amp diff',np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old))
+                        #print('old amp',found_heart_freq_amplitude_old)
+                        if np.abs(peak_freq[i] - found_heart_freq_old) < 0.2 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 4:# and (found_heart_freq_old < 1 or peak_freq[i] > 1):
+                            # To average peaks if they are close
+                            close_peaks_index.append(i)
+                            close_peaks.append(peak_freq[i])
 
                     found_heart_freq = peak_freq[np.argmax(np.array(self.peak_weighted))]
+                    found_heart_freq_amplitude_old = self.peak_amplitude[np.argmax(np.array(self.peak_weighted))]
+
+                    if len(close_peaks_index) > 2:
+                        print('averaging, old:',found_heart_freq,close_peaks_index)
+                        #found_heart_freq = np.mean(peak_freq[i] for i in close_peaks_index)
+                        found_heart_freq = np.mean(close_peaks)
                 except Exception as e:
                     print('exept in heart peak',e)
                     found_heart_freq = 0
+
+                if first_real_value and found_heart_freq > 1:
+                    first_real_value = False
+                if found_heart_freq < 1 and first_real_value:  # Do not trigger on the large noise peak under 1 Hz
+                    found_heart_freq = 0
+
+
                 found_heart_freq_old = found_heart_freq
+            elif len(peak_freq) > 0:
+                found_heart_freq = found_heart_freq_old  # just use the last values
             else:
+                # Just noise
                 #found_heart_freq = found_heart_freq_old
                 found_heart_freq = 0
-            print("Found heart rate Hz and BPM: ", found_heart_freq, int(60*found_heart_freq))
-            found_heart_rate = int(60 * found_heart_freq)  # Send to app
-            self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
+                self.peak_weighted.clear()
+
+
+            if not first_real_value:
+                print("Found heart rate Hz and BPM: ", found_heart_freq, int(60*found_heart_freq))
+                found_heart_rate = int(60 * found_heart_freq)  # Send to app
+                self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
+            else:
+                print("Waiting to find heart rate")
+                found_heart_rate = 0  # Send to app
+                self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
             # BPM_search = self.freq * 60 # Used where?
             # print("past plot heart rate")
 
@@ -179,11 +231,12 @@ class SignalProcessing:
         # length_seq = len(signal_in)  # number of sequences
         window = np.kaiser(self.length_fft_window, self.beta)  # beta: shape factor
         self.fft_window = np.multiply(self.fft_window, window)
+        #print(len(self.fft_window))
+        signal_in_fft = fft(self.fft_window,1200)  # two-sided fft of input signal
 
-        signal_in_fft = fft(self.fft_window)  # two-sided fft of input signal
-
-        signal_fft_abs = np.abs(np.divide(signal_in_fft, self.length_fft_window))
-        signal_out = np.multiply(2, signal_fft_abs[0:self.length_fft_window//2])  # one-sided fft
+        signal_fft_abs = np.abs(np.divide(signal_in_fft, len(signal_in_fft)))
+        #signal_out = np.multiply(2, signal_fft_abs[0:self.length_fft_window//2])  # one-sided fft
+        signal_out = np.multiply(2, signal_fft_abs[0:len(signal_in_fft) // 2])  # one-sided fft
 
         # frequency array corresponding to frequencies in the fft
         return signal_out
@@ -201,7 +254,8 @@ class SignalProcessing:
         #print("FFT_in_interval", FFT_in_interval, "\n", len(FFT_in_interval))
 
         MaxFFT = np.amax(FFT_in_interval)  # Do on one line later, to remove outliers
-        threshold = MaxFFT - 10
+        #threshold = MaxFFT - 10
+        threshold = -27
         peaks, _ = signal.find_peaks(FFT_in_interval)
 
         index_list = []
@@ -224,6 +278,7 @@ class SignalProcessing:
 
         # Plotting for FFT
         self.FFTfreq = peak_freq_linspace
+        print(len(FFT_in_interval))
         self.FFTamplitude = FFT_in_interval
         self.len_fft = int(len(FFT_in_interval))
         #print("Length of fft:", self.len_fft)

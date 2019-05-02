@@ -49,7 +49,7 @@ class DataAcquisition(threading.Thread):
         print(self.args.sensors)
         #self.config.sensor = 1
         # Settings for radar setup
-        self.config.range_interval = [0.4, 1]  # Measurement interval
+        self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
         self.config.sweep_rate = 20  # Probably 40 is the best without graph
         # For use of sample freq in other threads and classes.
@@ -292,8 +292,8 @@ class DataAcquisition(threading.Thread):
                 self.delta_distance  # calculates the distance traveled from phase differences
 
             # TODO testa utan lågpassfilter
-            #self.delta_distance = self.wave_length * \
-            #    (wrapped_phase - self.last_phase) / (4 * np.pi)
+            self.delta_distance = self.wave_length * \
+                (wrapped_phase - self.last_phase) / (4 * np.pi)
 
             # TODO testa med konjugat
             # delta_angle = np.angle(data[self.track_peaks_average_index] * np.conj(self.last_data[self.track_peaks_average_index]))
