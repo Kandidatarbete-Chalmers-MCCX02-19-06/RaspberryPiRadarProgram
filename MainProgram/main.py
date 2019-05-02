@@ -65,7 +65,7 @@ def main():
     peak_amplitude = [1]
     len_fft = 0
     array = []
-    freq_array = np.linspace(0.8*60, 180, 33)
+    freq_array = np.linspace(0.8*60, 180, 132)
     run_times = 0
 
     # BluetoothServer object sent to classes which sends data locally
@@ -89,32 +89,32 @@ def main():
         #plt.xlim(1, 3)
         FFTfreq, FFTamplitude, peak_freq, peak_amplitude, len_fft, peak_weighted = signal_processing.getFFTvalues()
         print("Length of FFT_amplitude", len(FFTamplitude))
-        # if len(FFTamplitude) == len_fft:
-        #     time_array = np.linspace(0, (run_times+1)*1.5, run_times+1)
-        #     array.append(FFTamplitude)
-        #     plt.figure(1)
-        #     plt.clf()
-        #     try:
-        #         #print('FFTfreq',len(FFTfreq), 'FFTamplitude',len(FFTamplitude))
-        #         #print('peak_freq',len(peak_freq),'peak_amplitude',len(peak_amplitude),'peak_weighted',len(peak_weighted),peak_weighted)
-        #         plt.plot(FFTfreq, FFTamplitude)
-        #         plt.plot(peak_freq, peak_amplitude, 'bo')
-        #         plt.plot(peak_freq, peak_weighted, 'ro')
-        #         plt.pause(0.1)
-        #     except Exception as e:
-        #         print('plot error',e)
-        #
-        #     cmap = plt.get_cmap('PiYG')
-        #     levels = MaxNLocator(nbins=90).tick_values(-35, np.amax(array))
-        #     norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
-        #
-        #     plt.figure(2)
-        #     plt.clf()
-        #     plt.pcolormesh(time_array, freq_array, np.transpose(array), norm=norm)
-        #     plt.colorbar()
-        #     plt.xlabel("Time (s)")
-        #     plt.ylabel("Frequency (bpm)")
-        #     run_times += 1
+        if len(FFTamplitude) == len_fft:
+            time_array = np.linspace(0, (run_times+1)*1.5, run_times+1)
+            array.append(FFTamplitude)
+            plt.figure(1)
+            plt.clf()
+            try:
+                #print('FFTfreq',len(FFTfreq), 'FFTamplitude',len(FFTamplitude))
+                #print('peak_freq',len(peak_freq),'peak_amplitude',len(peak_amplitude),'peak_weighted',len(peak_weighted),peak_weighted)
+                plt.plot(FFTfreq, FFTamplitude)
+                plt.plot(peak_freq, peak_amplitude, 'bo')
+                plt.plot(peak_freq, peak_weighted, 'ro')
+                plt.pause(0.1)
+            except Exception as e:
+                print('plot error',e)
+
+            cmap = plt.get_cmap('PiYG')
+            levels = MaxNLocator(nbins=90).tick_values(-35, np.amax(array))
+            norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
+
+            plt.figure(2)
+            plt.clf()
+            plt.pcolormesh(time_array, freq_array, np.transpose(array), norm=norm)
+            plt.colorbar()
+            plt.xlabel("Time (s)")
+            plt.ylabel("Frequency (bpm)")
+            run_times += 1
         plt.pause(0.9)
         # plt.plot(FFTfreq, FFTamplitude)
         # plt.plot(peak_freq, peak_amplitude, 'bo')
