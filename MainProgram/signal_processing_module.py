@@ -140,15 +140,17 @@ class SignalProcessing:
                     found_heart_freq = peak_freq[np.argmax(np.array(self.peak_weighted))]
                     found_heart_freq_amplitude_old = self.peak_amplitude[np.argmax(np.array(self.peak_weighted))]
 
-                    if len(close_peaks) > 2:
+                    if len(close_peaks) >= 2:
                         print('averaging, old:',found_heart_freq)
                         #found_heart_freq = np.mean(peak_freq[i] for i in close_peaks_index)
                         found_heart_freq = np.mean(close_peaks)
 
-                    if len(close_disturbing_peaks) > 5:
+                    if len(close_disturbing_peaks) >= 5:
                         # To many disturbing peaks around, can't identify the correct one
                         print('To many disturbing peaks around, can\'t identify the correct one')
                         found_heart_freq = found_heart_freq_old
+
+                    #if
 
                 except Exception as e:
                     print('exept in heart peak',e)
