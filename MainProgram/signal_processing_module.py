@@ -88,8 +88,8 @@ class SignalProcessing:
             fft_signal_out = self.windowedFFT()
             #print(fft_signal_out)
             fft_signal_out_dB = 20*np.log10(fft_signal_out)
-            print(type(fft_signal_out_dB))
-            print(type(self.FFT_old_values[index_in_FFT_old_values]))
+            #print(type(fft_signal_out_dB))
+            #print(type(self.FFT_old_values[index_in_FFT_old_values]))
             self.FFT_old_values[index_in_FFT_old_values][:] = fft_signal_out_dB
 
             # RBW = self.freq[1] - self.freq[0] # Used where?
@@ -276,7 +276,7 @@ class SignalProcessing:
         self.FFTfreq = peak_freq_linspace
         self.FFTamplitude = FFT_in_interval
         self.len_fft = int(len(FFT_in_interval))
-        #print("Length of fft:", self.len_fft)
+        print("Length of fft:", self.len_fft)
         return self.peak_freq, self.peak_amplitude
 
     # TODO Used for plotting in main, remove later
