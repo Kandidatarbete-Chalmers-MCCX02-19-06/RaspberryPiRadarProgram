@@ -116,12 +116,14 @@ class SignalProcessing:
                 #self.peak_weighted = np.add(
                 #    peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
                 self.peak_weighted = []
-                close_peaks_index = []
                 close_peaks = []
+                close_disturbing_peaks = []
                 try:
                     for i in range(0,len(peak_freq)):  # Weight the peaks found depending on their amplitude,
-                        if peak_freq[i] < 1:
-                            multiplication_factor = 7 # to lower the noise peak under 1 Hz
+                        if peak_freq[i] < 0.9:
+                            multiplication_factor = 5 # to lower the noise peak under 0.9 Hz
+                        elif peak_freq[i] < 1:
+                            multiplication_factor = 7  # to lower the noise peak under 1 Hz
                         else:
                             multiplication_factor = 10
                         # distance to the last tracked peak, and on the frequency (the noise is kind of 1/f, so to to fix that multiply with f)
@@ -131,16 +133,23 @@ class SignalProcessing:
                         #print('old amp',found_heart_freq_amplitude_old)
                         if np.abs(peak_freq[i] - found_heart_freq_old) < 0.2 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 4:# and (found_heart_freq_old < 1 or peak_freq[i] > 1):
                             # To average peaks if they are close
-                            close_peaks_index.append(i)
                             close_peaks.append(peak_freq[i])
+                        elif np.abs(peak_freq[i] - found_heart_freq_old) < 0.4 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 5:
+                            close_disturbing_peaks.append(peak_freq[i])
 
                     found_heart_freq = peak_freq[np.argmax(np.array(self.peak_weighted))]
                     found_heart_freq_amplitude_old = self.peak_amplitude[np.argmax(np.array(self.peak_weighted))]
 
-                    if len(close_peaks_index) > 2:
-                        print('averaging, old:',found_heart_freq,close_peaks_index)
+                    if len(close_peaks) > 2:
+                        print('averaging, old:',found_heart_freq)
                         #found_heart_freq = np.mean(peak_freq[i] for i in close_peaks_index)
                         found_heart_freq = np.mean(close_peaks)
+
+                    if len(close_disturbing_peaks) > 5:
+                        # To many disturbing peaks around, can't identify the correct one
+                        print('To many disturbing peaks around, can\'t identify the correct one')
+                        found_heart_freq = found_heart_freq_old
+
                 except Exception as e:
                     print('exept in heart peak',e)
                     found_heart_freq = 0
