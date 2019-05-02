@@ -75,8 +75,8 @@ class SignalProcessing:
         FFT_counter = 1  # In start to avg over FFT_counter before FFT_old_values is filled to max
         found_heart_freq_old = 180/60  # Guess the first freq
         # Variables for weigthed peaks
-        multiplication_factor = 30
-        time_constant = 1
+        #multiplication_factor = 20
+        time_constant = 2
 
         while self.go:
             # print("in while loop heart_rate")
@@ -108,8 +108,12 @@ class SignalProcessing:
                 self.peak_weighted = []
                 try:
                     for i in range(0,len(peak_freq)):  # Weight the peaks found depending on their amplitude,
+                        if peak_freq[i] < 1:
+                            multiplication_factor = 10 # to lower the noise peak under 1 Hz
+                        else:
+                            multiplication_factor = 20
                         # distance to the last tracked peak, and on the frequency (the noise is kind of 1/f, so to to fix that multiply with f)
-                        self.peak_weighted.append(peak_amplitude[i]+multiplication_factor*np.exp(-np.abs(peak_freq[i]-found_heart_freq_old)/time_constant)*np.sqrt(peak_freq[i]))
+                        self.peak_weighted.append(peak_amplitude[i]+multiplication_factor*np.exp(-np.abs(peak_freq[i]-found_heart_freq_old)/time_constant)*np.sqrt(np.sqrt(peak_freq[i])))
 
                     found_heart_freq = peak_freq[np.argmax(np.array(self.peak_weighted))]
                 except Exception as e:
@@ -206,6 +210,7 @@ class SignalProcessing:
 
         MaxFFT = np.amax(FFT_in_interval)  # Do on one line later, to remove outliers
         threshold = MaxFFT - 10
+        threshold = -30
         peaks, _ = signal.find_peaks(FFT_in_interval)
 
         index_list = []
