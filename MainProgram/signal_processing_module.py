@@ -224,7 +224,7 @@ class SignalProcessing:
         window = np.kaiser(self.length_fft_window, self.beta)  # beta: shape factor
         self.fft_window = np.multiply(self.fft_window, window)
 
-        signal_in_fft = fft(self.fft_window)  # two-sided fft of input signal
+        signal_in_fft = fft(self.fft_window,120)  # two-sided fft of input signal
 
         signal_fft_abs = np.abs(np.divide(signal_in_fft, self.length_fft_window))
         signal_out = np.multiply(2, signal_fft_abs[0:self.length_fft_window//2])  # one-sided fft
