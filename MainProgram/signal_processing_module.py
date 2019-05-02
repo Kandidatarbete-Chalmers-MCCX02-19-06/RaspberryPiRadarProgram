@@ -228,7 +228,8 @@ class SignalProcessing:
         signal_in_fft = fft(self.fft_window,120)  # two-sided fft of input signal
 
         signal_fft_abs = np.abs(np.divide(signal_in_fft, len(signal_in_fft)))
-        signal_out = np.multiply(2, signal_fft_abs[0:self.length_fft_window//2])  # one-sided fft
+        #signal_out = np.multiply(2, signal_fft_abs[0:self.length_fft_window//2])  # one-sided fft
+        signal_out = np.multiply(2, signal_fft_abs[0:120 // 2])  # one-sided fft
 
         # frequency array corresponding to frequencies in the fft
         return signal_out
