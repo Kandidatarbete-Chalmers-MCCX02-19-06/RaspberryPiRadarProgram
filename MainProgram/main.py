@@ -95,8 +95,8 @@ def main():
             plt.figure(1)
             plt.clf()
             try:
-                print('FFTfreq',FFTfreq, 'FFTamplitude',FFTamplitude)
-                print('peak_freq',peak_freq,'peak_amplitude',peak_amplitude,'peak_weighted',peak_weighted)
+                print('FFTfreq',len(FFTfreq), 'FFTamplitude',len(FFTamplitude))
+                print('peak_freq',len(peak_freq),'peak_amplitude',len(peak_amplitude),'peak_weighted',len(peak_weighted))
                 plt.plot(FFTfreq, FFTamplitude)
                 plt.plot(peak_freq, peak_amplitude, 'bo')
                 plt.plot(peak_freq, peak_weighted, 'ro')
