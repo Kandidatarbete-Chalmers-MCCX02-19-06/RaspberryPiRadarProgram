@@ -45,8 +45,9 @@ class SignalProcessing:
         self.delta_T = self.window_slide / self.sample_freq
         # int(round(self.tau / self.delta_T))  # Make tau is larger than delta_T, else it will be zero and programme will fail.
         self.number_of_old_FFT = 10
-        self.FFT_old_values = np.zeros((self.number_of_old_FFT, int(
-            self.window_width/2)))  # Saving old values for moving mean
+        #self.FFT_old_values = np.zeros((self.number_of_old_FFT, int(
+        #    self.window_width/2)))  # Saving old values for moving mean
+        self.FFT_old_values = np.zeros(120)
         # Starta heart_rate
         self.heart_rate_thread = threading.Thread(target=self.heart_rate)
         self.heart_rate_thread.start()
@@ -226,7 +227,7 @@ class SignalProcessing:
 
         signal_in_fft = fft(self.fft_window,120)  # two-sided fft of input signal
 
-        signal_fft_abs = np.abs(np.divide(signal_in_fft, self.length_fft_window))
+        signal_fft_abs = np.abs(np.divide(signal_in_fft, len(signal_in_fft)))
         signal_out = np.multiply(2, signal_fft_abs[0:self.length_fft_window//2])  # one-sided fft
 
         # frequency array corresponding to frequencies in the fft
