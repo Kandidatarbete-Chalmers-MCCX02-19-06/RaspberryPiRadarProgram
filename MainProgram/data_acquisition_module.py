@@ -296,11 +296,11 @@ class DataAcquisition(threading.Thread):
                 (wrapped_phase - self.last_phase) / (4 * np.pi)
 
             # TODO testa med konjugat
-            delta_angle = np.angle(data[self.track_peaks_average_index] * np.conj(self.last_data[self.track_peaks_average_index]))
-            vel = self.list_of_variables_for_threads["sample_freq"] * 2.5 * delta_angle / (2 * np.pi)
-            self.low_pass_vel = self.low_pass_const * vel + \
-                (1 - self.low_pass_const) * self.low_pass_vel
-            self.delta_distance = self.low_pass_vel / self.list_of_variables_for_threads["sample_freq"] / 1000
+            # delta_angle = np.angle(data[self.track_peaks_average_index] * np.conj(self.last_data[self.track_peaks_average_index]))
+            # vel = self.list_of_variables_for_threads["sample_freq"] * 2.5 * delta_angle / (2 * np.pi)
+            # self.low_pass_vel = self.low_pass_const * vel + \
+            #     (1 - self.low_pass_const) * self.low_pass_vel
+            # self.delta_distance = self.low_pass_vel / self.list_of_variables_for_threads["sample_freq"] / 1000
 
             # Remove Noise
             # Indicate if the current measurement is noise or not, to not use the noise in signal_processing
