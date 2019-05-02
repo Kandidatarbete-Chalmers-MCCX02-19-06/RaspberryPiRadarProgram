@@ -47,7 +47,7 @@ class SignalProcessing:
         self.number_of_old_FFT = 10
         #self.FFT_old_values = np.zeros((self.number_of_old_FFT, int(
         #    self.window_width/2)))  # Saving old values for moving mean
-        self.FFT_old_values = np.zeros(600)
+        self.FFT_old_values = np.zeros(1200,600)
         # Starta heart_rate
         self.heart_rate_thread = threading.Thread(target=self.heart_rate)
         self.heart_rate_thread.start()
