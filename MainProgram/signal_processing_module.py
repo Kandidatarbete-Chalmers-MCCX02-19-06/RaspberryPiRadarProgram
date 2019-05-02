@@ -29,7 +29,7 @@ class SignalProcessing:
 
         # Variables for Pulse detection
         self.index_fft = 0
-        self.T_resolution = 15  # förut 30
+        self.T_resolution = 20  # förut 30
         self.overlap = 90  # Percentage of old values for the new FFT
         self.beta = 1  # Kaiser window form
         self.tau = 12  # TODO Beskriva alla variabler
@@ -125,6 +125,7 @@ class SignalProcessing:
                         #print('amp diff',np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old))
                         #print('old amp',found_heart_freq_amplitude_old)
                         if np.abs(peak_freq[i] - found_heart_freq_old) < 0.2 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 4:# and (found_heart_freq_old < 1 or peak_freq[i] > 1):
+                            # To average peaks if they are close
                             close_peaks_index.append(i)
                             close_peaks.append(peak_freq[i])
 
