@@ -140,7 +140,7 @@ class SignalProcessing:
 
 
                 found_heart_freq_old = found_heart_freq
-            elif np.amax(peak_amplitude) > -30:
+            elif len(peak_freq) > 0:
                 found_heart_freq = found_heart_freq_old  # just use the last values
             else:
                 # Just noise
