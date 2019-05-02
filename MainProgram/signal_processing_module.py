@@ -131,7 +131,7 @@ class SignalProcessing:
 
                     if len(close_peaks_index) > 2:
                         print('averaging, old:',found_heart_freq,close_peaks_index)
-                        found_heart_freq = np.mean(peak_freq[np.array(close_peaks_index)])
+                        found_heart_freq = np.mean(peak_freq[i] for i in close_peaks_index)
                 except Exception as e:
                     print('exept in heart peak',e)
                     found_heart_freq = 0
