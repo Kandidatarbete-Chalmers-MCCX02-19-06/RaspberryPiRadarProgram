@@ -112,6 +112,7 @@ class SignalProcessing:
                 #    peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
                 self.peak_weighted = []
                 close_peaks_index = []
+                close_peaks = []
                 try:
                     for i in range(0,len(peak_freq)):  # Weight the peaks found depending on their amplitude,
                         if peak_freq[i] < 1:
@@ -125,13 +126,15 @@ class SignalProcessing:
                         #print('old amp',found_heart_freq_amplitude_old)
                         if np.abs(peak_freq[i] - found_heart_freq_old) < 0.3 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 5:# and (found_heart_freq_old < 1 or peak_freq[i] > 1):
                             close_peaks_index.append(i)
+                            close_peaks.append(peak_freq[i])
 
                     found_heart_freq = peak_freq[np.argmax(np.array(self.peak_weighted))]
                     found_heart_freq_amplitude_old = self.peak_amplitude[np.argmax(np.array(self.peak_weighted))]
 
                     if len(close_peaks_index) > 2:
                         print('averaging, old:',found_heart_freq,close_peaks_index)
-                        found_heart_freq = np.mean(peak_freq[i] for i in close_peaks_index)
+                        #found_heart_freq = np.mean(peak_freq[i] for i in close_peaks_index)
+                        found_heart_freq = np.mean(close_peaks)
                 except Exception as e:
                     print('exept in heart peak',e)
                     found_heart_freq = 0
