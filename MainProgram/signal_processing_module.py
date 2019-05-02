@@ -130,7 +130,7 @@ class SignalProcessing:
                     found_heart_freq_amplitude_old = self.peak_amplitude[np.argmax(np.array(self.peak_weighted))]
 
                     if len(close_peaks_index) > 2:
-                        print('averaging, old:',found_heart_freq)
+                        print('averaging, old:',found_heart_freq,close_peaks_index)
                         found_heart_freq = np.mean(peak_freq[np.array(close_peaks_index)])
                 except Exception as e:
                     print('exept in heart peak',e)
