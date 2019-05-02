@@ -98,7 +98,7 @@ class SignalProcessing:
             peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
             print('length of peak_freq',len(peak_freq))
             print('length of peak_amplitude', len(peak_amplitude))
-            if len(peak_freq) > 0 and np.amax(peak_amplitude) > -35:  # In case zero peaks, use last value, and to not trigger on noise
+            if len(peak_freq) > 0 and np.amax(peak_amplitude) > -30:  # In case zero peaks, use last value, and to not trigger on noise
                 # Going into own method when tested and working staying in "main loop"
                 delta_freq = []
                 for freq in peak_freq:
