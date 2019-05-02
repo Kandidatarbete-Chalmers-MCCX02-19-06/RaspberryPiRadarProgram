@@ -120,7 +120,7 @@ class SignalProcessing:
                             multiplication_factor = 10
                         # distance to the last tracked peak, and on the frequency (the noise is kind of 1/f, so to to fix that multiply with f)
                         self.peak_weighted.append(peak_amplitude[i]+multiplication_factor*np.exp(-np.abs(peak_freq[i]-found_heart_freq_old)/time_constant)*np.sqrt(np.sqrt(peak_freq[i])))
-                        if np.abs(peak_freq[i] - found_heart_freq_old) < 0.2 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 3 and (found_heart_freq_old < 1 or peak_freq[i] > 1):
+                        if np.abs(peak_freq[i] - found_heart_freq_old) < 0.3 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 4 and (found_heart_freq_old < 1 or peak_freq[i] > 1):
                             close_peaks_index.append(i)
 
                     found_heart_freq = peak_freq[np.argmax(np.array(self.peak_weighted))]
@@ -140,7 +140,7 @@ class SignalProcessing:
 
 
                 found_heart_freq_old = found_heart_freq
-            elif len(peak_freq):
+            elif np.amax(peak_amplitude) > -30:
                 found_heart_freq = found_heart_freq_old  # just use the last values
             else:
                 # Just noise
