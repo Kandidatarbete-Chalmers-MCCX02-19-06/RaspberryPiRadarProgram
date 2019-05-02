@@ -102,7 +102,7 @@ class SignalProcessing:
             peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
             print('length of peak_freq',len(peak_freq))
             print('length of peak_amplitude', len(peak_amplitude))
-            if len(peak_freq) > 0 and np.amax(peak_amplitude) > -30 and time.time() - start_time > 60:
+            if len(peak_freq) > 0 and np.amax(peak_amplitude) > -30 and time.time() - start_time > 50:
                 # In case zero peaks, use last value, and to not trigger on noise, and there is just noise before 30 seconds has passed
                 # Going into own method when tested and working staying in "main loop"
                 delta_freq = []
@@ -157,7 +157,7 @@ class SignalProcessing:
                 found_heart_rate = int(60 * found_heart_freq)  # Send to app
                 self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
             else:
-                print("Waiting to find heart rate Hz and BPM: ", 0, int(60 * 0))
+                print("Waiting to find heart rate")
                 found_heart_rate = 0  # Send to app
                 self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
             # BPM_search = self.freq * 60 # Used where?
