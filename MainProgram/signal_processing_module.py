@@ -35,7 +35,7 @@ class SignalProcessing:
         self.tau = 12  # TODO Beskriva alla variabler
         # Data in vector with length of window
         #self.fft_window = np.zeros(self.T_resolution*self.sample_freq)  # Width in samples of FFT
-        self.fft_window = np.zeros(1200)  # Width in samples of FFT
+        self.fft_window = np.zeros(600)  # Width in samples of FFT
         self.length_fft_window = len(self.fft_window)  # length of fft_window array
         self.window_width = int(len(self.fft_window))
         # window_width_half = int(window_width/2)  # Since FFT only processes half of freq (Nyqvist)
@@ -48,7 +48,7 @@ class SignalProcessing:
         self.number_of_old_FFT = 10
         #self.FFT_old_values = np.zeros((self.number_of_old_FFT, int(
         #    self.window_width/2)))  # Saving old values for moving mean
-        self.FFT_old_values = np.zeros((10,600))
+        self.FFT_old_values = np.zeros((10,int(self.length_fft_window/2)))
         # Starta heart_rate
         self.heart_rate_thread = threading.Thread(target=self.heart_rate)
         self.heart_rate_thread.start()
@@ -229,7 +229,7 @@ class SignalProcessing:
         window = np.kaiser(self.length_fft_window, self.beta)  # beta: shape factor
         self.fft_window = np.multiply(self.fft_window, window)
         #print(len(self.fft_window))
-        signal_in_fft = fft(self.fft_window,1200)  # two-sided fft of input signal
+        signal_in_fft = fft(self.fft_window,self.length_fft_window)  # two-sided fft of input signal
 
         signal_fft_abs = np.abs(np.divide(signal_in_fft, len(signal_in_fft)))
         #signal_out = np.multiply(2, signal_fft_abs[0:self.length_fft_window//2])  # one-sided fft
