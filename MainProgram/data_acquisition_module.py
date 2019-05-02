@@ -97,12 +97,13 @@ class DataAcquisition(threading.Thread):
         self.freq = 60e9  # radar frequency (Hz)
         self.wave_length = self.c / self.freq  # wave length of the radar
         self.delta_distance = 0  # difference in distance between the last two phases (m)
+        self.delta_distance_low_pass = 0  # low pass filtered delta distance for plotting
         self.noise_run_time = 0  # number of run times with noise, used to remove noise
         self.not_noise_run_time = 0  # number of run times without noise
 
         # other
         # how often values are plotted and sent to the app
-        self.modulo_base = int(self.list_of_variables_for_threads["sample_freq"] / 20)
+        self.modulo_base = int(self.list_of_variables_for_threads["sample_freq"] / 10)
         if self.modulo_base == 0:
             self.modulo_base = 1
         print('modulo base', self.modulo_base)
@@ -176,7 +177,7 @@ class DataAcquisition(threading.Thread):
         #self.client.get_next()
         info, data = self.client.get_next()  # get the next data from the radar
         #print('info',info[-1]['sequence_number'],'run_times',self.run_times)
-        if info[-1]['sequence_number'] > self.run_times + 5:
+        if info[-1]['sequence_number'] > self.run_times + 10:
             # to remove delay if handling the data takes longer time than for the radar to get it
             print("sequence diff over 10, removing difference",
                   info[-1]['sequence_number']-self.run_times)
@@ -289,9 +290,8 @@ class DataAcquisition(threading.Thread):
                 wrapped_phase = self.tracked_phase - 2 * np.pi
             else:
                 wrapped_phase = self.tracked_phase
-            self.delta_distance = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi) * self.low_pass_const + \
-                (1 - self.low_pass_const) * \
-                self.delta_distance  # calculates the distance traveled from phase differences
+            self.delta_distance_low_pass = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi) * self.low_pass_const + \
+                (1 - self.low_pass_const) * self.delta_distance_low_pass  # calculates the distance traveled from phase differences
 
             # TODO testa utan lågpassfilter
             self.delta_distance = self.wave_length * \
@@ -320,6 +320,7 @@ class DataAcquisition(threading.Thread):
                 # If there has been noise at least 10 times with less than 5 real values, the data is considered to be purely noise.
                 self.tracked_distance = 0
                 self.delta_distance = 0
+                self.delta_distance_low_pass = 0
                 if self.relative_distance == 0:
                     self.old_relative_distance_values = np.zeros(1000)
 
