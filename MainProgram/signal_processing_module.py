@@ -134,7 +134,7 @@ class SignalProcessing:
                         if np.abs(peak_freq[i] - found_heart_freq_old) < 0.2 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 4:# and (found_heart_freq_old < 1 or peak_freq[i] > 1):
                             # To average peaks if they are close
                             close_peaks.append(peak_freq[i])
-                        elif np.abs(peak_freq[i] - found_heart_freq_old) < 0.4 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 5:
+                        elif np.abs(peak_freq[i] - found_heart_freq_old) < 0.5 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 7:
                             close_disturbing_peaks.append(peak_freq[i])
 
                     found_heart_freq = peak_freq[np.argmax(np.array(self.peak_weighted))]
