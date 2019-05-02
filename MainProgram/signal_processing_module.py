@@ -131,7 +131,7 @@ class SignalProcessing:
 
                     if len(close_peaks_index) > 2:
                         print('averaging, old:',found_heart_freq)
-                        found_heart_freq = np.mean(peak_freq[close_peaks_index])
+                        found_heart_freq = np.mean(peak_freq[np.array(close_peaks_index)])
                 except Exception as e:
                     print('exept in heart peak',e)
                     found_heart_freq = 0
@@ -157,7 +157,7 @@ class SignalProcessing:
                 found_heart_rate = int(60 * found_heart_freq)  # Send to app
                 self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
             else:
-                print("Waiting to found heart rate Hz and BPM: ", 0, int(60 * 0))
+                print("Waiting to find heart rate Hz and BPM: ", 0, int(60 * 0))
                 found_heart_rate = 0  # Send to app
                 self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
             # BPM_search = self.freq * 60 # Used where?
