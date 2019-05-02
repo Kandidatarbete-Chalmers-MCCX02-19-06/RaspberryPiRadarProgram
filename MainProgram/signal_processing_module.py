@@ -131,7 +131,7 @@ class SignalProcessing:
                         #print('freq diff',np.abs(peak_freq[i] - found_heart_freq_old))
                         #print('amp diff',np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old))
                         #print('old amp',found_heart_freq_amplitude_old)
-                        if np.abs(peak_freq[i] - found_heart_freq_old) < 0.2 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 4:# and (found_heart_freq_old < 1 or peak_freq[i] > 1):
+                        if np.abs(peak_freq[i] - found_heart_freq_old) < 0.2 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 4 and (found_heart_freq_old < 1 or peak_freq[i] > 1):
                             # To average peaks if they are close
                             close_peaks.append(peak_freq[i])
                         elif np.abs(peak_freq[i] - found_heart_freq_old) < 0.5 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 6:
@@ -155,7 +155,7 @@ class SignalProcessing:
                         old_heart_freq_list.pop(0)
 
                     if np.abs(np.mean(old_heart_freq_list[
-                                      0:-2]) - found_heart_freq) > 0.17:  # too big change, probably noise or other disruptions
+                                      0:-2]) - found_heart_freq) > 0.1:  # too big change, probably noise or other disruptions
                         found_heart_freq = np.mean(old_heart_freq_list)
                         print('too big change, probably noise or other disruptions, old:', old_heart_freq_list[-1])
 
