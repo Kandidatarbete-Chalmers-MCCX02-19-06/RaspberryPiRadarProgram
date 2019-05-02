@@ -74,9 +74,13 @@ class SignalProcessing:
         index_in_FFT_old_values = 0  # Placement of old FFT in FFT_old_values
         FFT_counter = 1  # In start to avg over FFT_counter before FFT_old_values is filled to max
         found_heart_freq_old = 180/60  # Guess the first freq
+        found_heart_freq_amplitude_old = -20
         # Variables for weigthed peaks
         #multiplication_factor = 20
         time_constant = 2
+        start_time = time.time()
+        first_real_value = True  # the first real heart rate found
+        old_heart_freq_list = []
 
         while self.go:
             # print("in while loop heart_rate")
@@ -98,7 +102,8 @@ class SignalProcessing:
             peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
             print('length of peak_freq',len(peak_freq))
             print('length of peak_amplitude', len(peak_amplitude))
-            if len(peak_freq) > 0 and np.amax(peak_amplitude) > -40:  # In case zero peaks, use last value, and to not trigger on noise
+            if len(peak_freq) > 0 and np.amax(peak_amplitude) > -30 and time.time() - start_time > 30:
+                # In case zero peaks, use last value, and to not trigger on noise, and there is just noise before 30 seconds has passed
                 # Going into own method when tested and working staying in "main loop"
                 delta_freq = []
                 for freq in peak_freq:
@@ -106,6 +111,7 @@ class SignalProcessing:
                 #self.peak_weighted = np.add(
                 #    peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
                 self.peak_weighted = []
+                close_peaks_index = []
                 try:
                     for i in range(0,len(peak_freq)):  # Weight the peaks found depending on their amplitude,
                         if peak_freq[i] < 1:
@@ -114,18 +120,36 @@ class SignalProcessing:
                             multiplication_factor = 10
                         # distance to the last tracked peak, and on the frequency (the noise is kind of 1/f, so to to fix that multiply with f)
                         self.peak_weighted.append(peak_amplitude[i]+multiplication_factor*np.exp(-np.abs(peak_freq[i]-found_heart_freq_old)/time_constant)*np.sqrt(np.sqrt(peak_freq[i])))
+                        if np.abs(peak_freq[i] - found_heart_freq_old) < 0.2 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 3 and (found_heart_freq_old < 1 or peak_freq[i] > 1):
+                            close_peaks_index.append(i)
 
                     found_heart_freq = peak_freq[np.argmax(np.array(self.peak_weighted))]
+                    found_heart_freq_amplitude_old = self.peak_weighted[np.argmax(np.array(self.peak_weighted))]
+
+                    if len(close_peaks_index) > 2:
+                        print('averaging, old:',found_heart_freq)
+                        found_heart_freq = np.mean(peak_freq[close_peaks_index])
                 except Exception as e:
                     print('exept in heart peak',e)
                     found_heart_freq = 0
+
+                if first_real_value and found_heart_freq > 1:
+                    first_real_value = False
+                if found_heart_freq < 1 and first_real_value:  # Do not trigger on the large noise peak under 1 Hz
+                    found_heart_freq = 0
+
+
                 found_heart_freq_old = found_heart_freq
-                # if peak_amplitude[np.argmax(np.array(self.peak_weighted))] < -35:  # To not trigger on noise
-                #     found_heart_freq = 0
+            elif len(peak_freq):
+                found_heart_freq = found_heart_freq_old  # just use the last values
             else:
+                # Just noise
                 #found_heart_freq = found_heart_freq_old
                 found_heart_freq = 0
                 self.peak_weighted.clear()
+
+
+
             print("Found heart rate Hz and BPM: ", found_heart_freq, int(60*found_heart_freq))
             found_heart_rate = int(60 * found_heart_freq)  # Send to app
             self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
@@ -210,8 +234,8 @@ class SignalProcessing:
         #print("FFT_in_interval", FFT_in_interval, "\n", len(FFT_in_interval))
 
         MaxFFT = np.amax(FFT_in_interval)  # Do on one line later, to remove outliers
-        threshold = MaxFFT - 10
-        #threshold = -27
+        #threshold = MaxFFT - 10
+        threshold = -27
         peaks, _ = signal.find_peaks(FFT_in_interval)
 
         index_list = []
