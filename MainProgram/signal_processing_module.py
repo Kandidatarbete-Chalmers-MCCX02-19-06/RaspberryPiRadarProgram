@@ -107,7 +107,7 @@ class SignalProcessing:
             peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
             #print('length of peak_freq',len(peak_freq))
             #print('length of peak_amplitude', len(peak_amplitude))
-            if len(peak_freq) > 0 and np.amax(peak_amplitude) > -40 and time.time() - start_time > 40:
+            if len(peak_freq) > 0 and np.amax(peak_amplitude) > -40 and time.time() - start_time > 50:
                 # In case zero peaks, use last value, and to not trigger on noise, and there is just noise before 30 seconds has passed
                 # Going into own method when tested and working staying in "main loop"
                 delta_freq = []
@@ -134,7 +134,7 @@ class SignalProcessing:
                         if np.abs(peak_freq[i] - found_heart_freq_old) < 0.2 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 4 and (found_heart_freq_old < 1 or peak_freq[i] > 1):
                             # To average peaks if they are close
                             close_peaks.append(peak_freq[i])
-                        elif np.abs(peak_freq[i] - found_heart_freq_old) < 0.5 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 6:
+                        elif np.abs(peak_freq[i] - found_heart_freq_old) < 0.5 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 5:
                             close_disturbing_peaks.append(peak_freq[i])
 
                     found_heart_freq = peak_freq[np.argmax(np.array(self.peak_weighted))]
@@ -145,9 +145,9 @@ class SignalProcessing:
                         #found_heart_freq = np.mean(peak_freq[i] for i in close_peaks_index)
                         found_heart_freq = np.mean(close_peaks)
 
-                    if len(close_disturbing_peaks) > 3:
+                    if len(close_disturbing_peaks) > 3 and found_heart_freq_old > 1:
                         # To many disturbing peaks around, can't identify the correct one
-                        print('To many disturbing peaks around, can\'t identify the correct one')
+                        print('Too many disturbing peaks around, can\'t identify the correct one')
                         found_heart_freq = found_heart_freq_old
 
                     old_heart_freq_list.append(found_heart_freq)  # save last 20 values
@@ -157,7 +157,7 @@ class SignalProcessing:
                     if np.abs(np.mean(old_heart_freq_list[
                                       0:-2]) - found_heart_freq) > 0.1:  # too big change, probably noise or other disruptions
                         found_heart_freq = np.mean(old_heart_freq_list)
-                        print('too big change, probably noise or other disruptions, old:', old_heart_freq_list[-1])
+                        print('Too big change, probably noise or other disruptions, old:', old_heart_freq_list[-1])
 
 
                 except Exception as e:
