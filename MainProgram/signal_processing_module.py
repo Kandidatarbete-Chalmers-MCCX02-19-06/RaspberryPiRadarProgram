@@ -86,7 +86,7 @@ class SignalProcessing:
         while self.go:
             # print("in while loop heart_rate")
             fft_signal_out = self.windowedFFT()
-            print(fft_signal_out)
+            #print(fft_signal_out)
             fft_signal_out_dB = 20*np.log10(fft_signal_out)
             self.FFT_old_values[index_in_FFT_old_values][:] = fft_signal_out_dB
 
