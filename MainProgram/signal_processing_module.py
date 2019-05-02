@@ -109,9 +109,9 @@ class SignalProcessing:
                 try:
                     for i in range(0,len(peak_freq)):  # Weight the peaks found depending on their amplitude,
                         if peak_freq[i] < 1:
-                            multiplication_factor = 10 # to lower the noise peak under 1 Hz
+                            multiplication_factor = 7 # to lower the noise peak under 1 Hz
                         else:
-                            multiplication_factor = 20
+                            multiplication_factor = 10
                         # distance to the last tracked peak, and on the frequency (the noise is kind of 1/f, so to to fix that multiply with f)
                         self.peak_weighted.append(peak_amplitude[i]+multiplication_factor*np.exp(-np.abs(peak_freq[i]-found_heart_freq_old)/time_constant)*np.sqrt(np.sqrt(peak_freq[i])))
 
@@ -210,7 +210,7 @@ class SignalProcessing:
 
         MaxFFT = np.amax(FFT_in_interval)  # Do on one line later, to remove outliers
         threshold = MaxFFT - 10
-        threshold = -30
+        threshold = -27
         peaks, _ = signal.find_peaks(FFT_in_interval)
 
         index_list = []
