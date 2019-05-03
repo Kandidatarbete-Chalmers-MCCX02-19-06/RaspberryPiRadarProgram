@@ -65,7 +65,7 @@ def main():
     peak_amplitude = [1]
     len_fft = 0
     array = []
-    freq_array = np.linspace(0.8*60, 180, 33)
+    freq_array = np.linspace(0.8*60, 180, 66)
     run_times = 0
 
     # BluetoothServer object sent to classes which sends data locally
@@ -87,8 +87,8 @@ def main():
     while list_of_variables_for_threads.get('go'):
         # Test of FFT, remove later
         #plt.xlim(1, 3)
-        FFTfreq, FFTamplitude, peak_freq, peak_amplitude, len_fft, peak_weighted = signal_processing.getFFTvalues()
-        print("Length of FFT_amplitude", len(FFTamplitude))
+        # FFTfreq, FFTamplitude, peak_freq, peak_amplitude, len_fft, peak_weighted = signal_processing.getFFTvalues()
+        # #print("Length of FFT_amplitude", len(FFTamplitude))
         # if len(FFTamplitude) == len_fft:
         #     time_array = np.linspace(0, (run_times+1)*1.5, run_times+1)
         #     array.append(FFTamplitude)
