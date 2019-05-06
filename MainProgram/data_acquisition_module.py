@@ -89,10 +89,11 @@ class DataAcquisition(threading.Thread):
         self.low_pass_track_peak = None
         self.track_peak_relative_position = None  # used for plotting
         # the relative distance that is measured from phase differences (mm)
-        self.relative_distance = 0
+        self.relative_distance = 0  # relative distance to signal process
+        self.real_time_breathing_amplitude = 0  # to send to the application
         self.last_phase = 0  # tracked phase from previous loop
         # saves old values to remove bias in real time breathing plot
-        self.old_relative_distance_values = np.zeros(1000)
+        self.old_realtime_breathing_amplitude = np.zeros(1000)
         self.c = 2.998e8  # light speed (m/s)
         self.freq = 60e9  # radar frequency (Hz)
         self.wave_length = self.c / self.freq  # wave length of the radar
@@ -147,12 +148,12 @@ class DataAcquisition(threading.Thread):
                     tracked_data["relative distance"])
                 bandpass_filtered_data_HR = self.lowpass_HR.filter(highpass_filtered_data_HR)
                 highpass_filtered_data_RR = self.highpass_RR.filter(
-                    tracked_data["relative distance"])  # TODO: Ändra till highpass_filtered
+                    tracked_data["relative distance"])
                 bandpass_filtered_data_RR = self.lowpass_RR.filter(highpass_filtered_data_RR)
                 if self.run_measurement:
                     self.HR_filtered_queue.put(
                         bandpass_filtered_data_HR)  # Put filtered data in output queue to send to SignalProcessing
-                    self.RR_filtered_queue.put(bandpass_filtered_data_RR)  # TODO Aktivera igen
+                    self.RR_filtered_queue.put(bandpass_filtered_data_RR)
                     self.RTB_final_queue.put(bandpass_filtered_data_RR)
 
                     # Send to app
@@ -290,12 +291,16 @@ class DataAcquisition(threading.Thread):
                 wrapped_phase = self.tracked_phase - 2 * np.pi
             else:
                 wrapped_phase = self.tracked_phase
+
+            # Delta distance
+            self.delta_distance = self.wave_length * \
+                                    (wrapped_phase - self.last_phase) / (4 * np.pi)
+
+            # Low pass filtered delta distance
             self.delta_distance_low_pass = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi) * self.low_pass_const + \
                 (1 - self.low_pass_const) * self.delta_distance_low_pass  # calculates the distance traveled from phase differences
 
-            # TODO testa utan lågpassfilter
-            self.delta_distance = self.wave_length * \
-                (wrapped_phase - self.last_phase) / (4 * np.pi)
+
 
             # TODO testa med konjugat
             # delta_angle = np.angle(data[self.track_peaks_average_index] * np.conj(self.last_data[self.track_peaks_average_index]))
@@ -321,29 +326,28 @@ class DataAcquisition(threading.Thread):
                 self.tracked_distance = 0
                 self.delta_distance = 0
                 self.delta_distance_low_pass = 0
-                if self.relative_distance == 0:
-                    self.old_relative_distance_values = np.zeros(1000)
+                if self.real_time_breathing_amplitude == 0:
+                    self.old_realtime_breathing_amplitude = np.zeros(1000)
 
-            self.relative_distance = self.relative_distance - self.delta_distance  # relative distance in mm
+            self.relative_distance = self.relative_distance - self.delta_distance  # relative distance in m
+            self.real_time_breathing_amplitude = self.real_time_breathing_amplitude - self.delta_distance_low_pass  # real time breathing in m
             # The minus sign comes from changing coordinate system; what the radar think is outward is inward for the person that is measured on
             self.last_phase = self.tracked_phase
 
-            # array
-            #start = time.time()
             # Code to remove bias that comes from larger movements that is not completely captured by the radar.
-            self.old_relative_distance_values = np.roll(self.old_relative_distance_values, -1)
-            self.old_relative_distance_values[-1] = self.relative_distance
-            self.old_relative_distance_values = self.old_relative_distance_values - \
-                self.old_relative_distance_values.mean()/4
-            self.relative_distance = self.old_relative_distance_values[-1]
-            #end = time.time()
-            #print('time diff for list/array',(end-start)*1000)
+            self.old_realtime_breathing_amplitude = np.roll(self.old_realtime_breathing_amplitude, -1)
+            self.old_realtime_breathing_amplitude[-1] = self.real_time_breathing_amplitude
+            self.old_realtime_breathing_amplitude = self.old_realtime_breathing_amplitude - \
+                                                    self.old_realtime_breathing_amplitude.mean() / 4
+            self.real_time_breathing_amplitude = self.old_realtime_breathing_amplitude[-1]
 
             # Tracked data to return and plot
             self.tracked_data = {"tracked distance": self.tracked_distance,
                                  "tracked amplitude": self.tracked_amplitude, "tracked phase": self.tracked_phase,
                                  "abs": self.low_pass_amplitude, "tracked distance over time": plot_hist_pos,
-                                 "tracked distance over time 2": self.tracked_distance_over_time, "relative distance": self.relative_distance * 1000}
+                                 "tracked distance over time 2": self.tracked_distance_over_time,
+                                 "relative distance": self.relative_distance * 1000,
+                                 "real time breathing amplitude": self.real_time_breathing_amplitude*1000}
         self.last_data = data
         self.first_data = False
         return self.tracked_data
