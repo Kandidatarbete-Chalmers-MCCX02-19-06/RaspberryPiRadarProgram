@@ -57,13 +57,14 @@ class SignalProcessing:
         self.last_time = time.time()
         self.time = time.time()
 
-        # Temporary for test of FFT
+        # Temporary for test of FFT and saving to csv
         self.FFTfreq = FFTfreq
         self.FFTamplitude = FFTamplitude
         self.peak_freq = []
         self.peak_amplitude = []
         self.peak_weighted = []
         self.len_fft = 0
+        self.heart_rate_csv = list_of_variables_for_threads["heart_rate_csv"]
 
     # Kaos i koden, behöver struktureras upp och alla konstanter måste defineras i början
     # Följer just nu Matlab strukturen.
@@ -195,10 +196,12 @@ class SignalProcessing:
                     60*found_heart_freq), 'Reliability:', found_peak_reliability)
                 found_heart_rate = int(60 * found_heart_freq)
                 self.bluetooth_server.write_data_to_app(str(found_heart_rate) + ' ' + found_peak_reliability, 'heart rate')  # Send to app
+                self.heart_rate_csv.append(found_heart_rate)
             else:
                 print("Waiting to find heart rate")
                 found_heart_rate = 0
-                self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')  # Send to app
+                self.bluetooth_server.write_data_to_app(str(found_heart_rate) + ' ' + found_peak_reliability, 'heart rate')   # Send to app
+                self.heart_rate_csv.append(found_heart_rate)
             # BPM_search = self.freq * 60 # Used where?
             # print("past plot heart rate")
 
@@ -208,6 +211,10 @@ class SignalProcessing:
             index_in_FFT_old_values += 1
             if index_in_FFT_old_values == self.number_of_old_FFT:
                 index_in_FFT_old_values = 0
+        # After shutdown initiates save to CSV
+        np_csv = np.asarray(self.heart_rate_csv)
+        np.savetxt("heart_rate.csv", np_csv, delimiter=";")
+        self.heart_rate_csv.clear()
 
     def mean_of_old_values(self, FFT_counter):  # Check
         FFT_average_over = np.zeros(int(self.window_width/2))
