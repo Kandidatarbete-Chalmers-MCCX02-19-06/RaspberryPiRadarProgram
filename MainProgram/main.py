@@ -50,6 +50,7 @@ def main():
     RR_filtered_queue = queue.Queue()
     RR_final_queue = queue.Queue()
     RTB_final_queue = queue.Queue()  # Real time breating final queue
+    heart_rate_csv = []
 
     # List of arguments and data sent between classes
     go = ["True"]       # Used for closing threads before shutdown of Raspberry Pi
@@ -58,7 +59,7 @@ def main():
     list_of_variables_for_threads = {"HR_filtered_queue": HR_filtered_queue, "HR_final_queue": HR_final_queue,
                                      "RR_filtered_queue": RR_filtered_queue, "RR_final_queue": RR_final_queue,
                                      "RTB_final_queue": RTB_final_queue, "go": go, "run_measurement": run_measurement,
-                                     "sample_freq": sample_freq}
+                                     "sample_freq": sample_freq, "heart_rate_csv": heart_rate_csv}
     FFTfreq = [1, 2, 3]
     FFTamplitude = [1, 2, 3]
     peak_freq = [1]
