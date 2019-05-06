@@ -29,31 +29,27 @@ class SignalProcessing:
 
         # Variables for Pulse detection
         self.index_fft = 0
-        self.T_resolution = 20  # förut 30
+        self.T_resolution = 10  # förut 30
         self.overlap = 90  # Percentage of old values for the new FFT
         self.beta = 1  # Kaiser window form
         self.tau = 12  # TODO Beskriva alla variabler
         # Data in vector with length of window
-        #self.fft_window = np.zeros(self.T_resolution*self.sample_freq)  # Width in samples of FFT
-        self.fft_window = np.zeros(600)  # Width in samples of FFT
-        self.length_fft_window = len(self.fft_window)  # length of fft_window array
+        self.fft_window = np.zeros(self.T_resolution*self.sample_freq)  # Width in samples of FFT
         self.window_width = int(len(self.fft_window))
         # window_width_half = int(window_width/2)  # Since FFT only processes half of freq (Nyqvist)
         self.window_slide = int(np.round(self.window_width*(1-self.overlap/100)))
         self.freq = self.sample_freq * \
-            np.arange(self.length_fft_window/2)/self.length_fft_window  # Evenly spaced freq array
+            np.arange(self.window_width/2)/self.window_width  # Evenly spaced freq array
 
         self.delta_T = self.window_slide / self.sample_freq
         # int(round(self.tau / self.delta_T))  # Make tau is larger than delta_T, else it will be zero and programme will fail.
         self.number_of_old_FFT = 10
-        #self.FFT_old_values = np.zeros((self.number_of_old_FFT, int(
-        #    self.window_width/2)))  # Saving old values for moving mean
-        self.FFT_old_values = np.zeros((10,int(self.length_fft_window/2)))
+        self.FFT_old_values = np.zeros((self.number_of_old_FFT, int(
+            self.window_width/2)))  # Saving old values for moving mean
         # Starta heart_rate
         print("Start thread heart_rate")
         self.heart_rate_thread = threading.Thread(target=self.heart_rate)
         self.heart_rate_thread.start()
-        print("Start thread heart_rate")
         # Starta schmitt
         self.schmittTrigger_thread = threading.Thread(target=self.schmittTrigger)
         self.schmittTrigger_thread.start()
@@ -77,7 +73,6 @@ class SignalProcessing:
         index_in_FFT_old_values = 0  # Placement of old FFT in FFT_old_values
         FFT_counter = 1  # In start to avg over FFT_counter before FFT_old_values is filled to max
         found_heart_freq_old = 180/60  # Guess the first freq
-        found_heart_freq_amplitude_old = -20
         # Variables for weigthed peaks
         #multiplication_factor = 20
         time_constant = 2
@@ -89,10 +84,7 @@ class SignalProcessing:
         while self.go:
             # print("in while loop heart_rate")
             fft_signal_out = self.windowedFFT()
-            #print(fft_signal_out)
             fft_signal_out_dB = 20*np.log10(fft_signal_out)
-            #print(type(fft_signal_out_dB))
-            #print(type(self.FFT_old_values[index_in_FFT_old_values]))
             self.FFT_old_values[index_in_FFT_old_values][:] = fft_signal_out_dB
 
             # RBW = self.freq[1] - self.freq[0] # Used where?
@@ -107,29 +99,19 @@ class SignalProcessing:
             #print("Averaged FFT: ", FFT_averaged[2])
             # Returns the peaks in set inteval from averaged FFT
             peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
-            #print('length of peak_freq',len(peak_freq))
-            #print('length of peak_amplitude', len(peak_amplitude))
-            if len(peak_freq) > 0 and np.amax(peak_amplitude) > -40 and time.time() - start_time > 50:
-                # In case zero peaks, use last value, and to not trigger on noise, and there is just noise before 30 seconds has passed
+            if len(peak_freq) > 0 and np.amin(peak_amplitude) > -40:  # In case zero peaks, use last value
                 # Going into own method when tested and working staying in "main loop"
                 delta_freq = []
                 for freq in peak_freq:
                     delta_freq.append(freq - found_heart_freq_old)
-                #self.peak_weighted = np.add(
+                # self.peak_weighted = np.add(
                 #    peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
                 self.peak_weighted = []
-                close_peaks = []
-                close_disturbing_peaks = []
                 try:
-                    for i in range(0,len(peak_freq)):  # Weight the peaks found depending on their amplitude,
-                        if peak_freq[i] < 0.9:
-                            multiplication_factor = 5 # to lower the noise peak under 0.9 Hz
-                        elif peak_freq[i] < 1:
-                            multiplication_factor = 7  # to lower the noise peak under 1 Hz
-                        else:
-                            multiplication_factor = 10
+                    for i in range(0, len(peak_freq)):  # Weight the peaks found depending on their amplitude,
                         # distance to the last tracked peak, and on the frequency (the noise is kind of 1/f, so to to fix that multiply with f)
-                        self.peak_weighted.append(peak_amplitude[i]+multiplication_factor*np.exp(-np.abs(peak_freq[i]-found_heart_freq_old)/time_constant)*np.sqrt(np.sqrt(peak_freq[i])))
+                        self.peak_weighted.append(peak_amplitude[i]+multiplication_factor*np.exp(-np.abs(
+                            peak_freq[i]-found_heart_freq_old)/time_constant)*np.sqrt(np.sqrt(peak_freq[i])))
                         #print('freq diff',np.abs(peak_freq[i] - found_heart_freq_old))
                         #print('amp diff',np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old))
                         #print('old amp',found_heart_freq_amplitude_old)
@@ -144,10 +126,10 @@ class SignalProcessing:
                     found_heart_freq = peak_freq[found_peak_index]
                     found_heart_freq_amplitude_old = self.peak_amplitude[found_peak_index]
 
-                    # Determine the reliability of the found peak, if it's really the heart rate or just noise.
+                    # Determine the reability of the found peak, if it's really the heart rate or just noise.
                     # Compares to the next largest m´peak amplitude
-                    next_largest_peak_amplitude = np.max(self.peak_amplitude.pop(found_peak_index))
-                        #np.max(self.peak_amplitude[0:found_peak_index - 1, found_peak_index + 1:-1])
+                    next_largest_peak_amplitude = np.max(
+                        self.peak_amplitude[0:found_peak_index - 1, found_peak_index + 1:-1])
                     if found_heart_freq_amplitude_old > 15 * next_largest_peak_amplitude:
                         found_peak_reliability = "Outstanding"
                     elif found_heart_freq_amplitude_old > 8*next_largest_peak_amplitude:
@@ -158,7 +140,7 @@ class SignalProcessing:
                         found_peak_reliability = "Vague"
 
                     if len(close_peaks) > 1:
-                        print('averaging, old:',found_heart_freq)
+                        print('averaging, old:', found_heart_freq)
                         #found_heart_freq = np.mean(peak_freq[i] for i in close_peaks_index)
                         found_heart_freq = np.mean(close_peaks)
 
@@ -175,13 +157,11 @@ class SignalProcessing:
                     if np.abs(np.mean(old_heart_freq_list[
                                       0:-2]) - found_heart_freq) > 0.1:  # too big change, probably noise or other disruptions
                         found_heart_freq = np.mean(old_heart_freq_list)
-                        print('Too big change, probably noise or other disruptions, old:', old_heart_freq_list[-1])
-
-
-
+                        print('Too big change, probably noise or other disruptions, old:',
+                              old_heart_freq_list[-1])
 
                 except Exception as e:
-                    print('exept in heart peak:',e)
+                    print('exept in heart peak', e)
                     found_heart_freq = 0
 
                 if first_real_value and (found_heart_freq > 1 or time.time() - start_time > 120):
@@ -189,20 +169,19 @@ class SignalProcessing:
                 if found_heart_freq < 1 and first_real_value:  # Do not trigger on the large noise peak under 1 Hz
                     found_heart_freq = 0
 
-
                 found_heart_freq_old = found_heart_freq
             elif len(peak_freq) > 0:
                 found_heart_freq = found_heart_freq_old  # just use the last values
                 found_peak_reliability = "Uncertain"
             else:
-                # Just noise
                 #found_heart_freq = found_heart_freq_old
                 found_heart_freq = 0
                 self.peak_weighted.clear()
                 found_peak_reliability = "None"
 
             if not first_real_value:
-                print("Found heart rate Hz and BPM: ", found_heart_freq, int(60*found_heart_freq), 'Reability:',found_peak_reliability)
+                print("Found heart rate Hz and BPM: ", found_heart_freq, int(
+                    60*found_heart_freq), 'Reability:', found_peak_reliability)
                 found_heart_rate = int(60 * found_heart_freq)  # Send to app
                 self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
             else:
@@ -266,14 +245,13 @@ class SignalProcessing:
     def smartFFT(self):  # "signal_in" is "fft_window"
         # print("In smartFFT")
         # length_seq = len(signal_in)  # number of sequences
-        window = np.kaiser(self.length_fft_window, self.beta)  # beta: shape factor
+        window = np.kaiser(self.window_width, self.beta)  # beta: shape factor
         self.fft_window = np.multiply(self.fft_window, window)
-        #print(len(self.fft_window))
-        signal_in_fft = fft(self.fft_window,self.length_fft_window)  # two-sided fft of input signal
 
-        signal_fft_abs = np.abs(np.divide(signal_in_fft, len(signal_in_fft)))
-        #signal_out = np.multiply(2, signal_fft_abs[0:self.length_fft_window//2])  # one-sided fft
-        signal_out = np.multiply(2, signal_fft_abs[0:len(signal_in_fft) // 2])  # one-sided fft
+        signal_in_fft = fft(self.fft_window)  # two-sided fft of input signal
+
+        signal_fft_abs = np.abs(np.divide(signal_in_fft, self.window_width))
+        signal_out = np.multiply(2, signal_fft_abs[0:self.window_width//2])  # one-sided fft
 
         # frequency array corresponding to frequencies in the fft
         return signal_out
@@ -291,8 +269,7 @@ class SignalProcessing:
         #print("FFT_in_interval", FFT_in_interval, "\n", len(FFT_in_interval))
 
         MaxFFT = np.amax(FFT_in_interval)  # Do on one line later, to remove outliers
-        #threshold = MaxFFT - 10
-        threshold = -30
+        threshold = MaxFFT - 10
         peaks, _ = signal.find_peaks(FFT_in_interval)
 
         index_list = []
@@ -351,12 +328,16 @@ class SignalProcessing:
                 self.bluetooth_server.write_data_to_app(0, 'breath rate')
                 self.time_when_sent_last_value = time.time()
             trackedRRvector[countHys - 1] = self.RR_filtered_queue.get()
+            #print("Amplitude for respitory rate {}".format(trackedRRvector[countHys-1]))
             # self.RTB_final_queue.put(trackedRRvector[countHys - 1])
 
             if countHys == self.sample_freq * Tc:
-                Hcut = np.sqrt(np.mean(np.square(trackedRRvector)))*0.7  # rms of trackedRRvector
+                Hcut = np.sqrt(np.mean(np.square(trackedRRvector))) * 0.7  # rms of trackedRRvector
                 # Hcut = 0.002
+                if Hcut < 0.1:
+                    Hcut = 0.1
                 Lcut = -Hcut
+
                 # print("Hcut: ", Hcut)       # se vad hysteres blir
                 # print("The last value of vector {}".format(trackedRRvector[countHys-1]))
                 # TODO Hinder så att insvängningstiden för filtret hanteras
@@ -388,7 +369,6 @@ class SignalProcessing:
             # trackedRRvector[countHys-1] is the current data from filter
             elif trackedRRvector[countHys - 1] >= Hcut:
                 schNy = 1
-                # TODO skicka data till app för realTime breathing
 
             schGa = schNy
             count += 1
