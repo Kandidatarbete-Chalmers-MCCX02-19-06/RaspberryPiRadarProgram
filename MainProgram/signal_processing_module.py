@@ -83,6 +83,7 @@ class SignalProcessing:
         start_time = time.time()
         first_real_value = True  # the first real heart rate found
         old_heart_freq_list = []  # old values
+        found_peak_reliability = "None"
 
         while self.go:
             # print("in while loop heart_rate")
@@ -138,8 +139,21 @@ class SignalProcessing:
                             # If there is a lot of peaks to disturb the measurement
                             close_disturbing_peaks.append(peak_freq[i])
 
-                    found_heart_freq = peak_freq[np.argmax(np.array(self.peak_weighted))]
-                    found_heart_freq_amplitude_old = self.peak_amplitude[np.argmax(np.array(self.peak_weighted))]
+                    found_peak_index = np.argmax(np.array(self.peak_weighted))
+                    found_heart_freq = peak_freq[found_peak_index]
+                    found_heart_freq_amplitude_old = self.peak_amplitude[found_peak_index]
+
+                    # Determine the reability of the found peak, if it's really the heart rate or just noise.
+                    # Compares to the next largest m´peak amplitude
+                    next_largest_peak_amplitude = np.max(self.peak_amplitude[0:found_peak_index - 1, found_peak_index + 1:-1])
+                    if found_heart_freq_amplitude_old > 15 * next_largest_peak_amplitude:
+                        found_peak_reliability = "Outstanding"
+                    elif found_heart_freq_amplitude_old > 8*next_largest_peak_amplitude:
+                        found_peak_reliability = "Perfect"
+                    elif found_heart_freq_amplitude_old > 4*next_largest_peak_amplitude:
+                        found_peak_reliability = "Good"
+                    else:
+                        found_peak_reliability = "Vague"
 
                     if len(close_peaks) > 1:
                         print('averaging, old:',found_heart_freq)
@@ -150,6 +164,7 @@ class SignalProcessing:
                         # To many disturbing peaks around, can't identify the correct one
                         print('Too many disturbing peaks around, can\'t identify the correct one')
                         found_heart_freq = found_heart_freq_old
+                        found_peak_reliability = "Uncertain"
 
                     old_heart_freq_list.append(found_heart_freq)  # save last 20 values
                     if len(old_heart_freq_list) > 10:
@@ -159,6 +174,8 @@ class SignalProcessing:
                                       0:-2]) - found_heart_freq) > 0.1:  # too big change, probably noise or other disruptions
                         found_heart_freq = np.mean(old_heart_freq_list)
                         print('Too big change, probably noise or other disruptions, old:', old_heart_freq_list[-1])
+
+
 
 
                 except Exception as e:
@@ -174,14 +191,16 @@ class SignalProcessing:
                 found_heart_freq_old = found_heart_freq
             elif len(peak_freq) > 0:
                 found_heart_freq = found_heart_freq_old  # just use the last values
+                found_peak_reliability = "Uncertain"
             else:
                 # Just noise
                 #found_heart_freq = found_heart_freq_old
                 found_heart_freq = 0
                 self.peak_weighted.clear()
+                found_peak_reliability = "None"
 
             if not first_real_value:
-                print("Found heart rate Hz and BPM: ", found_heart_freq, int(60*found_heart_freq))
+                print("Found heart rate Hz and BPM: ", found_heart_freq, int(60*found_heart_freq), 'Reability:',found_peak_reliability)
                 found_heart_rate = int(60 * found_heart_freq)  # Send to app
                 self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
             else:

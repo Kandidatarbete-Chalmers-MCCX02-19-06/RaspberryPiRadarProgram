@@ -158,7 +158,7 @@ class DataAcquisition(threading.Thread):
 
                     # Send to app
                     if self.run_times % self.modulo_base == 0:
-                        # Send real time breathing amplitude to the app
+                        # Send real time breathing amplitude to the application
                         self.bluetooth_server.write_data_to_app(
                             tracked_data["real time breathing amplitude"], 'real time breath')
                         # self.bluetooth_server.write_data_to_app(
