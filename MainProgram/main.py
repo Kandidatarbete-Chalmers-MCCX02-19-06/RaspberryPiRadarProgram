@@ -115,7 +115,7 @@ def main():
         #     plt.xlabel("Time (s)")
         #     plt.ylabel("Frequency (bpm)")
         #     run_times += 1
-        plt.pause(0.9)
+        # plt.pause(0.9)
         # plt.plot(FFTfreq, FFTamplitude)
         # plt.plot(peak_freq, peak_amplitude, 'bo')
         # plt.plot(peak_freq, peak_weighted, 'ro')
@@ -123,7 +123,7 @@ def main():
         # time.sleep(1)
         #print(FFTfreq, FFTamplitude)
 
-    # Waits for running threads to finish their loops
+        # Waits for running threads to finish their loops
     bluetooth_server.connect_device_thread.join()
     print("bluetooth_server is closed")
     # signal_processings.heart_rate_thread.join()
