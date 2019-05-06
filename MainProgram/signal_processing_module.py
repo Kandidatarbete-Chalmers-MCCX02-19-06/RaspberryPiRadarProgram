@@ -334,7 +334,7 @@ class SignalProcessing:
             if countHys == self.sample_freq * Tc:
                 Hcut = np.sqrt(np.mean(np.square(trackedRRvector))) * 0.7  # rms of trackedRRvector
                 # Hcut = 0.002
-                if Hcut < 0.1:
+                if Hcut < 3:
                     Hcut = 10
                 Lcut = -Hcut
 
