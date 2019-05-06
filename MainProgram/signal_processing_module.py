@@ -74,8 +74,12 @@ class SignalProcessing:
         FFT_counter = 1  # In start to avg over FFT_counter before FFT_old_values is filled to max
         found_heart_freq_old = 180/60  # Guess the first freq
         # Variables for weigthed peaks
-        multiplication_factor = 30
-        time_constant = 1
+        #multiplication_factor = 20
+        time_constant = 2
+        start_time = time.time()
+        first_real_value = True  # the first real heart rate found
+        old_heart_freq_list = []  # old values
+        found_peak_reliability = "None"
 
         while self.go:
             # print("in while loop heart_rate")
@@ -107,19 +111,77 @@ class SignalProcessing:
                     for i in range(0, len(peak_freq)):  # Weight the peaks found depending on their amplitude,
                         # distance to the last tracked peak, and on the frequency (the noise is kind of 1/f, so to to fix that multiply with f)
                         self.peak_weighted.append(peak_amplitude[i]+multiplication_factor*np.exp(-np.abs(
-                            peak_freq[i]-found_heart_freq_old)/time_constant)*np.sqrt(peak_freq[i]))
+                            peak_freq[i]-found_heart_freq_old)/time_constant)*np.sqrt(np.sqrt(peak_freq[i])))
+                        #print('freq diff',np.abs(peak_freq[i] - found_heart_freq_old))
+                        #print('amp diff',np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old))
+                        #print('old amp',found_heart_freq_amplitude_old)
+                        if np.abs(peak_freq[i] - found_heart_freq_old) < 0.2 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 4 and (found_heart_freq_old < 1 or peak_freq[i] > 1):
+                            # To average peaks if they are close
+                            close_peaks.append(peak_freq[i])
+                        elif np.abs(peak_freq[i] - found_heart_freq_old) < 0.5 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 5:
+                            # If there is a lot of peaks to disturb the measurement
+                            close_disturbing_peaks.append(peak_freq[i])
 
-                    found_heart_freq = peak_freq[np.argmax(np.array(self.peak_weighted))]
+                    found_peak_index = np.argmax(np.array(self.peak_weighted))
+                    found_heart_freq = peak_freq[found_peak_index]
+                    found_heart_freq_amplitude_old = self.peak_amplitude[found_peak_index]
+
+                    # Determine the reability of the found peak, if it's really the heart rate or just noise.
+                    # Compares to the next largest m´peak amplitude
+                    next_largest_peak_amplitude = np.max(
+                        self.peak_amplitude[0:found_peak_index - 1, found_peak_index + 1:-1])
+                    if found_heart_freq_amplitude_old > 15 * next_largest_peak_amplitude:
+                        found_peak_reliability = "Outstanding"
+                    elif found_heart_freq_amplitude_old > 8*next_largest_peak_amplitude:
+                        found_peak_reliability = "Perfect"
+                    elif found_heart_freq_amplitude_old > 4*next_largest_peak_amplitude:
+                        found_peak_reliability = "Good"
+                    else:
+                        found_peak_reliability = "Vague"
+
+                    if len(close_peaks) > 1:
+                        print('averaging, old:', found_heart_freq)
+                        #found_heart_freq = np.mean(peak_freq[i] for i in close_peaks_index)
+                        found_heart_freq = np.mean(close_peaks)
+
+                    if len(close_disturbing_peaks) > 3 and found_heart_freq_old > 1:
+                        # To many disturbing peaks around, can't identify the correct one
+                        print('Too many disturbing peaks around, can\'t identify the correct one')
+                        found_heart_freq = found_heart_freq_old
+                        found_peak_reliability = "Uncertain"
+
+                    old_heart_freq_list.append(found_heart_freq)  # save last 20 values
+                    if len(old_heart_freq_list) > 10:
+                        old_heart_freq_list.pop(0)
+
+                    if np.abs(np.mean(old_heart_freq_list[
+                                      0:-2]) - found_heart_freq) > 0.1:  # too big change, probably noise or other disruptions
+                        found_heart_freq = np.mean(old_heart_freq_list)
+                        print('Too big change, probably noise or other disruptions, old:',
+                              old_heart_freq_list[-1])
+
                 except Exception as e:
                     print('exept in heart peak', e)
                     found_heart_freq = 0
                 found_heart_freq_old = found_heart_freq
+            elif len(peak_freq) > 0:
+                found_heart_freq = found_heart_freq_old  # just use the last values
+                found_peak_reliability = "Uncertain"
             else:
                 #found_heart_freq = found_heart_freq_old
                 found_heart_freq = 0
-            print("Found heart rate Hz and BPM: ", found_heart_freq, int(60*found_heart_freq))
-            found_heart_rate = int(60 * found_heart_freq)  # Send to app
-            self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
+                self.peak_weighted.clear()
+                found_peak_reliability = "None"
+
+            if not first_real_value:
+                print("Found heart rate Hz and BPM: ", found_heart_freq, int(
+                    60*found_heart_freq), 'Reability:', found_peak_reliability)
+                found_heart_rate = int(60 * found_heart_freq)  # Send to app
+                self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
+            else:
+                print("Waiting to find heart rate")
+                found_heart_rate = 0  # Send to app
+                self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
             # BPM_search = self.freq * 60 # Used where?
             # print("past plot heart rate")
 
@@ -263,18 +325,15 @@ class SignalProcessing:
             # self.RTB_final_queue.put(trackedRRvector[countHys - 1])
 
             if countHys == self.sample_freq * Tc:
-                if trackedRRvector[countHys-1] > 0.2:
-                    Hcut = np.sqrt(np.mean(np.square(trackedRRvector))) * \
-                        0.7  # rms of trackedRRvector
-                    # Hcut = 0.002
-                    Lcut = -Hcut
-                    # print("Hcut: ", Hcut)       # se vad hysteres blir
-                    # print("The last value of vector {}".format(trackedRRvector[countHys-1]))
-                    # TODO Hinder så att insvängningstiden för filtret hanteras
-                else:
-                    print("Only noise found {}".format(trackedRRvector[countHys-1]))
-                    Hcut = 100
-                    Lcut = -Hcut
+                Hcut = np.sqrt(np.mean(np.square(trackedRRvector))) * 0.7  # rms of trackedRRvector
+                # Hcut = 0.002
+                if Hcut < 0.1:
+                    Hcut = 0.1
+                Lcut = -Hcut
+
+                # print("Hcut: ", Hcut)       # se vad hysteres blir
+                # print("The last value of vector {}".format(trackedRRvector[countHys-1]))
+                # TODO Hinder så att insvängningstiden för filtret hanteras
                 countHys = 0
 
             # schNy = schGa   behövs inte. Görs nedan
