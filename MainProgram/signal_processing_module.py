@@ -142,7 +142,7 @@ class SignalProcessing:
                     # Determine the reliability of the found peak, if it's really the heart rate or just noise.
                     # Compares to the next largest m´peak amplitude
                     next_largest_peak_amplitude = np.max(
-                        self.peak_amplitude[list(set(range(len(self.peak_amplitude))) - set(found_peak_index))])
+                        self.peak_amplitude[np.delete(self.peak_amplitude,found_peak_index)])
                             #self.peak_amplitude[x for i, x in self.peak_amplitude if i != found_peak_index])
                     #next_largest_peak_amplitude = np.max(self.peak_amplitude[0:found_peak_index-1]+self.peak_amplitude[found_peak_index+1:-1])
                     #next_largest_peak_amplitude = np.max(self.peak_amplitude[np.arange(len(self.peak_amplitude)) != 3])
