@@ -100,7 +100,7 @@ class SignalProcessing:
             #print("Averaged FFT: ", FFT_averaged[2])
             # Returns the peaks in set inteval from averaged FFT
             peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
-            if len(peak_freq) > 0 and np.amin(peak_amplitude) > -40 and time.time() - start_time > 40:
+            if len(peak_freq) > 0 and np.amin(peak_amplitude) > -40 and np.amax(peak_amplitude > -30) and time.time() - start_time > 40:
                 # In case zero peaks, use last value, and to not trigger on noise, and there is just noise before 30 seconds has passed
                 # Going into own method when tested and working staying in "main loop"
                 delta_freq = []
@@ -149,8 +149,9 @@ class SignalProcessing:
                     #next_largest_peak_amplitude = np.max(
                         #self.peak_amplitude[(np.delete(range(len(self.peak_amplitude)),found_peak_index))])
                             #self.peak_amplitude[x for i, x in self.peak_amplitude if i != found_peak_index])
-                    next_largest_peak_amplitude = np.max(self.peak_amplitude[:found_peak_index]+self.peak_amplitude[found_peak_index:])
-                    print(self.peak_amplitude[:found_peak_index]+self.peak_amplitude[found_peak_index:])
+                    next_largest_peak_amplitude = np.amax(self.peak_amplitude[:found_peak_index]+self.peak_amplitude[found_peak_index:])
+                    print(self.peak_amplitude[:found_peak_index])
+                    print(self.peak_amplitude[found_peak_index:])
                     print(next_largest_peak_amplitude)
                     #next_largest_peak_amplitude = np.max(self.peak_amplitude[np.arange(len(self.peak_amplitude)) != 3])
                     if found_heart_freq_amplitude_old - next_largest_peak_amplitude > 15 or (found_heart_freq_amplitude_old > -15):
@@ -193,7 +194,7 @@ class SignalProcessing:
                     found_heart_freq = 0
 
                 found_heart_freq_old = found_heart_freq
-            elif len(peak_freq) > 0:
+            elif np.amin(peak_amplitude) > -40:
                 found_heart_freq = found_heart_freq_old  # just use the last values
                 found_peak_reliability = "Uncertain"
             else:
@@ -299,7 +300,7 @@ class SignalProcessing:
 
         MaxFFT = np.amax(FFT_in_interval)  # Do on one line later, to remove outliers
         #threshold = MaxFFT - 10
-        threshold = -30
+        threshold = -40
         peaks, _ = signal.find_peaks(FFT_in_interval)
 
         index_list = []
