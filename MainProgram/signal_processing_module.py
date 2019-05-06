@@ -88,26 +88,17 @@ class SignalProcessing:
             fft_signal_out_dB = 20*np.log10(fft_signal_out)
             self.FFT_old_values[index_in_FFT_old_values][:] = fft_signal_out_dB
 
-            # RBW = self.freq[1] - self.freq[0] # Used where?
-            #print("This new FFT: ", fft_signal_out_dB[2])
             saved_old = self.FFT_old_values[:, 2]
-            #print("length: ", len(saved_old))
-            #print("Saved old FFT: ", saved_old)
-            #print("Rows", len(self.FFT_old_values))
-            #print("Columns", len(self.FFT_old_values[0]))
             # fft movemean
             FFT_averaged = self.mean_of_old_values(FFT_counter)
-            #print("Averaged FFT: ", FFT_averaged[2])
             # Returns the peaks in set inteval from averaged FFT
             peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
-            if len(peak_freq) > 0 and np.amin(peak_amplitude) > -40 and np.amax(peak_amplitude) > -30 and time.time() - start_time > 40:
+            if len(peak_freq) > 0 and np.amin(peak_amplitude) > -40 and np.amax(peak_amplitude) > -30 and time.time() - start_time > 45:
                 # In case zero peaks, use last value, and to not trigger on noise, and there is just noise before 30 seconds has passed
                 # Going into own method when tested and working staying in "main loop"
                 delta_freq = []
                 for freq in peak_freq:
                     delta_freq.append(freq - found_heart_freq_old)
-                # self.peak_weighted = np.add(
-                #    peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
                 self.peak_weighted = []
                 close_peaks = []
                 close_disturbing_peaks = []
@@ -123,9 +114,6 @@ class SignalProcessing:
                         self.peak_weighted.append(peak_amplitude[i] + multiplication_factor * np.exp(
                             -np.abs(peak_freq[i] - found_heart_freq_old) / time_constant) * np.sqrt(
                             np.sqrt(peak_freq[i])))
-                        # print('freq diff',np.abs(peak_freq[i] - found_heart_freq_old))
-                        # print('amp diff',np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old))
-                        # print('old amp',found_heart_freq_amplitude_old)
                         if np.abs(peak_freq[i] - found_heart_freq_old) < 0.2 and np.abs(
                                 peak_amplitude[i] - found_heart_freq_amplitude_old) < 4 and (
                                 found_heart_freq_old < 1 or peak_freq[i] > 1):
@@ -141,41 +129,29 @@ class SignalProcessing:
                     found_heart_freq_amplitude_old = self.peak_amplitude[found_peak_index]
 
                     # Determine the reliability of the found peak, if it's really the heart rate or just noise.
-                    # Compares to the next largest m´peak amplitude
-                    #print(np.delete(range(len(self.peak_amplitude)),found_peak_index))
-                    #large_peak_amplitude = np.delete(self.peak_amplitude,found_heart_freq_amplitude_old)
-                    #next_largest_peak_amplitude = np.max(large_peak_amplitude)
-                    #print(next_largest_peak_amplitude)
-                    #next_largest_peak_amplitude = np.max(
-                        #self.peak_amplitude[(np.delete(range(len(self.peak_amplitude)),found_peak_index))])
-                            #self.peak_amplitude[x for i, x in self.peak_amplitude if i != found_peak_index])
+                    # Compares to the next largest peak amplitude
                     try:
                         next_largest_peak_amplitude = np.amax(self.peak_amplitude[:found_peak_index]+self.peak_amplitude[found_peak_index+1:])
                     except:
                         next_largest_peak_amplitude = -35
-                    #print(self.peak_amplitude[:found_peak_index])
-                    #print(self.peak_amplitude[found_peak_index+1:])
-                    #print(next_largest_peak_amplitude)
-                    #next_largest_peak_amplitude = np.max(self.peak_amplitude[np.arange(len(self.peak_amplitude)) != 3])
-                    if found_heart_freq_amplitude_old - next_largest_peak_amplitude > 15:
+                    if found_heart_freq_amplitude_old - next_largest_peak_amplitude > 12:
                         found_peak_reliability = "Outstanding"
                     elif found_heart_freq_amplitude_old - next_largest_peak_amplitude > 8:
                         found_peak_reliability = "Perfect"
-                    elif found_heart_freq_amplitude_old - next_largest_peak_amplitude > 4:
+                    elif found_heart_freq_amplitude_old - next_largest_peak_amplitude > 3:
                         found_peak_reliability = "Good"
                     else:
-                        found_peak_reliability = "Vague"
+                        found_peak_reliability = "Doubtful"
 
                     if len(close_peaks) > 1:
                         print('averaging, old:', found_heart_freq)
-                        #found_heart_freq = np.mean(peak_freq[i] for i in close_peaks_index)
                         found_heart_freq = np.mean(close_peaks)
 
                     if len(close_disturbing_peaks) > 3 and found_heart_freq_old > 1:
                         # To many disturbing peaks around, can't identify the correct one
                         print('Too many disturbing peaks around, can\'t identify the correct one')
                         found_heart_freq = found_heart_freq_old
-                        found_peak_reliability = "Uncertain"
+                        found_peak_reliability = "Bad"
 
                     old_heart_freq_list.append(found_heart_freq)  # save last 20 values
                     if len(old_heart_freq_list) > 10:
