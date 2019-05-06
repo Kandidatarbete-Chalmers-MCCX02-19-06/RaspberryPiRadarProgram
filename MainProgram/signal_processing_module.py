@@ -50,6 +50,7 @@ class SignalProcessing:
         #    self.window_width/2)))  # Saving old values for moving mean
         self.FFT_old_values = np.zeros((10,int(self.length_fft_window/2)))
         # Starta heart_rate
+        print("Start thread heart_rate")
         self.heart_rate_thread = threading.Thread(target=self.heart_rate)
         self.heart_rate_thread.start()
         print("Start thread heart_rate")

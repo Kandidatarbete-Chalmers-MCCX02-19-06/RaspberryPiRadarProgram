@@ -96,13 +96,13 @@ def main():
             plt.clf()
             try:
                 #print('FFTfreq',len(FFTfreq), 'FFTamplitude',len(FFTamplitude))
-                #print('peak_freq',len(peak_freq),'peak_amplitude',len(peak_amplitude),'peak_weighted',len(peak_weighted),peak_weighted)
+                # print('peak_freq',len(peak_freq),'peak_amplitude',len(peak_amplitude),'peak_weighted',len(peak_weighted),peak_weighted)
                 plt.plot(FFTfreq, FFTamplitude)
                 plt.plot(peak_freq, peak_amplitude, 'bo')
                 plt.plot(peak_freq, peak_weighted, 'ro')
                 plt.pause(0.1)
             except Exception as e:
-                print('plot error',e)
+                print('plot error', e)
 
             cmap = plt.get_cmap('PiYG')
             levels = MaxNLocator(nbins=90).tick_values(-35, np.amax(array))
@@ -123,7 +123,7 @@ def main():
         # time.sleep(1)
         #print(FFTfreq, FFTamplitude)
 
-    # Waits for running threads to finish their loops
+        # Waits for running threads to finish their loops
     bluetooth_server.connect_device_thread.join()
     print("bluetooth_server is closed")
     # signal_processings.heart_rate_thread.join()
