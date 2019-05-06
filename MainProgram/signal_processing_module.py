@@ -107,18 +107,30 @@ class SignalProcessing:
                 # self.peak_weighted = np.add(
                 #    peak_amplitude, multiplication_factor*np.exp(-np.abs(delta_freq)/time_constant))
                 self.peak_weighted = []
+                close_peaks = []
+                close_disturbing_peaks = []
                 try:
                     for i in range(0, len(peak_freq)):  # Weight the peaks found depending on their amplitude,
+                        if peak_freq[i] < 0.9:
+                            multiplication_factor = 5  # to lower the noise peak under 0.9 Hz
+                        elif peak_freq[i] < 1:
+                            multiplication_factor = 7  # to lower the noise peak under 1 Hz
+                        else:
+                            multiplication_factor = 10
                         # distance to the last tracked peak, and on the frequency (the noise is kind of 1/f, so to to fix that multiply with f)
-                        self.peak_weighted.append(peak_amplitude[i]+multiplication_factor*np.exp(-np.abs(
-                            peak_freq[i]-found_heart_freq_old)/time_constant)*np.sqrt(np.sqrt(peak_freq[i])))
-                        #print('freq diff',np.abs(peak_freq[i] - found_heart_freq_old))
-                        #print('amp diff',np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old))
-                        #print('old amp',found_heart_freq_amplitude_old)
-                        if np.abs(peak_freq[i] - found_heart_freq_old) < 0.2 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 4 and (found_heart_freq_old < 1 or peak_freq[i] > 1):
+                        self.peak_weighted.append(peak_amplitude[i] + multiplication_factor * np.exp(
+                            -np.abs(peak_freq[i] - found_heart_freq_old) / time_constant) * np.sqrt(
+                            np.sqrt(peak_freq[i])))
+                        # print('freq diff',np.abs(peak_freq[i] - found_heart_freq_old))
+                        # print('amp diff',np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old))
+                        # print('old amp',found_heart_freq_amplitude_old)
+                        if np.abs(peak_freq[i] - found_heart_freq_old) < 0.2 and np.abs(
+                                peak_amplitude[i] - found_heart_freq_amplitude_old) < 4 and (
+                                found_heart_freq_old < 1 or peak_freq[i] > 1):
                             # To average peaks if they are close
                             close_peaks.append(peak_freq[i])
-                        elif np.abs(peak_freq[i] - found_heart_freq_old) < 0.5 and np.abs(peak_amplitude[i] - found_heart_freq_amplitude_old) < 5:
+                        elif np.abs(peak_freq[i] - found_heart_freq_old) < 0.5 and np.abs(
+                                peak_amplitude[i] - found_heart_freq_amplitude_old) < 5:
                             # If there is a lot of peaks to disturb the measurement
                             close_disturbing_peaks.append(peak_freq[i])
 
@@ -128,8 +140,7 @@ class SignalProcessing:
 
                     # Determine the reability of the found peak, if it's really the heart rate or just noise.
                     # Compares to the next largest m´peak amplitude
-                    next_largest_peak_amplitude = np.max(
-                        self.peak_amplitude[0:found_peak_index - 1, found_peak_index + 1:-1])
+                    next_largest_peak_amplitude = np.max(self.peak_amplitude.pop(found_peak_index))
                     if found_heart_freq_amplitude_old > 15 * next_largest_peak_amplitude:
                         found_peak_reliability = "Outstanding"
                     elif found_heart_freq_amplitude_old > 8*next_largest_peak_amplitude:
@@ -181,13 +192,13 @@ class SignalProcessing:
 
             if not first_real_value:
                 print("Found heart rate Hz and BPM: ", found_heart_freq, int(
-                    60*found_heart_freq), 'Reability:', found_peak_reliability)
-                found_heart_rate = int(60 * found_heart_freq)  # Send to app
-                self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
+                    60*found_heart_freq), 'Reliability:', found_peak_reliability)
+                found_heart_rate = int(60 * found_heart_freq)
+                self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')  # Send to app
             else:
                 print("Waiting to find heart rate")
-                found_heart_rate = 0  # Send to app
-                self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')
+                found_heart_rate = 0
+                self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')  # Send to app
             # BPM_search = self.freq * 60 # Used where?
             # print("past plot heart rate")
 
