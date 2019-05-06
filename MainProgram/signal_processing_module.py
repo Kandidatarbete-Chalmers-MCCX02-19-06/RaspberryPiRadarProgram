@@ -175,7 +175,7 @@ class SignalProcessing:
                 found_heart_freq_old = found_heart_freq
             elif len(peak_freq) > 0 and np.amin(peak_amplitude) > -40:
                 found_heart_freq = found_heart_freq_old  # just use the last values
-                found_peak_reliability = "Uncertain"
+                found_peak_reliability = "Bad"
             else:
                 #found_heart_freq = found_heart_freq_old
                 found_heart_freq = 0
