@@ -148,11 +148,11 @@ class SignalProcessing:
                             #self.peak_amplitude[x for i, x in self.peak_amplitude if i != found_peak_index])
                     #next_largest_peak_amplitude = np.max(self.peak_amplitude[0:found_peak_index-1]+self.peak_amplitude[found_peak_index+1:-1])
                     #next_largest_peak_amplitude = np.max(self.peak_amplitude[np.arange(len(self.peak_amplitude)) != 3])
-                    if found_heart_freq_amplitude_old - next_largest_peak_amplitude > 15:
+                    if found_heart_freq_amplitude_old - next_largest_peak_amplitude > 15 or (len(next_largest_peak_amplitude) == 0 and found_heart_freq_amplitude_old > -15):
                         found_peak_reliability = "Outstanding"
-                    elif found_heart_freq_amplitude_old - next_largest_peak_amplitude > 8:
+                    elif found_heart_freq_amplitude_old - next_largest_peak_amplitude > 8 or (len(next_largest_peak_amplitude) == 0 and found_heart_freq_amplitude_old > -22):
                         found_peak_reliability = "Perfect"
-                    elif found_heart_freq_amplitude_old - next_largest_peak_amplitude > 4:
+                    elif found_heart_freq_amplitude_old - next_largest_peak_amplitude > 4 or (len(next_largest_peak_amplitude) == 0 and found_heart_freq_amplitude_old > -26):
                         found_peak_reliability = "Good"
                     else:
                         found_peak_reliability = "Vague"
@@ -294,7 +294,7 @@ class SignalProcessing:
 
         MaxFFT = np.amax(FFT_in_interval)  # Do on one line later, to remove outliers
         #threshold = MaxFFT - 10
-        threshold = np.max(-30,MaxFFT)
+        threshold = -30
         peaks, _ = signal.find_peaks(FFT_in_interval)
 
         index_list = []
