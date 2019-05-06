@@ -292,9 +292,9 @@ class SignalProcessing:
 
         #print("FFT_in_interval", FFT_in_interval, "\n", len(FFT_in_interval))
 
-        #MaxFFT = np.amax(FFT_in_interval)  # Do on one line later, to remove outliers
+        MaxFFT = np.amax(FFT_in_interval)  # Do on one line later, to remove outliers
         #threshold = MaxFFT - 10
-        threshold = -30
+        threshold = np.max(-30,MaxFFT)
         peaks, _ = signal.find_peaks(FFT_in_interval)
 
         index_list = []
