@@ -138,7 +138,7 @@ class SignalProcessing:
                     found_heart_freq = peak_freq[found_peak_index]
                     found_heart_freq_amplitude_old = self.peak_amplitude[found_peak_index]
 
-                    # Determine the reability of the found peak, if it's really the heart rate or just noise.
+                    # Determine the reliability of the found peak, if it's really the heart rate or just noise.
                     # Compares to the next largest m´peak amplitude
                     next_largest_peak_amplitude = np.max(self.peak_amplitude.pop(found_peak_index))
                     if found_heart_freq_amplitude_old > 15 * next_largest_peak_amplitude:
@@ -194,7 +194,7 @@ class SignalProcessing:
                 print("Found heart rate Hz and BPM: ", found_heart_freq, int(
                     60*found_heart_freq), 'Reliability:', found_peak_reliability)
                 found_heart_rate = int(60 * found_heart_freq)
-                self.bluetooth_server.write_data_to_app(found_heart_rate, 'heart rate')  # Send to app
+                self.bluetooth_server.write_data_to_app(str(found_heart_rate) + ' ' + found_peak_reliability, 'heart rate')  # Send to app
             else:
                 print("Waiting to find heart rate")
                 found_heart_rate = 0
