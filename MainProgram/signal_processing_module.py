@@ -328,7 +328,7 @@ class SignalProcessing:
                 self.bluetooth_server.write_data_to_app(0, 'breath rate')
                 self.time_when_sent_last_value = time.time()
             trackedRRvector[countHys - 1] = self.RR_filtered_queue.get()
-            print("Amplitude for respitory rate {}".format(trackedRRvector[countHys-1]))
+            #print("Amplitude for respitory rate {}".format(trackedRRvector[countHys-1]))
             # self.RTB_final_queue.put(trackedRRvector[countHys - 1])
 
             if countHys == self.sample_freq * Tc:
