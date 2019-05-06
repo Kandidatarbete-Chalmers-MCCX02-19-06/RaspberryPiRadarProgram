@@ -149,9 +149,9 @@ class SignalProcessing:
                     #next_largest_peak_amplitude = np.max(
                         #self.peak_amplitude[(np.delete(range(len(self.peak_amplitude)),found_peak_index))])
                             #self.peak_amplitude[x for i, x in self.peak_amplitude if i != found_peak_index])
-                    next_largest_peak_amplitude = np.amax(self.peak_amplitude[:found_peak_index]+self.peak_amplitude[found_peak_index:])
+                    next_largest_peak_amplitude = np.amax(self.peak_amplitude[:found_peak_index]+self.peak_amplitude[found_peak_index+1:])
                     print(self.peak_amplitude[:found_peak_index])
-                    print(self.peak_amplitude[found_peak_index:])
+                    print(self.peak_amplitude[found_peak_index+1:])
                     print(next_largest_peak_amplitude)
                     #next_largest_peak_amplitude = np.max(self.peak_amplitude[np.arange(len(self.peak_amplitude)) != 3])
                     if found_heart_freq_amplitude_old - next_largest_peak_amplitude > 15 or (found_heart_freq_amplitude_old > -15):
@@ -300,7 +300,7 @@ class SignalProcessing:
 
         MaxFFT = np.amax(FFT_in_interval)  # Do on one line later, to remove outliers
         #threshold = MaxFFT - 10
-        threshold = -40
+        threshold = -30
         peaks, _ = signal.find_peaks(FFT_in_interval)
 
         index_list = []
