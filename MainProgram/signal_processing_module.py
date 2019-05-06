@@ -182,7 +182,7 @@ class SignalProcessing:
                     print('exept in heart peak',e)
                     found_heart_freq = 0
 
-                if first_real_value and found_heart_freq > 1:
+                if first_real_value and (found_heart_freq > 1 or time.time() - start_time > 120):
                     first_real_value = False
                 if found_heart_freq < 1 and first_real_value:  # Do not trigger on the large noise peak under 1 Hz
                     found_heart_freq = 0
