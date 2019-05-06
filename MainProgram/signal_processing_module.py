@@ -328,13 +328,14 @@ class SignalProcessing:
                 self.bluetooth_server.write_data_to_app(0, 'breath rate')
                 self.time_when_sent_last_value = time.time()
             trackedRRvector[countHys - 1] = self.RR_filtered_queue.get()
+            print("Amplitude for respitory rate {}".format(trackedRRvector[countHys-1]))
             # self.RTB_final_queue.put(trackedRRvector[countHys - 1])
 
             if countHys == self.sample_freq * Tc:
                 Hcut = np.sqrt(np.mean(np.square(trackedRRvector))) * 0.7  # rms of trackedRRvector
                 # Hcut = 0.002
                 if Hcut < 0.1:
-                    Hcut = 0.1
+                    Hcut = 10
                 Lcut = -Hcut
 
                 # print("Hcut: ", Hcut)       # se vad hysteres blir
