@@ -100,7 +100,7 @@ class SignalProcessing:
             #print("Averaged FFT: ", FFT_averaged[2])
             # Returns the peaks in set inteval from averaged FFT
             peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
-            if len(peak_freq) > 0 and np.amin(peak_amplitude) > -40 and np.amax(peak_amplitude > -30) and time.time() - start_time > 40:
+            if len(peak_freq) > 0 and np.amin(peak_amplitude) > -40 and np.amax(peak_amplitude) > -30 and time.time() - start_time > 40:
                 # In case zero peaks, use last value, and to not trigger on noise, and there is just noise before 30 seconds has passed
                 # Going into own method when tested and working staying in "main loop"
                 delta_freq = []
