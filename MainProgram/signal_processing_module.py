@@ -141,7 +141,8 @@ class SignalProcessing:
 
                     # Determine the reliability of the found peak, if it's really the heart rate or just noise.
                     # Compares to the next largest m´peak amplitude
-                    next_largest_peak_amplitude = np.max(self.peak_amplitude[np.arange(len(self.peak_amplitude))!=3])
+                    next_largest_peak_amplitude = np.max(self.peak_amplitude[0:found_peak_index-1]+self.peak_amplitude[found_peak_index+1:-1])
+                    #next_largest_peak_amplitude = np.max(self.peak_amplitude[np.arange(len(self.peak_amplitude)) != 3])
                     if found_heart_freq_amplitude_old - next_largest_peak_amplitude > 15:
                         found_peak_reliability = "Outstanding"
                     elif found_heart_freq_amplitude_old - next_largest_peak_amplitude > 8:
@@ -173,7 +174,7 @@ class SignalProcessing:
                               old_heart_freq_list[-1])
 
                 except Exception as e:
-                    print('exept in heart peak', e)
+                    print('exept in heart peak:', e)
                     found_heart_freq = 0
 
                 if first_real_value and (found_heart_freq > 1 or time.time() - start_time > 120):
