@@ -328,10 +328,12 @@ class SignalProcessing:
         # TODO Unsure about this part, same max freq several times in a row
         F_scan_lower = 0.8
         F_scan_upper = 3
+        print("len self freq: ", len(self.freq))
         FFT_in_interval = FFT_averaged[self.freq <= F_scan_upper]
         freq2 = self.freq[self.freq <= F_scan_upper]
         FFT_in_interval = FFT_in_interval[freq2 > F_scan_lower]
         peak_freq_linspace = np.linspace(F_scan_lower, F_scan_upper, num=len(FFT_in_interval))
+        # Endast 66 värden borde nu vara 132 st....
         print("len of fft in interval: ", len(FFT_in_interval))
         #print("FFT_in_interval", FFT_in_interval, "\n", len(FFT_in_interval))
 
