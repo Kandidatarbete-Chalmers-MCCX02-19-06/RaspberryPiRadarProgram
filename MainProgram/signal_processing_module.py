@@ -42,9 +42,9 @@ class SignalProcessing:
         self.window_slide = int(np.round(self.window_width*(1-self.overlap/100)))
         self.window_slide_global = list_of_variables_for_threads["window_slide"]
         self.window_slide_global = self.window_slide
-        self.freq = self.sample_freq * \
-            np.arange(self.total_fft_length/2)/self.window_width  # Evenly spaced freq array
-
+        # self.freq = self.sample_freq * \
+        #    np.arange(self.total_fft_length/2)/self.window_width  # Evenly spaced freq array
+        self.freq = np.linspace(0, self.sample_freq/2, num=self.total_fft_length/2)
         self.delta_T = self.window_slide / self.sample_freq
         # int(round(self.tau / self.delta_T))  # Make tau is larger than delta_T, else it will be zero and programme will fail.
         self.number_of_old_FFT = 10
