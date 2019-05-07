@@ -37,6 +37,7 @@ class SignalProcessing:
         # Data in vector with length of window
         self.fft_window = np.zeros(self.T_resolution*self.sample_freq)  # Width in samples of FFT
         self.window_width = int(len(self.fft_window))
+        self.total_fft_length = int(2*self.window_width)
         # window_width_half = int(window_width/2)  # Since FFT only processes half of freq (Nyqvist)
         self.window_slide = int(np.round(self.window_width*(1-self.overlap/100)))
         self.window_slide_global = list_of_variables_for_threads["window_slide"]
@@ -48,7 +49,7 @@ class SignalProcessing:
         # int(round(self.tau / self.delta_T))  # Make tau is larger than delta_T, else it will be zero and programme will fail.
         self.number_of_old_FFT = 10
         self.FFT_old_values = np.zeros((self.number_of_old_FFT, int(
-            self.window_width/2)))  # Saving old values for moving mean
+            self.total_fft_length/2)))  # Saving old values for moving mean
         # Starta heart_rate
         print("Start thread heart_rate")
         self.heart_rate_thread = threading.Thread(target=self.heart_rate)
@@ -310,13 +311,12 @@ class SignalProcessing:
         # length_seq = len(signal_in)  # number of sequences
         window = np.kaiser(self.window_width, self.beta)  # beta: shape factor
         self.fft_window = np.multiply(self.fft_window, window)
-        n = 2*self.window_width
         # two-sided fft of input signal
-        signal_in_fft = fft(self.fft_window, n=n)  # ,n=2*self.window_width)
+        signal_in_fft = fft(self.fft_window, n=self.total_fft_length)  # ,n=2*self.window_width)
         print("len of fft: ", len(signal_in_fft))
         signal_fft_abs = np.abs(np.divide(signal_in_fft, self.window_width))
         #print("fft abs: ", signal_fft_abs)
-        signal_out = np.multiply(2, signal_fft_abs[0:n//2])  # one-sided fft
+        signal_out = np.multiply(2, signal_fft_abs[0:self.total_fft_length//2])  # one-sided fft
         #print("Signal out: ", signal_out)
         print("len of signal out: ", len(signal_out))
         # frequency array corresponding to frequencies in the fft
