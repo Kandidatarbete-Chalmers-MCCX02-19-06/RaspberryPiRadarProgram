@@ -210,22 +210,20 @@ class SignalProcessing:
             if index_in_FFT_old_values == self.number_of_old_FFT:
                 index_in_FFT_old_values = 0
             # initiate save to CSV'
-            print("time for csv write Self: ", self.start_write_to_csv_time)
             print("time for csv write List: ",
                   self.list_of_variables_for_threads["start_write_to_csv_time"])
-            if self.initiate_write_heart_rate and time.time() - self.start_write_to_csv_time < 5*60:
+            if self.initiate_write_heart_rate and time.time() - self.list_of_variables_for_threads["start_write_to_csv_time"] < 5*60:
                 print("Inside save to csv statement")
-
                 self.heart_rate_csv.append(found_heart_rate)
-            # elif self.initiate_write_heart_rate:
-            #     self.go = False
-            #     print("Out of while go heart_rate")
-            #     np_csv = np.asarray(self.heart_rate_csv)
-            #     print("Saved as numpy array")
-            #     np.savetxt("heart_rate.csv", np_csv, delimiter=";")
-            #     print("Should have saved CSV")
-            #     self.heart_rate_csv.clear()
-            #     print("Finish with heart_rate")
+            elif self.initiate_write_heart_rate:
+                self.go = False
+                print("Out of while go heart_rate")
+                np_csv = np.asarray(self.heart_rate_csv)
+                print("Saved as numpy array")
+                np.savetxt("heart_rate.csv", np_csv, delimiter=";")
+                print("Should have saved CSV")
+                self.heart_rate_csv.clear()
+                print("Finish with heart_rate")
 
     def mean_of_old_values(self, FFT_counter):  # Check
         FFT_average_over = np.zeros(int(self.window_width/2))
