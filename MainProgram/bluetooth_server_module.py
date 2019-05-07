@@ -149,6 +149,25 @@ class BluetoothServer:
                         os.system("echo 'power off\nquit' | bluetoothctl")  # TODO
                     except Exception as error:
                         print("exception in for-loop in read_device: " + str(error))
+                if not self.go:
+                    print("Shutdown starting")
+                    try:
+                        #self.go = []
+                        #self.list_of_variables_for_threads["go"] = self.go.pop(0)
+                        #list_of_variables_for_threads["go"] = go.pop(0)
+                        # self.go.pop(0)
+                        print("go= " + str(self.go))
+                        for client in self.client_list:
+                            print('try to remove client ' +
+                                  str(self.address_list[self.client_list.index(client)]))
+                            client.close()
+                            print('remove client ' +
+                                  str(self.address_list[self.client_list.index(client)]))
+                        self.server.close()
+                        print("server is now closed")
+                        os.system("echo 'power off\nquit' | bluetoothctl")  # TODO
+                    except Exception as error:
+                        print("exception in for-loop in read_device: " + str(error))
 
                 elif data == 'startMeasure':
                     self.run_measurement.append(c)

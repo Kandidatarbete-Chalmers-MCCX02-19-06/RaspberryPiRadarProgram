@@ -216,7 +216,8 @@ class SignalProcessing:
                 print("Inside save to csv statement")
                 self.heart_rate_csv.append(found_heart_rate)
             elif self.initiate_write_heart_rate:
-                self.go = False
+                self.go.pop(0)
+                self.list_of_variables_for_threads["go"] = self.go
                 print("Out of while go heart_rate")
                 np_csv = np.asarray(self.heart_rate_csv)
                 print("Saved as numpy array")
