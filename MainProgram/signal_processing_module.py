@@ -43,7 +43,7 @@ class SignalProcessing:
         self.window_slide_global = list_of_variables_for_threads["window_slide"]
         self.window_slide_global = self.window_slide
         self.freq = self.sample_freq * \
-            np.arange(self.window_width)/self.window_width  # Evenly spaced freq array
+            np.arange(self.window_width/2)/self.window_width  # Evenly spaced freq array
 
         self.delta_T = self.window_slide / self.sample_freq
         # int(round(self.tau / self.delta_T))  # Make tau is larger than delta_T, else it will be zero and programme will fail.
@@ -93,12 +93,13 @@ class SignalProcessing:
         while self.go:
             # print("in while loop heart_rate")
             fft_signal_out = self.windowedFFT()
-            fft_signal_out_dB = 20*np.log10(fft_signal_out)
+            fft_signal_out_dB = 20*np.log10(fft_signal_out)  # As of May 7, lenght of vector is 600
             self.FFT_old_values[index_in_FFT_old_values][:] = fft_signal_out_dB
 
-            saved_old = self.FFT_old_values[:, 2]
+            # saved_old = self.FFT_old_values[:, 2] #to print
             # fft movemean
             FFT_averaged = self.mean_of_old_values(FFT_counter)
+            print("Length of averaged FFT: ", len(FFT_averaged))
             # Returns the peaks in set inteval from averaged FFT
             peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
             if len(peak_freq) > 0 and np.amin(peak_amplitude) > -40 and np.amax(peak_amplitude) > -30 and time.time() - start_time > 50:
@@ -263,8 +264,8 @@ class SignalProcessing:
         self.heart_rate_csv.clear()
 
     def mean_of_old_values(self, FFT_counter):  # Check
-        FFT_average_over = np.zeros(int(self.window_width/2))
-        for columns in range(0, int(self.window_width/2)):
+        FFT_average_over = np.zeros(int(self.total_fft_length/2))
+        for columns in range(0, int(self.total_fft_length/2)):
             for rows in range(0, self.number_of_old_FFT):
                 FFT_average_over[columns] = self.FFT_old_values[rows][columns] + \
                     FFT_average_over[columns]
