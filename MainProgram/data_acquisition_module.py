@@ -171,6 +171,7 @@ class DataAcquisition(threading.Thread):
                     self.go.pop(0)
                     break
         self.RR_filtered_queue.put(0)  # to quit the signal processing thread
+        print('before for loop to fill HR queue')
         for i in range(self.window_slide):
             print("Data acq filling HR queue with 0:s")
             self.HR_filtered_queue.put(0)
