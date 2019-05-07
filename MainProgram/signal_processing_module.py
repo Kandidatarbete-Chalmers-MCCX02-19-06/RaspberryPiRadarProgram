@@ -225,6 +225,7 @@ class SignalProcessing:
                 print("Should have saved CSV")
                 self.heart_rate_csv.clear()
                 print("Finish with heart_rate")
+        print("Out of pulse")
 
     def mean_of_old_values(self, FFT_counter):  # Check
         FFT_average_over = np.zeros(int(self.window_width/2))
