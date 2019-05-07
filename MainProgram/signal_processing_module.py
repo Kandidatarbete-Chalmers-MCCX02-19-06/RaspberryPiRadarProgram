@@ -210,7 +210,9 @@ class SignalProcessing:
             if index_in_FFT_old_values == self.number_of_old_FFT:
                 index_in_FFT_old_values = 0
             # initiate save to CSV'
-            print("time for csv write: ", self.start_write_to_csv_time)
+            print("time for csv write Self: ", self.start_write_to_csv_time)
+            print("time for csv write List: ",
+                  self.list_of_variables_for_threads["start_write_to_csv_time"])
             if self.initiate_write_heart_rate and time.time() - self.start_write_to_csv_time < 5*60:
                 print("Inside save to csv statement")
 
