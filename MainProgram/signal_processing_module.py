@@ -43,7 +43,7 @@ class SignalProcessing:
         self.window_slide_global = list_of_variables_for_threads["window_slide"]
         self.window_slide_global = self.window_slide
         self.freq = self.sample_freq * \
-            np.arange(self.window_width)/self.window_width  # Evenly spaced freq array
+            np.arange(self.total_fft_length/2)/self.window_width  # Evenly spaced freq array
 
         self.delta_T = self.window_slide / self.sample_freq
         # int(round(self.tau / self.delta_T))  # Make tau is larger than delta_T, else it will be zero and programme will fail.
