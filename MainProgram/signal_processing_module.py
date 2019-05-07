@@ -38,7 +38,8 @@ class SignalProcessing:
         self.window_width = int(len(self.fft_window))
         # window_width_half = int(window_width/2)  # Since FFT only processes half of freq (Nyqvist)
         self.window_slide = int(np.round(self.window_width*(1-self.overlap/100)))
-        list_of_variables_for_threads["window_slide"] = self.window_slide
+        self.window_slide_global = list_of_variables_for_threads["window_slide"]
+        self.window_slide_global = self.window_slide
         self.freq = self.sample_freq * \
             np.arange(self.window_width/2)/self.window_width  # Evenly spaced freq array
 

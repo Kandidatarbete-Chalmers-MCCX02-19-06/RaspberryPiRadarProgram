@@ -51,7 +51,7 @@ def main():
     RR_final_queue = queue.Queue()
     RTB_final_queue = queue.Queue()  # Real time breating final queue
     heart_rate_csv = []
-    initiate_write_heart_rate = False
+    initiate_write_heart_rate = []
     start_write_to_csv_time = 0
     window_slide = 1
 
