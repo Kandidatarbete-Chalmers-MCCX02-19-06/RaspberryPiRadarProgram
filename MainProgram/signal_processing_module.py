@@ -131,7 +131,8 @@ class SignalProcessing:
                     # Determine the reliability of the found peak, if it's really the heart rate or just noise.
                     # Compares to the next largest peak amplitude
                     try:
-                        next_largest_peak_amplitude = np.amax(self.peak_amplitude[:found_peak_index]+self.peak_amplitude[found_peak_index+1:])
+                        next_largest_peak_amplitude = np.amax(
+                            self.peak_amplitude[:found_peak_index]+self.peak_amplitude[found_peak_index+1:])
                     except:
                         next_largest_peak_amplitude = -35
                     if found_heart_freq_amplitude_old - next_largest_peak_amplitude > 12:
@@ -186,12 +187,14 @@ class SignalProcessing:
                 print("Found heart rate Hz and BPM: ", found_heart_freq, int(
                     60*found_heart_freq), 'Reliability:', found_peak_reliability)
                 found_heart_rate = int(60 * found_heart_freq)
-                self.bluetooth_server.write_data_to_app(str(found_heart_rate) + ' ' + found_peak_reliability, 'heart rate')  # Send to app
+                self.bluetooth_server.write_data_to_app(
+                    str(found_heart_rate) + ' ' + found_peak_reliability, 'heart rate')  # Send to app
                 self.heart_rate_csv.append(found_heart_rate)
             else:
                 print("Waiting to find heart rate")
                 found_heart_rate = 0
-                self.bluetooth_server.write_data_to_app(str(found_heart_rate) + ' ' + found_peak_reliability, 'heart rate')   # Send to app
+                self.bluetooth_server.write_data_to_app(
+                    str(found_heart_rate) + ' ' + found_peak_reliability, 'heart rate')   # Send to app
                 self.heart_rate_csv.append(found_heart_rate)
             # BPM_search = self.freq * 60 # Used where?
             # print("past plot heart rate")
@@ -202,9 +205,11 @@ class SignalProcessing:
             index_in_FFT_old_values += 1
             if index_in_FFT_old_values == self.number_of_old_FFT:
                 index_in_FFT_old_values = 0
-        # After shutdown initiates save to CSV
+
+        # After shutdown initiate save to CSV
         np_csv = np.asarray(self.heart_rate_csv)
         np.savetxt("heart_rate.csv", np_csv, delimiter=";")
+        print("Should have saved CSV")
         self.heart_rate_csv.clear()
 
     def mean_of_old_values(self, FFT_counter):  # Check
