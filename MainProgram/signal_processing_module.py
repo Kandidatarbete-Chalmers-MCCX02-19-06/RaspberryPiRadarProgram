@@ -225,6 +225,17 @@ class SignalProcessing:
                 print("Should have saved CSV")
                 self.heart_rate_csv.clear()
                 print("Finish with heart_rate")
+
+                for client in self.bluetooth_server.client_list:
+                    print('try to remove client ' +
+                          str(self.bluetooth_server.address_list[self.bluetooth_server.client_list.index(client)]))
+                    client.close()
+                    print('remove client ' +
+                          str(self.bluetooth_server.address_list[self.bluetooth_server.client_list.index(client)]))
+                self.bluetooth_server.server.close()
+                print("server is now closed")
+                #os.system("echo 'power off\nquit' | bluetoothctl")  # TODO
+
         print("Out of pulse")
 
     def mean_of_old_values(self, FFT_counter):  # Check
