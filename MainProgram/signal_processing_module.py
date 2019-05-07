@@ -70,6 +70,7 @@ class SignalProcessing:
         self.heart_rate_csv = list_of_variables_for_threads["heart_rate_csv"]
         self.start_write_to_csv_time = list_of_variables_for_threads["start_write_to_csv_time"]
         self.initiate_write_heart_rate = list_of_variables_for_threads["initiate_write_heart_rate"]
+        self.heart_rate_reliability_csv = []
 
     # Kaos i koden, behöver struktureras upp och alla konstanter måste defineras i början
     # Följer just nu Matlab strukturen.
@@ -86,6 +87,7 @@ class SignalProcessing:
         first_real_value = True  # the first real heart rate found
         old_heart_freq_list = []  # old values
         found_peak_reliability = "None"
+        found_peak_reliability_int = 0
 
         while self.go:
             # print("in while loop heart_rate")
@@ -141,13 +143,20 @@ class SignalProcessing:
                     except:
                         next_largest_peak_amplitude = -35
                     if found_heart_freq_amplitude_old - next_largest_peak_amplitude > 12:
-                        found_peak_reliability = "Outstanding"
-                    elif found_heart_freq_amplitude_old - next_largest_peak_amplitude > 8: # TODO 7
-                        found_peak_reliability = "Perfect"
-                    elif found_heart_freq_amplitude_old - next_largest_peak_amplitude > 4: # TODO ny med 3 Intermediates
-                        found_peak_reliability = "Good"
+                        found_peak_reliability = "ExceptionalHigh"
+                        found_peak_reliability_int = 6
+                    elif found_heart_freq_amplitude_old - next_largest_peak_amplitude > 7:
+                        found_peak_reliability = "VeryHigh"
+                        found_peak_reliability_int = 5
+                    elif found_heart_freq_amplitude_old - next_largest_peak_amplitude > 4:
+                        found_peak_reliability = "High"
+                        found_peak_reliability_int = 4
+                    elif found_heart_freq_amplitude_old - next_largest_peak_amplitude > 3:
+                        found_peak_reliability = "Medium"
+                        found_peak_reliability_int = 3
                     else:
-                        found_peak_reliability = "Doubtful" # TODO uncertain?
+                        found_peak_reliability = "Low" # TODO uncertain?
+                        found_peak_reliability_int = 2
 
                     if len(close_peaks) > 1:
                         print('averaging, old:', found_heart_freq)
@@ -157,7 +166,8 @@ class SignalProcessing:
                         # To many disturbing peaks around, can't identify the correct one
                         print('Too many disturbing peaks around, can\'t identify the correct one')
                         found_heart_freq = found_heart_freq_old
-                        found_peak_reliability = "Bad"
+                        found_peak_reliability = "VeryLow"
+                        found_peak_reliability_int = 1
 
                     old_heart_freq_list.append(found_heart_freq)  # save last 20 values
                     if len(old_heart_freq_list) > 10:
@@ -181,12 +191,14 @@ class SignalProcessing:
                 found_heart_freq_old = found_heart_freq
             elif len(peak_freq) > 0 and np.amin(peak_amplitude) > -40:
                 found_heart_freq = found_heart_freq_old  # just use the last values
-                found_peak_reliability = "Bad"
+                found_peak_reliability = "VeryLow"
+                found_peak_reliability_int = 1
             else:
                 #found_heart_freq = found_heart_freq_old
                 found_heart_freq = 0
                 self.peak_weighted.clear()
                 found_peak_reliability = "None"
+                found_peak_reliability_int = 0
 
             if not first_real_value:
                 print("Found heart rate Hz and BPM: ", found_heart_freq, int(
@@ -211,11 +223,12 @@ class SignalProcessing:
             if index_in_FFT_old_values == self.number_of_old_FFT:
                 index_in_FFT_old_values = 0
             # initiate save to CSV'
-            print("time for csv write List: ",
-                  self.list_of_variables_for_threads["start_write_to_csv_time"])
+            #print("time for csv write List: ",
+            #      self.list_of_variables_for_threads["start_write_to_csv_time"])
             if self.initiate_write_heart_rate and time.time() - self.list_of_variables_for_threads["start_write_to_csv_time"] < 0.5*60:
                 print("Inside save to csv statement")
                 self.heart_rate_csv.append(found_heart_rate)
+                self.heart_rate_reliability_csv.append(found_peak_reliability_int)
             elif self.initiate_write_heart_rate:
                 self.go.pop(0)
                 self.list_of_variables_for_threads["go"] = self.go
@@ -223,6 +236,8 @@ class SignalProcessing:
                 np_csv = np.asarray(self.heart_rate_csv)
                 #print("Saved as numpy array")
                 np.savetxt("heart_rate.csv", np_csv, delimiter=";")
+                np_csv = np.asarray(self.heart_rate_reliability_csv)
+                np.savetxt("heart_rate_reliability.csv", np_csv, delimiter=";")
                 print("Should have saved CSV")
                 self.heart_rate_csv.clear()
                 #print("Finish with heart_rate")
