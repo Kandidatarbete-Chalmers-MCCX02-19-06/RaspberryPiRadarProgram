@@ -38,6 +38,7 @@ class SignalProcessing:
         self.window_width = int(len(self.fft_window))
         # window_width_half = int(window_width/2)  # Since FFT only processes half of freq (Nyqvist)
         self.window_slide = int(np.round(self.window_width*(1-self.overlap/100)))
+        list_of_variables_for_threads["window_slide"] = self.window_slide
         self.freq = self.sample_freq * \
             np.arange(self.window_width/2)/self.window_width  # Evenly spaced freq array
 
@@ -65,6 +66,8 @@ class SignalProcessing:
         self.peak_weighted = []
         self.len_fft = 0
         self.heart_rate_csv = list_of_variables_for_threads["heart_rate_csv"]
+        self.start_write_to_csv_time = list_of_variables_for_threads["start_write_to_csv_time"]
+        self.initiate_write_heart_rate = list_of_variables_for_threads["initiate_write_heart_rate"]
 
     # Kaos i koden, behöver struktureras upp och alla konstanter måste defineras i början
     # Följer just nu Matlab strukturen.
@@ -189,13 +192,13 @@ class SignalProcessing:
                 found_heart_rate = int(60 * found_heart_freq)
                 self.bluetooth_server.write_data_to_app(
                     str(found_heart_rate) + ' ' + found_peak_reliability, 'heart rate')  # Send to app
-                self.heart_rate_csv.append(found_heart_rate)
+
             else:
                 print("Waiting to find heart rate")
                 found_heart_rate = 0
                 self.bluetooth_server.write_data_to_app(
                     str(found_heart_rate) + ' ' + found_peak_reliability, 'heart rate')   # Send to app
-                self.heart_rate_csv.append(found_heart_rate)
+
             # BPM_search = self.freq * 60 # Used where?
             # print("past plot heart rate")
 
@@ -205,15 +208,19 @@ class SignalProcessing:
             index_in_FFT_old_values += 1
             if index_in_FFT_old_values == self.number_of_old_FFT:
                 index_in_FFT_old_values = 0
-
-        # After shutdown initiate save to CSV'
-        print("Out of while go heart_rate")
-        np_csv = np.asarray(self.heart_rate_csv)
-        print("Saved as numpy array")
-        np.savetxt("heart_rate.csv", np_csv, delimiter=";")
-        print("Should have saved CSV")
-        self.heart_rate_csv.clear()
-        print("Finish with heart_rate")
+            # initiate save to CSV'
+            if self.initiate_write_heart_rate and time.time() - self.start_write_to_csv_time < 5*60:
+                print("Inside save to csv statement")
+                self.heart_rate_csv.append(found_heart_rate)
+            elif self.initiate_write_heart_rate:
+                self.go = False
+                print("Out of while go heart_rate")
+                np_csv = np.asarray(self.heart_rate_csv)
+                print("Saved as numpy array")
+                np.savetxt("heart_rate.csv", np_csv, delimiter=";")
+                print("Should have saved CSV")
+                self.heart_rate_csv.clear()
+                print("Finish with heart_rate")
 
     def mean_of_old_values(self, FFT_counter):  # Check
         FFT_average_over = np.zeros(int(self.window_width/2))

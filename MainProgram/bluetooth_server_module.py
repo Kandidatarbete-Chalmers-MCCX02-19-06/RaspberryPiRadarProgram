@@ -31,6 +31,7 @@ class BluetoothServer:
         self.RR_final_queue = list_of_variables_for_threads["RR_final_queue"]
         self.RTB_final_queue = list_of_variables_for_threads["RTB_final_queue"]
         self.run_measurement = list_of_variables_for_threads["run_measurement"]
+        self.initiate_write_heart_rate = list_of_variables_for_threads["initiate_write_heart_rate"]
         print('Bluetooth Socket Created')
         try:
             self.server.bind((self.host, self.port))
@@ -158,6 +159,11 @@ class BluetoothServer:
                         self.run_measurement.remove(c)
                         self.list_of_variables_for_threads["run_measurement"] = self.run_measurement
                         print("Device removed")
+                elif data == 'write':
+                    self.list_of_variables_for_threads["initiate_write_heart_rate"] = True
+                    self.list_of_variables_for_threads["start_write_to_csv_time"] = time.time()
+
+                    # self.initiate_write_heart_rate
 
         except Exception as error:
             print("last exception read_device: " + str(error))
