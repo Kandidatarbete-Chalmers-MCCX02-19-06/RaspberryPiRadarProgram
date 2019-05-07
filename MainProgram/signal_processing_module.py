@@ -155,7 +155,7 @@ class SignalProcessing:
                         found_peak_reliability = "Medium"
                         found_peak_reliability_int = 3
                     else:
-                        found_peak_reliability = "Low" # TODO uncertain?
+                        found_peak_reliability = "Low"  # TODO uncertain?
                         found_peak_reliability_int = 2
 
                     if len(close_peaks) > 1:
@@ -223,36 +223,43 @@ class SignalProcessing:
             if index_in_FFT_old_values == self.number_of_old_FFT:
                 index_in_FFT_old_values = 0
             # initiate save to CSV'
-            #print("time for csv write List: ",
+            # print("time for csv write List: ",
             #      self.list_of_variables_for_threads["start_write_to_csv_time"])
             if self.initiate_write_heart_rate and time.time() - self.list_of_variables_for_threads["start_write_to_csv_time"] < 0.5*60:
                 print("Inside save to csv statement")
                 self.heart_rate_csv.append(found_heart_rate)
                 self.heart_rate_reliability_csv.append(found_peak_reliability_int)
-            elif self.initiate_write_heart_rate:
-                self.go.pop(0)
-                self.list_of_variables_for_threads["go"] = self.go
+            # elif self.initiate_write_heart_rate:
+                # self.go.pop(0)
+                #self.list_of_variables_for_threads["go"] = self.go
                 #print("Out of while go heart_rate")
-                np_csv = np.asarray(self.heart_rate_csv)
-                #print("Saved as numpy array")
-                np.savetxt("heart_rate.csv", np_csv, delimiter=";")
-                np_csv = np.asarray(self.heart_rate_reliability_csv)
-                np.savetxt("heart_rate_reliability.csv", np_csv, delimiter=";")
-                print("Should have saved CSV")
-                self.heart_rate_csv.clear()
+                # np_csv = np.asarray(self.heart_rate_csv)
+                # print("Saved as numpy array")
+                # np.savetxt("heart_rate.csv", np_csv, delimiter=";")
+                # np_csv = np.asarray(self.heart_rate_reliability_csv)
+                # np.savetxt("heart_rate_reliability.csv", np_csv, delimiter=";")
+                # print("Should have saved CSV")
+                # self.heart_rate_csv.clear()
                 #print("Finish with heart_rate")
                 # Remove Bluetooth clients
-                for client in self.bluetooth_server.client_list:
-                    print('try to remove client ' +
-                          str(self.bluetooth_server.address_list[self.bluetooth_server.client_list.index(client)]))
-                    client.close()
-                    print('remove client ' +
-                          str(self.bluetooth_server.address_list[self.bluetooth_server.client_list.index(client)]))
-                self.bluetooth_server.server.close()
-                print("server is now closed")
-                os.system("echo 'power off\nquit' | bluetoothctl")
+                # for client in self.bluetooth_server.client_list:
+                #     print('try to remove client ' +
+                #           str(self.bluetooth_server.address_list[self.bluetooth_server.client_list.index(client)]))
+                #     client.close()
+                #     print('remove client ' +
+                #           str(self.bluetooth_server.address_list[self.bluetooth_server.client_list.index(client)]))
+                # self.bluetooth_server.server.close()
+                # print("server is now closed")
+                # os.system("echo 'power off\nquit' | bluetoothctl")
 
         print("Out of pulse")
+        np_csv = np.asarray(self.heart_rate_csv)
+        print("Saved as numpy array")
+        np.savetxt("heart_rate.csv", np_csv, delimiter=";")
+        np_csv = np.asarray(self.heart_rate_reliability_csv)
+        np.savetxt("heart_rate_reliability.csv", np_csv, delimiter=";")
+        print("Should have saved CSV")
+        self.heart_rate_csv.clear()
 
     def mean_of_old_values(self, FFT_counter):  # Check
         FFT_average_over = np.zeros(int(self.window_width/2))

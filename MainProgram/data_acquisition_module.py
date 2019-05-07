@@ -5,6 +5,7 @@ import threading
 import numpy as np
 from scipy import signal
 import queue
+import os
 
 # Import for graphs
 import pyqtgraph as pg
@@ -31,7 +32,8 @@ class DataAcquisition(threading.Thread):
         self.bluetooth_server = bluetooth_server
         self.run_measurement = self.list_of_variables_for_threads['run_measurement']
         self.window_slide = self.list_of_variables_for_threads["window_slide"]
-
+        self.initiate_write_respitory_rate = list_of_variables_for_threads["initiate_write_heart_rate"]
+        self.resp_rate_csv = []
         # Setup for collecting data from Acconeer's radar files
         self.args = example_utils.ExampleArgumentParser().parse_args()
         example_utils.config_logging(self.args)
@@ -48,7 +50,7 @@ class DataAcquisition(threading.Thread):
         self.config = configs.IQServiceConfig()
         self.config.sensor = self.args.sensors
         print(self.args.sensors)
-        #self.config.sensor = 1
+        # self.config.sensor = 1
         # Settings for radar setup
         self.config.range_interval = [0.4, 1.4]  # Measurement interval
         # Frequency for collecting data. To low means that fast movements can't be tracked.
@@ -148,15 +150,16 @@ class DataAcquisition(threading.Thread):
                 highpass_filtered_data_HR = self.highpass_HR.filter(
                     tracked_data["relative distance"])
                 bandpass_filtered_data_HR = self.lowpass_HR.filter(highpass_filtered_data_HR)
+
                 highpass_filtered_data_RR = self.highpass_RR.filter(
                     tracked_data["relative distance"])
                 bandpass_filtered_data_RR = self.lowpass_RR.filter(highpass_filtered_data_RR)
+
                 if self.run_measurement:
                     self.HR_filtered_queue.put(
                         bandpass_filtered_data_HR)  # Put filtered data in output queue to send to SignalProcessing
                     self.RR_filtered_queue.put(bandpass_filtered_data_RR)
-                    self.RTB_final_queue.put(bandpass_filtered_data_RR)
-
+                    # self.RTB_final_queue.put(bandpass_filtered_data_RR)
                     # Send to app
                     if self.run_times % self.modulo_base == 0:
                         # Send real time breathing amplitude to the application
@@ -164,6 +167,9 @@ class DataAcquisition(threading.Thread):
                             tracked_data["real time breathing amplitude"], 'real time breath')
                         # self.bluetooth_server.write_data_to_app(
                         #    bandpass_filtered_data_HR, 'real time breath')
+
+                self.csv_filtered_respitory(bandpass_filtered_data_RR)
+
             if self.plot_graphs and self.run_times % self.modulo_base == 0:
                 try:
                     self.pg_process.put_data(tracked_data)  # plot data
@@ -171,9 +177,9 @@ class DataAcquisition(threading.Thread):
                     self.go.pop(0)
                     break
         self.RR_filtered_queue.put(0)  # to quit the signal processing thread
-        #print('before for loop to fill HR queue')
+        # print('before for loop to fill HR queue')
         for i in range(600):
-            #print("Data acq filling HR queue with 0:s")
+            # print("Data acq filling HR queue with 0:s")
             self.HR_filtered_queue.put(0)
         print("out of while go in radar")
         self.client.disconnect()
@@ -250,7 +256,7 @@ class DataAcquisition(threading.Thread):
             # Tracked phase is the angle between I and Q in data for tracked index
             self.tracked_phase = np.angle(data[self.track_peaks_average_index])
         else:
-            #track_peak_relative_position = 0
+            # track_peak_relative_position = 0
             self.not_noise_run_time = 0
             self.tracked_distance = 0
             self.tracked_phase = 0
@@ -362,6 +368,31 @@ class DataAcquisition(threading.Thread):
     def low_pass_filter_constants_function(self, tau, dt):
         return 1 - np.exp(-dt / tau)
 
+    def csv_filtered_respitory(self, bandpass_filtered_data_RR):
+        if self.initiate_write_respitory_rate and time.time() - self.list_of_variables_for_threads["start_write_to_csv_time"] < 0.5*60:
+            print("Inside save to csv respitory rate")
+            self.resp_rate_csv.append(bandpass_filtered_data_RR)
+            # lf.heart_rate_reliability_csv.append(found_peak_reliability_int)
+        elif self.initiate_write_respitory_rate:
+            self.go.pop(0)
+            self.list_of_variables_for_threads["go"] = self.go
+            # print("Out of while go heart_rate")
+            np_csv = np.asarray(self.resp_rate_csv)
+            # print("Saved as numpy array")
+            np.savetxt("respitory_rate.csv", np_csv, delimiter=";")
+            print("Should have saved CSV")
+            self.resp_rate_csv.clear()
+            # Remove Bluetooth clients
+            for client in self.bluetooth_server.client_list:
+                print('try to remove client ' +
+                      str(self.bluetooth_server.address_list[self.bluetooth_server.client_list.index(client)]))
+                client.close()
+                print('remove client ' +
+                      str(self.bluetooth_server.address_list[self.bluetooth_server.client_list.index(client)]))
+            self.bluetooth_server.server.close()
+            print("server is now closed")
+            os.system("echo 'power off\nquit' | bluetoothctl")
+
 
 class PGUpdater:
     def __init__(self, config):
@@ -407,7 +438,7 @@ class PGUpdater:
     def update(self, data):
         if self.first:
             self.xs = np.linspace(*self.interval, len(data["abs"]))
-            #self.ts = np.linspace(-5, 0, len(data["tracked distance over time"]))
+            # self.ts = np.linspace(-5, 0, len(data["tracked distance over time"]))
             self.first = False
 
         self.distance_curve.setData(self.xs, np.array(data["abs"]).flatten())
@@ -416,5 +447,5 @@ class PGUpdater:
             self.distance_inf_line.setValue(data["tracked distance"])
         # else:
         #    self.distance_inf_line.setValue(0.4)
-        #self.distance_over_time_curve.setData(self.ts, data["tracked distance over time"])
-        #self.distance_over_time_curve2.setData(self.ts, data["tracked distance over time 2"])
+        # self.distance_over_time_curve.setData(self.ts, data["tracked distance over time"])
+        # self.distance_over_time_curve2.setData(self.ts, data["tracked distance over time 2"])
