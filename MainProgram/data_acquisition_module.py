@@ -369,7 +369,7 @@ class DataAcquisition(threading.Thread):
         return 1 - np.exp(-dt / tau)
 
     def csv_filtered_respitory(self, bandpass_filtered_data_RR):
-        if self.initiate_write_respitory_rate and time.time() - self.list_of_variables_for_threads["start_write_to_csv_time"] < 0.5*60:
+        if self.initiate_write_respitory_rate and time.time() - self.list_of_variables_for_threads["start_write_to_csv_time"] < 1*60:
             print("Inside save to csv respitory rate")
             self.resp_rate_csv.append(bandpass_filtered_data_RR)
             # lf.heart_rate_reliability_csv.append(found_peak_reliability_int)
