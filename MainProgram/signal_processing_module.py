@@ -138,7 +138,7 @@ class SignalProcessing:
                         found_peak_reliability = "Outstanding"
                     elif found_heart_freq_amplitude_old - next_largest_peak_amplitude > 8:
                         found_peak_reliability = "Perfect"
-                    elif found_heart_freq_amplitude_old - next_largest_peak_amplitude > 3:
+                    elif found_heart_freq_amplitude_old - next_largest_peak_amplitude > 4:
                         found_peak_reliability = "Good"
                     else:
                         found_peak_reliability = "Doubtful"
