@@ -310,13 +310,13 @@ class SignalProcessing:
         # length_seq = len(signal_in)  # number of sequences
         window = np.kaiser(self.window_width, self.beta)  # beta: shape factor
         self.fft_window = np.multiply(self.fft_window, window)
-
+        n = 2*self.window_width
         # two-sided fft of input signal
-        signal_in_fft = fft(self.fft_window, n=2*self.window_width)  # ,n=2*self.window_width)
+        signal_in_fft = fft(self.fft_window, n=n)  # ,n=2*self.window_width)
         print("len of fft: ", len(signal_in_fft))
         signal_fft_abs = np.abs(np.divide(signal_in_fft, self.window_width))
         #print("fft abs: ", signal_fft_abs)
-        signal_out = np.multiply(2, signal_fft_abs[0:self.window_width//2])  # one-sided fft
+        signal_out = np.multiply(2, signal_fft_abs[0:n//2])  # one-sided fft
         #print("Signal out: ", signal_out)
         print("len of signal out: ", len(signal_out))
         # frequency array corresponding to frequencies in the fft
