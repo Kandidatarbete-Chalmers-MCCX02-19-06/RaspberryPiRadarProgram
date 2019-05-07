@@ -206,11 +206,14 @@ class SignalProcessing:
             if index_in_FFT_old_values == self.number_of_old_FFT:
                 index_in_FFT_old_values = 0
 
-        # After shutdown initiate save to CSV
+        # After shutdown initiate save to CSV'
+        print("Out of while go heart_rate")
         np_csv = np.asarray(self.heart_rate_csv)
+        print("Saved as numpy array")
         np.savetxt("heart_rate.csv", np_csv, delimiter=";")
         print("Should have saved CSV")
         self.heart_rate_csv.clear()
+        print("Finish with heart_rate")
 
     def mean_of_old_values(self, FFT_counter):  # Check
         FFT_average_over = np.zeros(int(self.window_width/2))
