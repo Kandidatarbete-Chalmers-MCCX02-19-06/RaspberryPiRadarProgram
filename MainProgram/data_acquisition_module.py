@@ -171,9 +171,9 @@ class DataAcquisition(threading.Thread):
                     self.go.pop(0)
                     break
         self.RR_filtered_queue.put(0)  # to quit the signal processing thread
-        print('before for loop to fill HR queue')
-        for i in range(self.list_of_variables_for_threads["window_slide"]+1):
-            print("Data acq filling HR queue with 0:s")
+        #print('before for loop to fill HR queue')
+        for i in range(600):
+            #print("Data acq filling HR queue with 0:s")
             self.HR_filtered_queue.put(0)
         print("out of while go in radar")
         self.client.disconnect()

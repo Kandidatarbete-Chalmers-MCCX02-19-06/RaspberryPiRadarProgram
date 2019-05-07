@@ -219,14 +219,14 @@ class SignalProcessing:
             elif self.initiate_write_heart_rate:
                 self.go.pop(0)
                 self.list_of_variables_for_threads["go"] = self.go
-                print("Out of while go heart_rate")
+                #print("Out of while go heart_rate")
                 np_csv = np.asarray(self.heart_rate_csv)
-                print("Saved as numpy array")
+                #print("Saved as numpy array")
                 np.savetxt("heart_rate.csv", np_csv, delimiter=";")
                 print("Should have saved CSV")
                 self.heart_rate_csv.clear()
-                print("Finish with heart_rate")
-
+                #print("Finish with heart_rate")
+                # Remove Bluetooth clients
                 for client in self.bluetooth_server.client_list:
                     print('try to remove client ' +
                           str(self.bluetooth_server.address_list[self.bluetooth_server.client_list.index(client)]))
