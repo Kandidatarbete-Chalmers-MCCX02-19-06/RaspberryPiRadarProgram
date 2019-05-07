@@ -31,6 +31,8 @@ class BluetoothServer:
         self.RR_final_queue = list_of_variables_for_threads["RR_final_queue"]
         self.RTB_final_queue = list_of_variables_for_threads["RTB_final_queue"]
         self.run_measurement = list_of_variables_for_threads["run_measurement"]
+        self.start_write_to_csv_time = list_of_variables_for_threads["start_write_to_csv_time"]
+        self.initiate_write_heart_rate = list_of_variables_for_threads["initiate_write_heart_rate"]
         print('Bluetooth Socket Created')
         try:
             self.server.bind((self.host, self.port))
@@ -147,6 +149,25 @@ class BluetoothServer:
                         os.system("echo 'power off\nquit' | bluetoothctl")  # TODO
                     except Exception as error:
                         print("exception in for-loop in read_device: " + str(error))
+                if not self.go:
+                    print("Shutdown starting")
+                    try:
+                        #self.go = []
+                        #self.list_of_variables_for_threads["go"] = self.go.pop(0)
+                        #list_of_variables_for_threads["go"] = go.pop(0)
+                        # self.go.pop(0)
+                        print("go= " + str(self.go))
+                        for client in self.client_list:
+                            print('try to remove client ' +
+                                  str(self.address_list[self.client_list.index(client)]))
+                            client.close()
+                            print('remove client ' +
+                                  str(self.address_list[self.client_list.index(client)]))
+                        self.server.close()
+                        print("server is now closed")
+                        os.system("echo 'power off\nquit' | bluetoothctl")  # TODO
+                    except Exception as error:
+                        print("exception in for-loop in read_device: " + str(error))
 
                 elif data == 'startMeasure':
                     self.run_measurement.append(c)
@@ -158,6 +179,14 @@ class BluetoothServer:
                         self.run_measurement.remove(c)
                         self.list_of_variables_for_threads["run_measurement"] = self.run_measurement
                         print("Device removed")
+                elif data == 'write':
+                    print("Bluetooth Write started")
+                    self.initiate_write_heart_rate.append(0)
+                    self.list_of_variables_for_threads["initiate_write_heart_rate"] = self.initiate_write_heart_rate
+                    self.start_write_to_csv_time = time.time()
+                    self.list_of_variables_for_threads["start_write_to_csv_time"] = self.start_write_to_csv_time
+
+                    # self.initiate_write_heart_rate
 
         except Exception as error:
             print("last exception read_device: " + str(error))

@@ -30,6 +30,7 @@ class DataAcquisition(threading.Thread):
         self.list_of_variables_for_threads = list_of_variables_for_threads
         self.bluetooth_server = bluetooth_server
         self.run_measurement = self.list_of_variables_for_threads['run_measurement']
+        self.window_slide = self.list_of_variables_for_threads["window_slide"]
 
         # Setup for collecting data from Acconeer's radar files
         self.args = example_utils.ExampleArgumentParser().parse_args()
@@ -170,14 +171,17 @@ class DataAcquisition(threading.Thread):
                     self.go.pop(0)
                     break
         self.RR_filtered_queue.put(0)  # to quit the signal processing thread
+        for i in range(self.window_slide):
+            print("Data acq filling HR queue with 0:s")
+            self.HR_filtered_queue.put(0)
         print("out of while go in radar")
         self.client.disconnect()
         self.pg_process.close()
 
     def get_data(self):
-        #self.client.get_next()
+        # self.client.get_next()
         info, data = self.client.get_next()  # get the next data from the radar
-        #print('info',info[-1]['sequence_number'],'run_times',self.run_times)
+        # print('info',info[-1]['sequence_number'],'run_times',self.run_times)
         if info[-1]['sequence_number'] > self.run_times + 10:
             # to remove delay if handling the data takes longer time than for the radar to get it
             print("sequence diff over 10, removing difference",
@@ -294,13 +298,12 @@ class DataAcquisition(threading.Thread):
 
             # Delta distance
             self.delta_distance = self.wave_length * \
-                                    (wrapped_phase - self.last_phase) / (4 * np.pi)
+                (wrapped_phase - self.last_phase) / (4 * np.pi)
 
             # Low pass filtered delta distance
             self.delta_distance_low_pass = self.wave_length * (wrapped_phase - self.last_phase) / (4 * np.pi) * self.low_pass_const + \
-                (1 - self.low_pass_const) * self.delta_distance_low_pass  # calculates the distance traveled from phase differences
-
-
+                (1 - self.low_pass_const) * \
+                self.delta_distance_low_pass  # calculates the distance traveled from phase differences
 
             # TODO testa med konjugat
             # delta_angle = np.angle(data[self.track_peaks_average_index] * np.conj(self.last_data[self.track_peaks_average_index]))
@@ -330,15 +333,17 @@ class DataAcquisition(threading.Thread):
                     self.old_realtime_breathing_amplitude = np.zeros(1000)
 
             self.relative_distance = self.relative_distance - self.delta_distance  # relative distance in m
-            self.real_time_breathing_amplitude = self.real_time_breathing_amplitude - self.delta_distance_low_pass  # real time breathing in m
+            self.real_time_breathing_amplitude = self.real_time_breathing_amplitude - \
+                self.delta_distance_low_pass  # real time breathing in m
             # The minus sign comes from changing coordinate system; what the radar think is outward is inward for the person that is measured on
             self.last_phase = self.tracked_phase
 
             # Code to remove bias that comes from larger movements that is not completely captured by the radar.
-            self.old_realtime_breathing_amplitude = np.roll(self.old_realtime_breathing_amplitude, -1)
+            self.old_realtime_breathing_amplitude = np.roll(
+                self.old_realtime_breathing_amplitude, -1)
             self.old_realtime_breathing_amplitude[-1] = self.real_time_breathing_amplitude
             self.old_realtime_breathing_amplitude = self.old_realtime_breathing_amplitude - \
-                                                    self.old_realtime_breathing_amplitude.mean() / 4
+                self.old_realtime_breathing_amplitude.mean() / 4
             self.real_time_breathing_amplitude = self.old_realtime_breathing_amplitude[-1]
 
             # Tracked data to return and plot
