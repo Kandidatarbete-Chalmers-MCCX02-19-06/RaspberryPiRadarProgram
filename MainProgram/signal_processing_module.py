@@ -311,8 +311,8 @@ class SignalProcessing:
         window = np.kaiser(self.window_width, self.beta)  # beta: shape factor
         self.fft_window = np.multiply(self.fft_window, window)
 
-        signal_in_fft = fft(self.fft_window)  # two-sided fft of input signal
-
+        signal_in_fft = fft(self.fft_window, n=2*self.fft_window)  # two-sided fft of input signal
+        print("Length of new FFT: ", len(signal_in_fft))
         signal_fft_abs = np.abs(np.divide(signal_in_fft, self.window_width))
         signal_out = np.multiply(2, signal_fft_abs[0:self.window_width//2])  # one-sided fft
 
