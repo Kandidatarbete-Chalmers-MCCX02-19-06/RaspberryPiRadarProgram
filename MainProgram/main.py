@@ -127,7 +127,8 @@ def main():
         # Waits for running threads to finish their loops
     bluetooth_server.connect_device_thread.join()
     print("bluetooth_server is closed")
-    # signal_processings.heart_rate_thread.join()
+    signal_processing.heart_rate_thread.join()
+    print('Heart rate thread is closed')
     signal_processing.schmittTrigger_thread.join()
     print("signal_processing is closed")
     data_acquisition.join()
