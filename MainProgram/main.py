@@ -63,7 +63,7 @@ def main():
                                      "RR_filtered_queue": RR_filtered_queue, "RR_final_queue": RR_final_queue,
                                      "RTB_final_queue": RTB_final_queue, "go": go, "run_measurement": run_measurement,
                                      "sample_freq": sample_freq, "heart_rate_csv": heart_rate_csv,
-                                     "window_slide": window_slide, "initiate_write_heart_rate": initiate_write_heart_rate
+                                     "window_slide": window_slide, "initiate_write_heart_rate": initiate_write_heart_rate,
                                      "start_write_to_csv_time": start_write_to_csv_time}
     FFTfreq = [1, 2, 3]
     FFTamplitude = [1, 2, 3]
