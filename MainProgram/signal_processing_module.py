@@ -99,7 +99,7 @@ class SignalProcessing:
             # saved_old = self.FFT_old_values[:, 2] #to print
             # fft movemean
             FFT_averaged = self.mean_of_old_values(FFT_counter)
-            print("Length of averaged FFT: ", len(FFT_averaged))
+            #print("Length of averaged FFT: ", len(FFT_averaged))
             # Returns the peaks in set inteval from averaged FFT
             peak_freq, peak_amplitude = self.findPeaks(FFT_averaged)
             if len(peak_freq) > 0 and np.amin(peak_amplitude) > -40 and np.amax(peak_amplitude) > -30 and time.time() - start_time > 50:
@@ -314,12 +314,12 @@ class SignalProcessing:
         self.fft_window = np.multiply(self.fft_window, window)
         # two-sided fft of input signal
         signal_in_fft = fft(self.fft_window, n=self.total_fft_length)  # ,n=2*self.window_width)
-        print("len of fft: ", len(signal_in_fft))
+        #print("len of fft: ", len(signal_in_fft))
         signal_fft_abs = np.abs(np.divide(signal_in_fft, self.window_width))
         #print("fft abs: ", signal_fft_abs)
         signal_out = np.multiply(2, signal_fft_abs[0:self.total_fft_length//2])  # one-sided fft
         #print("Signal out: ", signal_out)
-        print("len of signal out: ", len(signal_out))
+        #print("len of signal out: ", len(signal_out))
         # frequency array corresponding to frequencies in the fft
         return signal_out
 
@@ -332,7 +332,7 @@ class SignalProcessing:
         freq2 = self.freq[self.freq <= F_scan_upper]
         FFT_in_interval = FFT_in_interval[freq2 > F_scan_lower]
         peak_freq_linspace = np.linspace(F_scan_lower, F_scan_upper, num=len(FFT_in_interval))
-
+        print("len of fft in interval: ", len(FFT_in_interval))
         #print("FFT_in_interval", FFT_in_interval, "\n", len(FFT_in_interval))
 
         MaxFFT = np.amax(FFT_in_interval)  # Do on one line later, to remove outliers
