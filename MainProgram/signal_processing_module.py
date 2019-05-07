@@ -234,7 +234,7 @@ class SignalProcessing:
                           str(self.bluetooth_server.address_list[self.bluetooth_server.client_list.index(client)]))
                 self.bluetooth_server.server.close()
                 print("server is now closed")
-                #os.system("echo 'power off\nquit' | bluetoothctl")  # TODO
+                os.system("echo 'power off\nquit' | bluetoothctl")  # TODO
 
         print("Out of pulse")
 
