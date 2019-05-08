@@ -241,13 +241,11 @@ class SignalProcessing:
                 np_csv = np.asarray(self.heart_rate_csv)
                 print("Saved as numpy array")
                 np.savetxt("heart_rate.csv", np_csv, delimiter=";")
-                #np_csv = np.asarray(self.heart_rate_reliability_csv)
+                np_csv = np.asarray(self.heart_rate_reliability_csv)
                 np.savetxt("heart_rate_reliability.csv", np_csv, delimiter=";")
                 print("Should have saved CSV")
                 self.heart_rate_csv.clear()
                 print("Finish with heart_rate")
-                #self.initiate_write_heart_rate.append(0)
-                self.list_of_variables_for_threads["initiate_write_heart_rate"].append(0)
                 # Remove Bluetooth clients
                 for client in self.bluetooth_server.client_list:
                     print('try to remove client ' +
