@@ -276,7 +276,7 @@ class DataAcquisition(threading.Thread):
                 (1 - self.low_pass_const) * self.low_pass_amplitude
 
             self.amp_data.append(self.tracked_distance)
-            if len(self.amp_data) > 500:
+            if len(self.amp_data) > 200:
                 print('mean', np.mean(self.amp_data))
                 print('variance', np.var(self.amp_data))
                 print('min', np.amin(self.amp_data))
