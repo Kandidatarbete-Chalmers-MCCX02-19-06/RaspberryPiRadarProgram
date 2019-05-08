@@ -275,7 +275,7 @@ class DataAcquisition(threading.Thread):
             self.low_pass_amplitude = self.low_pass_const * amplitude + \
                 (1 - self.low_pass_const) * self.low_pass_amplitude
 
-            self.amp_data.append(self.tracked_amplitude)
+            self.amp_data.append(self.tracked_distance)
             if len(self.amp_data) > 500:
                 print('mean', np.mean(self.amp_data))
                 print('variance', np.var(self.amp_data))
