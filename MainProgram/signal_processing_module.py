@@ -37,7 +37,7 @@ class SignalProcessing:
         # Data in vector with length of window
         self.fft_window = np.zeros(self.T_resolution*self.sample_freq)  # Width in samples of FFT
         self.window_width = int(len(self.fft_window))
-        self.total_fft_length = int(3*self.window_width)
+        self.total_fft_length = int(2*self.window_width)
         # window_width_half = int(window_width/2)  # Since FFT only processes half of freq (Nyqvist)
         self.window_slide = int(np.round(self.window_width*(1-self.overlap/100)))
         self.window_slide_global = list_of_variables_for_threads["window_slide"]
@@ -47,7 +47,7 @@ class SignalProcessing:
         self.freq = np.linspace(0, self.sample_freq/2, num=self.total_fft_length/2)
         self.delta_T = self.window_slide / self.sample_freq
         # int(round(self.tau / self.delta_T))  # Make tau is larger than delta_T, else it will be zero and programme will fail.
-        self.number_of_old_FFT = 5
+        self.number_of_old_FFT = 10
         self.FFT_old_values = np.zeros((self.number_of_old_FFT, int(
             self.total_fft_length/2)))  # Saving old values for moving mean
         # Starta heart_rate
