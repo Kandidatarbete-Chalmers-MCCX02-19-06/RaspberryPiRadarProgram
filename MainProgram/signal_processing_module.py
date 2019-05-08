@@ -230,12 +230,13 @@ class SignalProcessing:
             #      self.list_of_variables_for_threads["start_write_to_csv_time"])
             if self.initiate_write_heart_rate and time.time() - self.list_of_variables_for_threads["start_write_to_csv_time"] < 3*1: # 5*60
                 print("Inside save to csv statement")
-                self.heart_rate_csv.append(self.heart_rate_spectrum)
+                self.heart_rate_csv.append(self.FFTfreq)
+                self.heart_rate_reliability_csv.append(self.FFTamplitude)
                 #self.heart_rate_csv.append(found_heart_rate)
                 self.heart_rate_reliability_csv.append(found_peak_reliability_int)
             elif self.initiate_write_heart_rate:
-                #self.go.pop(0)
-                #self.list_of_variables_for_threads["go"] = self.go
+                self.go.pop(0)
+                self.list_of_variables_for_threads["go"] = self.go
                 print("Out of while go heart_rate")
                 np_csv = np.asarray(self.heart_rate_csv)
                 print("Saved as numpy array")
@@ -248,15 +249,15 @@ class SignalProcessing:
                 #self.initiate_write_heart_rate.append(0)
                 self.list_of_variables_for_threads["initiate_write_heart_rate"].append(0)
                 # Remove Bluetooth clients
-                # for client in self.bluetooth_server.client_list:
-                #     print('try to remove client ' +
-                #           str(self.bluetooth_server.address_list[self.bluetooth_server.client_list.index(client)]))
-                #     client.close()
-                #     print('remove client ' +
-                #           str(self.bluetooth_server.address_list[self.bluetooth_server.client_list.index(client)]))
-                # self.bluetooth_server.server.close()
-                # print("server is now closed")
-                # os.system("echo 'power off\nquit' | bluetoothctl")
+                for client in self.bluetooth_server.client_list:
+                    print('try to remove client ' +
+                          str(self.bluetooth_server.address_list[self.bluetooth_server.client_list.index(client)]))
+                    client.close()
+                    print('remove client ' +
+                          str(self.bluetooth_server.address_list[self.bluetooth_server.client_list.index(client)]))
+                self.bluetooth_server.server.close()
+                print("server is now closed")
+                os.system("echo 'power off\nquit' | bluetoothctl")
 
         print("Out of pulse")
         # np_csv = np.asarray(self.heart_rate_csv)
