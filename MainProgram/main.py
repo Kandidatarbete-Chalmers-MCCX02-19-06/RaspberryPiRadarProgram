@@ -83,8 +83,8 @@ def main():
     data_acquisition.start()
 
     # SignalProcessing object used below
-    #signal_processing = signal_processing_module.SignalProcessing(
-    #    list_of_variables_for_threads, bluetooth_server, FFTfreq, FFTamplitude)
+    signal_processing = signal_processing_module.SignalProcessing(
+        list_of_variables_for_threads, bluetooth_server, FFTfreq, FFTamplitude)
 
     #plt.pcolormesh(specTime, specFreq, specSignal)
     # plt.pause(1)
