@@ -37,7 +37,7 @@ class SignalProcessing:
         # Data in vector with length of window
         self.fft_window = np.zeros(self.T_resolution*self.sample_freq)  # Width in samples of FFT
         self.window_width = int(len(self.fft_window))
-        self.total_fft_length = int(1*self.window_width)
+        self.total_fft_length = int(2*self.window_width)
         # window_width_half = int(window_width/2)  # Since FFT only processes half of freq (Nyqvist)
         self.window_slide = int(np.round(self.window_width*(1-self.overlap/100)))
         self.window_slide_global = list_of_variables_for_threads["window_slide"]
@@ -381,7 +381,7 @@ class SignalProcessing:
         Hcut = 0.001  # Higher hysteres cut. Change this according to filter. To manage startup of filter
         Lcut = -Hcut  # Lower hysteres cut
         # average over old values. TODO ev. ingen medelvärdesbildning. För att förhindra att andningen går mot ett fast värde. Vi vill se mer i realtid.
-        avOver = 5
+        avOver = 8
         freqArray = np.zeros(avOver)  # for averaging over old values
         count = 1  # for counting number of samples passed since last negative flank
         countHys = 1  # for counting if hysteresis should be updated
