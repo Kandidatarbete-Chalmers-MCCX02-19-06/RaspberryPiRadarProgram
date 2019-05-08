@@ -355,7 +355,7 @@ class DataAcquisition(threading.Thread):
                 self.old_realtime_breathing_amplitude.mean() / 4
             self.real_time_breathing_amplitude = self.old_realtime_breathing_amplitude[-1]
 
-            self.amp_data.append(self.real_time_breathing_amplitude*1000)
+            self.amp_data.append(self.relative_distance*1000)
             if len(self.amp_data) > 500:
                 print('mean', np.mean(self.amp_data))
                 print('variance', np.var(self.amp_data))
