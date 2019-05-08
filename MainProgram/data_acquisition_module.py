@@ -208,15 +208,6 @@ class DataAcquisition(threading.Thread):
         amplitude = np.abs(data)
         power = amplitude * amplitude
 
-        self.amp_data.append(amplitude)
-        if len(self.amp_data) > 500:
-            print('mean',np.mean(self.amp_data))
-            print('variance',np.var(self.amp_data))
-            print('min', np.amin(self.amp_data))
-            print('max',np.amax(self.amp_data))
-            print('std',np.std(self.amp_data))
-            self.amp_data.clear()
-
         # Find and track peaks
         if np.sum(amplitude)/data_length > 1e-6:
             max_peak_index = np.argmax(power)
@@ -283,6 +274,15 @@ class DataAcquisition(threading.Thread):
             # Amplitude of data for plotting
             self.low_pass_amplitude = self.low_pass_const * amplitude + \
                 (1 - self.low_pass_const) * self.low_pass_amplitude
+
+            self.amp_data.append(self.tracked_amplitude)
+            if len(self.amp_data) > 500:
+                print('mean', np.mean(self.amp_data))
+                print('variance', np.var(self.amp_data))
+                print('min', np.amin(self.amp_data))
+                print('max', np.amax(self.amp_data))
+                print('std', np.std(self.amp_data))
+                self.amp_data.clear()
 
             # real time graph over the whole range
             # self.tracked_distance_over_time = np.roll(
