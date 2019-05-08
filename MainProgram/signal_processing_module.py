@@ -47,7 +47,7 @@ class SignalProcessing:
         self.freq = np.linspace(0, self.sample_freq/2, num=self.total_fft_length/2)
         self.delta_T = self.window_slide / self.sample_freq
         # int(round(self.tau / self.delta_T))  # Make tau is larger than delta_T, else it will be zero and programme will fail.
-        self.number_of_old_FFT = 1
+        self.number_of_old_FFT = 5
         self.FFT_old_values = np.zeros((self.number_of_old_FFT, int(
             self.total_fft_length/2)))  # Saving old values for moving mean
         # Starta heart_rate
