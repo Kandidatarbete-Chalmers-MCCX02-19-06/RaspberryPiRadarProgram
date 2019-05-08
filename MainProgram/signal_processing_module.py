@@ -228,7 +228,7 @@ class SignalProcessing:
             # initiate save to CSV'
             # print("time for csv write List: ",
             #      self.list_of_variables_for_threads["start_write_to_csv_time"])
-            if self.initiate_write_heart_rate and time.time() - self.list_of_variables_for_threads["start_write_to_csv_time"] < 5*1: # 5*60
+            if self.initiate_write_heart_rate and time.time() - self.list_of_variables_for_threads["start_write_to_csv_time"] < 3*1: # 5*60
                 print("Inside save to csv statement")
                 self.heart_rate_csv.append(self.heart_rate_spectrum)
                 #self.heart_rate_csv.append(found_heart_rate)
@@ -245,6 +245,7 @@ class SignalProcessing:
                 print("Should have saved CSV")
                 self.heart_rate_csv.clear()
                 print("Finish with heart_rate")
+                self.initiate_write_heart_rate.append(0)
                 # Remove Bluetooth clients
                 # for client in self.bluetooth_server.client_list:
                 #     print('try to remove client ' +
