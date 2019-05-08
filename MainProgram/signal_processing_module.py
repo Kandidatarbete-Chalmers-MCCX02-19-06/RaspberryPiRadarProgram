@@ -234,8 +234,8 @@ class SignalProcessing:
                 #self.heart_rate_csv.append(found_heart_rate)
                 self.heart_rate_reliability_csv.append(found_peak_reliability_int)
             elif self.initiate_write_heart_rate:
-                self.go.pop(0)
-                self.list_of_variables_for_threads["go"] = self.go
+                #self.go.pop(0)
+                #self.list_of_variables_for_threads["go"] = self.go
                 print("Out of while go heart_rate")
                 np_csv = np.asarray(self.heart_rate_csv)
                 print("Saved as numpy array")
