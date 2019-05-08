@@ -233,7 +233,7 @@ class SignalProcessing:
                 self.heart_rate_csv.append(self.FFTfreq)
                 self.heart_rate_reliability_csv.append(self.FFTamplitude)
                 #self.heart_rate_csv.append(found_heart_rate)
-                self.heart_rate_reliability_csv.append(found_peak_reliability_int)
+                #self.heart_rate_reliability_csv.append(found_peak_reliability_int)
             elif self.initiate_write_heart_rate:
                 self.go.pop(0)
                 self.list_of_variables_for_threads["go"] = self.go
