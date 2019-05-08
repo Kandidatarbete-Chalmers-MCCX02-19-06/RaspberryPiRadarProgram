@@ -227,7 +227,7 @@ class SignalProcessing:
             # initiate save to CSV'
             # print("time for csv write List: ",
             #      self.list_of_variables_for_threads["start_write_to_csv_time"])
-            if self.initiate_write_heart_rate and time.time() - self.list_of_variables_for_threads["start_write_to_csv_time"] < 1*60:
+            if self.initiate_write_heart_rate and time.time() - self.list_of_variables_for_threads["start_write_to_csv_time"] < 5*60:
                 print("Inside save to csv statement")
                 self.heart_rate_csv.append(found_heart_rate)
                 self.heart_rate_reliability_csv.append(found_peak_reliability_int)
