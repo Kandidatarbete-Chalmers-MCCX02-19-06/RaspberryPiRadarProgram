@@ -275,16 +275,6 @@ class DataAcquisition(threading.Thread):
             self.low_pass_amplitude = self.low_pass_const * amplitude + \
                 (1 - self.low_pass_const) * self.low_pass_amplitude
 
-            self.amp_data.append(self.tracked_distance)
-            if len(self.amp_data) > 500:
-                print('mean', np.mean(self.amp_data))
-                print('variance', np.var(self.amp_data))
-                print('min', np.amin(self.amp_data))
-                print('max', np.amax(self.amp_data))
-                print('std', np.std(self.amp_data))
-                print('diff',np.amax(self.amp_data)-np.amin(self.amp_data))
-                self.amp_data.clear()
-
             # real time graph over the whole range
             # self.tracked_distance_over_time = np.roll(
             #     self.tracked_distance_over_time, -1)  # Distance over time
@@ -364,6 +354,16 @@ class DataAcquisition(threading.Thread):
             self.old_realtime_breathing_amplitude = self.old_realtime_breathing_amplitude - \
                 self.old_realtime_breathing_amplitude.mean() / 4
             self.real_time_breathing_amplitude = self.old_realtime_breathing_amplitude[-1]
+
+            self.amp_data.append(self.real_time_breathing_amplitude*1000)
+            if len(self.amp_data) > 500:
+                print('mean', np.mean(self.amp_data))
+                print('variance', np.var(self.amp_data))
+                print('min', np.amin(self.amp_data))
+                print('max', np.amax(self.amp_data))
+                print('std', np.std(self.amp_data))
+                print('diff', np.amax(self.amp_data) - np.amin(self.amp_data))
+                self.amp_data.clear()
 
             # Tracked data to return and plot
             self.tracked_data = {"tracked distance": self.tracked_distance,
