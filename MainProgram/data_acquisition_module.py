@@ -115,7 +115,7 @@ class DataAcquisition(threading.Thread):
         self.calibrating_time = 5  # Time sleep for passing through filters. Used for Real time breathing
 
         # Graphs
-        self.plot_graphs = True  # if plot the graphs or not
+        self.plot_graphs = False  # if plot the graphs or not
         if self.plot_graphs:
             self.pg_updater = PGUpdater(self.config)
             self.pg_process = PGProcess(self.pg_updater)
