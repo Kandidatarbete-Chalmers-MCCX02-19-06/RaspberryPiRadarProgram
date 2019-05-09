@@ -73,6 +73,7 @@ class SignalProcessing:
         self.initiate_write_heart_rate = list_of_variables_for_threads["initiate_write_heart_rate"]
         self.heart_rate_reliability_csv = []
         self.heart_rate_spectrum = []
+        self.heart_rate_frequency = []
 
     # Kaos i koden, behöver struktureras upp och alla konstanter måste defineras i början
     # Följer just nu Matlab strukturen.
@@ -167,7 +168,7 @@ class SignalProcessing:
 
                     if len(close_disturbing_peaks) > 3 and found_heart_freq_old > 1:
                         # To many disturbing peaks around, can't identify the correct one
-                        print('Too many disturbing peaks around, can\'t identify the correct one')
+                        #print('Too many disturbing peaks around, can\'t identify the correct one')
                         found_heart_freq = found_heart_freq_old
                         found_peak_reliability = "VeryLow"
                         found_peak_reliability_int = 1
@@ -179,8 +180,7 @@ class SignalProcessing:
                     if np.abs(np.mean(old_heart_freq_list[
                                       0:-2]) - found_heart_freq) > 0.1:  # too big change, probably noise or other disruptions
                         found_heart_freq = np.mean(old_heart_freq_list)
-                        print('Too big change, probably noise or other disruptions, old:',
-                              old_heart_freq_list[-1])
+                        #print('Too big change, probably noise or other disruptions, old:', old_heart_freq_list[-1])
 
                 except Exception as e:
                     print('exept in heart peak:', e)
@@ -213,6 +213,8 @@ class SignalProcessing:
             else:
                 print("Waiting to find heart rate")
                 found_heart_rate = 0
+                found_peak_reliability = "None"
+                found_peak_reliability_int = 0
                 self.bluetooth_server.write_data_to_app(
                     str(found_heart_rate) + ' ' + found_peak_reliability, 'heart rate')   # Send to app
 
@@ -228,24 +230,20 @@ class SignalProcessing:
             # initiate save to CSV'
             # print("time for csv write List: ",
             #      self.list_of_variables_for_threads["start_write_to_csv_time"])
-            if self.initiate_write_heart_rate and time.time() - self.list_of_variables_for_threads["start_write_to_csv_time"] < 3*1: # 5*60
+            if self.initiate_write_heart_rate and time.time() - self.list_of_variables_for_threads["start_write_to_csv_time"] < 5*60:
                 print("Inside save to csv statement")
-                self.heart_rate_csv.append(self.FFTfreq)
-                self.heart_rate_reliability_csv.append(self.FFTamplitude)
-                #self.heart_rate_csv.append(found_heart_rate)
-                #self.heart_rate_reliability_csv.append(found_peak_reliability_int)
+                # self.heart_rate_spectrum.append(self.FFTamplitude)
+                # self.heart_rate_frequency.append(self.FFTfreq)
+                self.heart_rate_csv.append(found_heart_rate)
+                self.heart_rate_reliability_csv.append(found_peak_reliability_int)
             elif self.initiate_write_heart_rate:
                 self.go.pop(0)
                 self.list_of_variables_for_threads["go"] = self.go
-                print("Out of while go heart_rate")
                 np_csv = np.asarray(self.heart_rate_csv)
-                print("Saved as numpy array")
                 np.savetxt("heart_rate.csv", np_csv, delimiter=";")
                 np_csv = np.asarray(self.heart_rate_reliability_csv)
                 np.savetxt("heart_rate_reliability.csv", np_csv, delimiter=";")
                 print("Should have saved CSV")
-                self.heart_rate_csv.clear()
-                print("Finish with heart_rate")
                 # Remove Bluetooth clients
                 for client in self.bluetooth_server.client_list:
                     print('try to remove client ' +
@@ -258,13 +256,6 @@ class SignalProcessing:
                 os.system("echo 'power off\nquit' | bluetoothctl")
 
         print("Out of pulse")
-        # np_csv = np.asarray(self.heart_rate_csv)
-        # print("Saved as numpy array")
-        # np.savetxt("heart_rate.csv", np_csv, delimiter=";")
-        # np_csv = np.asarray(self.heart_rate_reliability_csv)
-        # np.savetxt("heart_rate_reliability.csv", np_csv, delimiter=";")
-        # print("Should have saved CSV")
-        # self.heart_rate_csv.clear()
 
     def mean_of_old_values(self, FFT_counter):  # Check
         FFT_average_over = np.zeros(int(self.total_fft_length/2))
