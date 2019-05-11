@@ -1,3 +1,7 @@
+# Använda filterparametrar
+# Andningsfrekvens passband 0.1 - 0.7 Hz
+# Hjärtfrekvens passband 0.9 - 3 Hz
+
 import numpy as np
 
 class Filter:
