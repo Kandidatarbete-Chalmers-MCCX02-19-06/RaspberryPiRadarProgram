@@ -8,6 +8,7 @@ The Python program also includes a Bluetooth server to connect to up to seven sm
 to visually display the measured heart and repsiratory rate. 
 An Android applicaiton is available on Google Play at https://play.google.com/store/apps/details?id=com.chalmers.respiradar, 
 and the associated source code is available on GitHub at https://github.com/Kandidatarbete-Chalmers-MCCX02-19-06/ResPiRadar.
+The Python program needs acconeer-python-exploration to run properly. Install it with the right Python dependencies from https://github.com/acconeer/acconeer-python-exploration. The Raspberry Pi also needs sowftware for connecting to the radar and is available at https://developer.acconeer.com/.
 
 ## Source code
 The Python program is located in the MainProgram folder. 
