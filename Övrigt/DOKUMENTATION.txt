@@ -1,2 +1,0 @@
-Här kan onödiga filer läggas som bara nästan kan slängas. 
-Ingen dokumentation eller struktur behövs här.
