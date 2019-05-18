@@ -9,6 +9,21 @@ to visually display the measured heart and repsiratory rate.
 An Android applicaiton is available on Google Play at https://play.google.com/store/apps/details?id=com.chalmers.respiradar, 
 and the associated source code is available on GitHub at https://github.com/Kandidatarbete-Chalmers-MCCX02-19-06/ResPiRadar.
 
+## Source code
+The Python program is located in the MainProgram folder. 
+Following scripts and modules are available:
+- `main.py`\
+  Main program to start all threads and services.
+- `bluetooth_server_module.py`\
+  Module to host the Bluetooth server. Can connect up to seven devices. Every connection starts a nwe thread to read incomming commands.
+- `data_acquisition_module.py`\
+  Module to acquire radar data. Tracks the highets peak to calculate relative distance movements from the phase.
+- `signal_processing_module.py`\
+  Module to signal process the relative movements to obtain heart rate and repiratory rate with Schmitt trigger and FFT.
+- `filter.py`\
+  Creates band-pass filter to filter the relative movements.
+  
+There is also MATLAB files in the folder MATLAB to signal process radar data afterwards.
 
 ## Licence
 MIT License
@@ -32,3 +47,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+Some software in this repository is licensed under other terms and conditions. 
+See license files in the subdirectories for the external software components.
