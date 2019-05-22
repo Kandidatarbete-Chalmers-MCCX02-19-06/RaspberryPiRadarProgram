@@ -57,7 +57,7 @@ def main():
 
     # List of arguments and data sent between classes
     go = ["True"]       # Used for closing threads before shutdown of Raspberry Pi
-    run_measurement = ["value"]        # Determines if data is being sent to devices or not
+    run_measurement = []        # Determines if data is being sent to devices or not
     sample_freq = 0         # Value is updated in DataAcquisition. Needs to be the same in the whole program
     list_of_variables_for_threads = {"HR_filtered_queue": HR_filtered_queue, "HR_final_queue": HR_final_queue,
                                      "RR_filtered_queue": RR_filtered_queue, "RR_final_queue": RR_final_queue,
@@ -92,23 +92,23 @@ def main():
     # Lets threads and thereby program run while go is True. Go is set from app
     while list_of_variables_for_threads.get('go'):
         # Test of FFT, remove later
-        plt.xlim(1, 3)
-        FFTfreq, FFTamplitude, peak_freq, peak_amplitude, len_fft, peak_weighted = signal_processing.getFFTvalues()
+        #plt.xlim(1, 3)
+        #FFTfreq, FFTamplitude, peak_freq, peak_amplitude, len_fft, peak_weighted = signal_processing.getFFTvalues()
         #print("Length of FFT_amplitude", len(FFTamplitude))
-        if len(FFTamplitude) == len_fft:
-            time_array = np.linspace(0, (run_times+1)*1.5, run_times+1)
+        #if len(FFTamplitude) == len_fft:
+            #time_array = np.linspace(0, (run_times+1)*1.5, run_times+1)
             # array.append(FFTamplitude)
-            plt.figure(1)
-            plt.clf()
-            try:
-                #print('FFTfreq',len(FFTfreq), 'FFTamplitude',len(FFTamplitude))
-                # print('peak_freq',len(peak_freq),'peak_amplitude',len(peak_amplitude),'peak_weighted',len(peak_weighted),peak_weighted)
-                plt.plot(FFTfreq, FFTamplitude)
-                plt.plot(peak_freq, peak_amplitude, 'bo')
-                plt.plot(peak_freq, peak_weighted, 'ro')
-                plt.pause(0.1)
-            except Exception as e:
-                print('plot error:', e)
+            #plt.figure(1)
+            #plt.clf()
+            # try:
+            #     #print('FFTfreq',len(FFTfreq), 'FFTamplitude',len(FFTamplitude))
+            #     # print('peak_freq',len(peak_freq),'peak_amplitude',len(peak_amplitude),'peak_weighted',len(peak_weighted),peak_weighted)
+            #     plt.plot(FFTfreq, FFTamplitude)
+            #     plt.plot(peak_freq, peak_amplitude, 'bo')
+            #     plt.plot(peak_freq, peak_weighted, 'ro')
+            #     plt.pause(0.1)
+            # except Exception as e:
+            #     print('plot error:', e)
 
             # cmap = plt.get_cmap('PiYG')
             # levels = MaxNLocator(nbins=90).tick_values(-35, np.amax(array))
@@ -121,7 +121,8 @@ def main():
             # plt.xlabel("Time (s)")
             # plt.ylabel("Frequency (bpm)")
             # run_times += 1
-        plt.pause(0.9)
+        #plt.pause(0.9)
+        time.sleep(1)
         # plt.plot(FFTfreq, FFTamplitude)
         # plt.plot(peak_freq, peak_amplitude, 'bo')
         # plt.plot(peak_freq, peak_weighted, 'ro')
@@ -140,7 +141,7 @@ def main():
     print("data_acquisition is closed")
 
     print('Shut down succeed')
-    # subprocess.call(["sudo", "shutdown", "-r", "now"])         # Terminal command for shutting down Raspberry Pi
+    subprocess.call(["sudo", "shutdown", "-r", "now"])         # Terminal command for shutting down Raspberry Pi
 
 
 if __name__ == "__main__":      # Required for making main method the used main-method
