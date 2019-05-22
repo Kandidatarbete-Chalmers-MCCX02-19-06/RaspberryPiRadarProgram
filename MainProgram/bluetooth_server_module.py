@@ -89,7 +89,7 @@ class BluetoothServer:
             print(len(self.RR_final_queue))
 
     def connect_device(self):
-        os.system("echo 'power on\nquit' | bluetoothctl")  # Startup for bluetooth on rpi TODO
+        #os.system("echo 'power on\nquit' | bluetoothctl")  # Startup for bluetooth on rpi TODO
         thread_list = []  # List which adds devices
         self.server.listen(7)  # Amount of devices that can simultaniously recive data.
         while self.go:
