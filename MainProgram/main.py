@@ -17,32 +17,6 @@ import signal_processing_module
 
 
 def main():
-    # subprocess.call("./Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c")
-    #subprocess.Popen('cd ..', shell=False)
-    #evk = subprocess.Popen('./evk_service_linux_armv7l_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c', shell=False)
-    #os.system('gnome-terminal -x ./evk_service_linux_armv7l_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c')
-
-    #p = os.popen('sudo /home/pi/Documents ls')
-    # print(p.read()) # fungerar
-
-    #p = os.popen('sudo lxterminal -e ./home/pi/Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c')
-    # print(p.read())
-
-    # process = subprocess.Popen(
-    #     'lxterminal -e "./home/pi/Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c"',
-    #     stdout=subprocess.PIPE,
-    #     stderr=None,
-    #     shell=True
-    # )
-    # subprocess.call(["./home/pi/Documents/evk_service_linux_armv71_xc112/utils/acc_streaming_server_rpi_xc112_r2b_xr112_r2b_a111_r2c"],shell=True)
-
-    # process = subprocess.Popen(
-    #     'lxterminal -e "ls -ls"',
-    #     stdout=subprocess.PIPE,
-    #     stderr=None,
-    #     shell=True
-    # )
-    # print(process.stdout)
 
     # Queues used for accessing data from different threads
     HR_filtered_queue = queue.Queue()
@@ -71,7 +45,7 @@ def main():
     peak_amplitude = [1]
     len_fft = 0
     array = []
-    freq_array = np.linspace(0.8*60, 180, 2*33)
+    #freq_array = np.linspace(0.8*60, 180, 2*33)
     run_times = 0
 
     # BluetoothServer object sent to classes which sends data locally
