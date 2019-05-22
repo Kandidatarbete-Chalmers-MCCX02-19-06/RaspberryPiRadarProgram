@@ -189,17 +189,19 @@ class DataAcquisition(threading.Thread):
 
     def get_data(self):
         # self.client.get_next()
-        info, data = self.client.get_next()  # get the next data from the radar
-        # print('info',info[-1]['sequence_number'],'run_times',self.run_times)
-        if info[-1]['sequence_number'] > self.run_times + 10:
-            # to remove delay if handling the data takes longer time than for the radar to get it
-            print("sequence diff over 10, removing difference",
-                  info[-1]['sequence_number']-self.run_times)
-            for i in range(0, info[-1]['sequence_number']-self.run_times):
-                self.client.get_next()  # getting the data without using it
-            info, data = self.client.get_next()
-            self.run_times = info[-1]['sequence_number']
-
+        try:
+            info, data = self.client.get_next()  # get the next data from the radar
+            # print('info',info[-1]['sequence_number'],'run_times',self.run_times)
+            if info[-1]['sequence_number'] > self.run_times + 10:
+                # to remove delay if handling the data takes longer time than for the radar to get it
+                print("sequence diff over 10, removing difference",
+                      info[-1]['sequence_number']-self.run_times)
+                for i in range(0, info[-1]['sequence_number']-self.run_times):
+                    self.client.get_next()  # getting the data without using it
+                info, data = self.client.get_next()
+                self.run_times = info[-1]['sequence_number']
+        except:
+            data = 0
         return data
 
     def tracking(self, data):
