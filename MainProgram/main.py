@@ -31,7 +31,7 @@ def main():
 
     # List of arguments and data sent between classes
     go = ["True"]       # Used for closing threads before shutdown of Raspberry Pi
-    run_measurement = []        # Determines if data is being sent to devices or not
+    run_measurement = ["Permanent"]        # Determines if data is being sent to devices or not
     sample_freq = 0         # Value is updated in DataAcquisition. Needs to be the same in the whole program
     list_of_variables_for_threads = {"HR_filtered_queue": HR_filtered_queue, "HR_final_queue": HR_final_queue,
                                      "RR_filtered_queue": RR_filtered_queue, "RR_final_queue": RR_final_queue,
@@ -115,7 +115,8 @@ def main():
     print("data_acquisition is closed")
 
     print('Shut down succeed')
-    subprocess.call(["sudo", "shutdown", "-r", "now"])         # Terminal command for shutting down Raspberry Pi
+    #subprocess.call(["sudo", "shutdown", "-r", "now"])         # Terminal command for shutting down Raspberry Pi
+    os.system("sudo shutdown -r now")
 
 
 if __name__ == "__main__":      # Required for making main method the used main-method
