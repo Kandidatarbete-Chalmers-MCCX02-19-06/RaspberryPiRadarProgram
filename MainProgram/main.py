@@ -31,7 +31,7 @@ def main():
 
     # List of arguments and data sent between classes
     go = ["True"]       # Used for closing threads before shutdown of Raspberry Pi
-    run_measurement = ["Permanent"]        # Determines if data is being sent to devices or not
+    run_measurement = []        # Determines if data is being sent to devices or not
     sample_freq = 0         # Value is updated in DataAcquisition. Needs to be the same in the whole program
     list_of_variables_for_threads = {"HR_filtered_queue": HR_filtered_queue, "HR_final_queue": HR_final_queue,
                                      "RR_filtered_queue": RR_filtered_queue, "RR_final_queue": RR_final_queue,
