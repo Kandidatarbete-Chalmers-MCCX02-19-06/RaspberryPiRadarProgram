@@ -17,6 +17,8 @@ import signal_processing_module
 
 
 def main():
+    print("Waiting for streaming server 10 s")
+    time.sleep(10)      # delay start of program to wait for streaming server
 
     # Queues used for accessing data from different threads
     HR_filtered_queue = queue.Queue()
