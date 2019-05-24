@@ -17,6 +17,7 @@ import signal_processing_module
 
 
 def main():
+    time.sleep(1)
     # Queues used for accessing data from different threads
     HR_filtered_queue = queue.Queue()
     HR_final_queue = queue.Queue()
@@ -115,7 +116,7 @@ def main():
 
     print('Shut down succeed')
     #subprocess.call(["sudo", "shutdown", "-r", "now"])         # Terminal command for shutting down Raspberry Pi
-    os.system("sudo shutdown -r now")
+    os.system("sudo shutdown -h now")
 
 
 if __name__ == "__main__":      # Required for making main method the used main-method
