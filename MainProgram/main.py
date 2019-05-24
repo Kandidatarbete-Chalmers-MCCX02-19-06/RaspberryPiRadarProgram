@@ -17,7 +17,7 @@ import signal_processing_module
 
 
 def main():
-    time.sleep(1)
+    time.sleep(5)
     # Queues used for accessing data from different threads
     HR_filtered_queue = queue.Queue()
     HR_final_queue = queue.Queue()
