@@ -1,5 +1,5 @@
 # RaspberryPiRadarProgram
-RaspberryPiRadarProgram is a Python program to run on a Raspberry Pi to measure heart and respiratory rate with a radar. The radar is an A111 from Acconeer, which is a 60 GHz pulsed coherent radar system on a sensor board with an associated connector board (R112 and XC112 from Acconeer). From the radar data, the movements of the chest are tracked to obtain the relative movement. The respiratory rate is gained with a Schmitt trigger, while the heart rate is obtained with an FFT. The Python program also includes a Bluetooth server to connect to up to seven smartphones, to visually display the measured heart and respiratory rate. An Android application is available on Google Play at https://play.google.com/store/apps/details?id=com.chalmers.respiradar, and the associated source code is available on GitHub at https://github.com/Kandidatarbete-Chalmers-MCCX02-19-06/ResPiRadar. The Python program needs acconeer-python-exploration to run properly. Install it with the right Python dependencies from https://github.com/acconeer/acconeer-python-exploration. The Raspberry Pi also needs software for connecting to the radar and is available at https://developer.acconeer.com/.
+RaspberryPiRadarProgram is a Python program to run on a Raspberry Pi to measure heart and respiratory rate with a radar. The radar is an A111 from Acconeer, which is a 60 GHz pulsed coherent radar system on a sensor board with an associated connector board (R112 and XC112 from Acconeer). From the radar data, the movements of the chest are tracked to obtain the relative movement. The respiratory rate is gained with a Schmitt trigger, while the heart rate is obtained with an FFT. The Python program also includes a Bluetooth server to connect to up to seven smartphones, to visually display the measured heart and respiratory rate. An Android application is available on Google Play at https://play.google.com/store/apps/details?id=com.chalmers.respiradar, and the associated source code is available on GitHub at https://github.com/Kandidatarbete-Chalmers-MCCX02-19-06/ResPiRadar. The Python program needs a package called acconeer-python-exploration-tool to run properly. The Exploration Tool is originally from https://github.com/acconeer/acconeer-python-exploration, but newer versions of it does not work in this project. Therefor a copy of the Exploration Tool is provided in this project. The Exploration Tool could either be placed in the Python Package folder or it could be imported locally by inserting the path in the import statements. The Exploration Tool also have some dependencies that have to be installed, see the requirements.txt in the Exploration Tool. The Raspberry Pi also needs software for connecting to the radar and is available at https://developer.acconeer.com/.
 
 ## Source code
 The Python program is located in the MainProgram folder. 
@@ -16,6 +16,12 @@ Following scripts and modules are available:
   Creates a band-pass filter to filter the relative movements.
   
 There is also MATLAB files in the folder MATLAB to signal process radar data afterwards.
+
+## Issues
+- Only the provided copy of the Exploration Tool can be used (it's possible to adjust the `data_acquisition_module.py` to use newer versions of the Exploration Tool from https://github.com/acconeer/acconeer-python-exploration).
+- The exploration Tool must either be placed in the Python package folder or imported by inserting the path in the import statements.
+- There can be problem with the Bluetooth and GPIO using the same UART which means they will block each other. This can be solved by changing Bluetooth to use the mini UART. 
+- This project is supposed to run on a Raspberry Pi. It might be possible to run it on Windows/Mac too, but it's not guaranteed. 
 
 ## Licence
 MIT License
