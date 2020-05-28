@@ -21,7 +21,7 @@ There is also MATLAB files in the folder MATLAB to signal process radar data aft
 - Only the provided copy of the Exploration Tool can be used (it's possible to adjust the `data_acquisition_module.py` to use newer versions of the Exploration Tool from https://github.com/acconeer/acconeer-python-exploration).
 - The exploration Tool must either be placed in the Python package folder or imported by inserting the path in the import statements.
 - There can be problem with the Bluetooth and GPIO using the same UART which means they will block each other. This can be solved by changing Bluetooth to use the mini UART. 
-- This project is supposed to run on a Raspberry Pi. It might be possible to run it on Windows/Mac too, but it's not guaranteed. If the program is used remotly (not on the Raspberry Pi with the radar) the IP adress in the JSONClient (row 47 in `data_acquisition_module.py`) in has to be changed from the local 0.0.0.0 to the actual adress.
+- This project is supposed to run on a Raspberry Pi. It might be possible to run it on Windows/Mac too, but it's not guaranteed. If the program is used remotly (not on the Raspberry Pi with the radar) the IP adress in the JSONClient (row 47 in `data_acquisition_module.py`) in has to be changed from the local adress 0.0.0.0 to the actual adress.
 
 ## Licence
 MIT License
